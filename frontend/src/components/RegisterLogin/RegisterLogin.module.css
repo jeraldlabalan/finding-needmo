@@ -1,0 +1,163 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.container .content {
+  padding: 20px;
+  width: 100%;
+  max-width: 550px;
+  height: auto;
+  justify-self: center;
+  align-self: center;
+}
+
+.content .logo {
+  height: 65px; 
+  width: 100%;
+}
+
+.signup_content .signup_fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.login_content .signup_fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.signup_fields .input_field {
+  height: 40px;
+  border-radius: 50px;
+  padding: 16px;
+  width: 100%;
+  border: none;
+  background-color: #DDDDDD;
+  color: var(--title-color-dark);
+}
+
+.signup_content .title {
+  margin-bottom: 25px;
+}
+
+.login_content .title {
+  margin-bottom: 25px;
+}
+
+.signup_content .signup_radio_container {
+  padding: 0 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.signup_radio_container .signup_radio_buttons_container {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;  
+  width: 100%;
+  margin-top: 10px;
+}
+
+.login_button_container {
+  padding: 0 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.login_button_container .login_button {
+  width: 100%;
+  height: 40px;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: white;
+  border-radius: 50px;
+  border: none;
+  background-color: #235890;
+  text-align: center;
+}
+
+.signup_radio_buttons_container .radio_field {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.radio_field input,
+.radio_field label {
+  margin: 0 5px;
+}
+
+
+.radio_field label {
+  color: var(--title-color-dark);
+  text-transform: capitalize;
+}
+
+.signup_button_container {
+  padding: 0 20px;
+}
+
+.signup_button_container .signup_button {
+  width: 100%;
+  height: 40px;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: white;
+  border-radius: 50px;
+  border: none;
+  background-color: #235890;
+  text-align: center;
+}
+
+.forgot_password_container {
+  padding: 0 20px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.forgot_password {
+  font-size: var(--small-font-size);
+  color: #235890;
+  font-weight: var(--font-semi-bold);
+}
+
+.dont_have_an_account_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 65px;
+}
+
+.dont_have_an_account_container .dont_have_an_account {
+  font-size: var(--small-font-size);
+  color: var(--title-color-dark);
+}
+
+.dont_have_an_account .dont_have_an_account_sign_up {
+  font-weight: var(--font-semi-bold);
+  color: var(--title-color-dark);
+  margin-left: 2px;
+  cursor: pointer;
+}
+
+
