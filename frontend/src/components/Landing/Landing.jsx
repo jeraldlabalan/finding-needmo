@@ -1,5 +1,5 @@
 import React from 'react'
-import styles from './Landing.module.css'
+import styles from '/src/components/Landing/Landing.module.css'
 import logo from '../../assets/logo.png'
 import landing_photo from '../../assets/landing-photo.png'
 import search_icon from '../../assets/search-icon.png'
