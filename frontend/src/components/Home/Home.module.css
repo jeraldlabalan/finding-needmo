@@ -1,0 +1,111 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+}
+.content {
+  padding: 100px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.main_content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.logo_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo_container .logo {
+  width: 250px;
+}
+
+.content_search_bar_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.content_search_bar_container .content_search_bar {
+  width: 100%;
+  width: 650px;
+  height: 50px;
+  border: none;
+  padding: 30px;
+  border-radius: 50px;
+  font-size: var(--h3-font-size);
+  position: relative;
+  background-color: #DDDDDD;
+}
+
+.content_search_bar_container .search_button {
+  position: relative;
+  top: 50%;
+  right: 60px;
+  background-color: aqua;
+}
+
+.search_button .search_icon {
+  position: absolute;
+  transform: translateY(-50%);
+  width: 50px;
+}
+
+.action_buttons_container {
+  width: 650px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.action_buttons_container .action_button {
+  padding: 3px 8px;
+  background-color: white;
+  border: 1px solid #235890;
+  border-radius: 50px;
+  text-transform: capitalize;
+  color: var(--title-color-dark);
+  letter-spacing: 1px;
+  word-spacing: 2px;
+}
+
+.downloaded_contents_button_container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 30px 0;
+}
+
+.download_contents_button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: capitalize;
+  padding: 4px 0;
+  width: 300px;
+  background-color: #235890;
+  color: white;
+  border-radius: 50px;
+  box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.2);
+}
+
+.download_contents_button .download_contents_icon {
+  height: 18px;
+  margin: 0 20px;
+}
+
+
