@@ -8,7 +8,7 @@ function RegisterLogin() {
   const location = useLocation(); // Get current location object
   const [isSignUp, setIsSignUp] = useState(true); // Default form is Sign Up
 
-   // Logic para ma-direct sa sign up or log in form kung galing sa landing page
+   // Logic para ma-direct sa sign up or log in form kapag galing sa landing page
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const formType = queryParams.get('form'); // 'login' or 'register'
@@ -17,7 +17,7 @@ function RegisterLogin() {
   }, [location]);
 
 
-  // Toggle for sign up and log in form
+  // Switching from sign up form to login form vice versa
   const toggleForm = () => {
     setIsSignUp((prev) => !prev);
   };

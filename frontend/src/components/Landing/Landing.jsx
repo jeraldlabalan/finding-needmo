@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '/src/components/Landing/Landing.module.css';
 import logo from '../../assets/logo.png';
@@ -31,6 +31,20 @@ function Landing() {
     }
   };
 
+  const slideRef = useRef(null);
+
+  const slideLeft = () => {
+    if (slideRef.current) {
+      slideRef.current.scrollLeft -= slideRef.current.offsetWidth; // Move left by container width
+    }
+  };
+
+  const slideRight = () => {
+    if (slideRef.current) {
+      slideRef.current.scrollLeft += slideRef.current.offsetWidth; // Move right by container width
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -47,7 +61,7 @@ function Landing() {
         </Link>
           <button
             className={`${styles.button} ${styles.join_now_button}`}
-            onClick={openModal}
+            onClick={openModal} // Open modal on join_now_button click
           >
             join now
           </button>
@@ -129,48 +143,69 @@ function Landing() {
         </div>
       )}
 
-      <div className={styles.footer}>
-        <div className={styles.footer_title_container}>
-          <h3 className={styles.footer_title}>Materials</h3>
+  <div className={styles.footer}>
+      <div className={styles.footer_title_container}>
+        <h3 className={styles.footer_title}>Materials</h3>
+      </div>
+
+      <div className={styles.footer_slide_container}>
+        <div>
+          <button
+            className={`${styles.navigation_button}`}
+            onClick={slideLeft}
+          >
+            <img
+              src={navigation_icon}
+              className={`${styles.navigation_icon}`}
+              alt="Left Navigation"
+            />
+          </button>
         </div>
 
-        <div className={styles.footer_slide_container}>
-          <div>
-            <button className={`${styles.navigation_button}`}>
-              <img
-                src={navigation_icon}
-                className={`${styles.navigation_icon}`}
-                alt="This is the left navigation"
-              />
-            </button>
+        <div className={styles.slide_content_container} ref={slideRef}>
+
+          <div className={styles.slide_content}>
+            <img
+              src={computer_science}
+              className={styles.slide_topic}
+              alt="This is computer science"
+            />
+            <img
+              src={information_technology}
+              className={styles.slide_topic}
+              alt="This is information technology"
+            />
           </div>
 
-          <div className={styles.slide_content_container}>
-            <div className={styles.slide_content}>
-              <img
-                src={computer_science}
-                className={styles.slide_topic}
-                alt="This is computer science"
-              />
-              <img
-                src={information_technology}
-                className={styles.slide_topic}
-                alt="This is information technology"
-              />
-            </div>
+          <div className={styles.slide_content}>
+            <img
+              src={computer_science}
+              className={styles.slide_topic}
+              alt="This is computer science"
+            />
+            <img
+              src={information_technology}
+              className={styles.slide_topic}
+              alt="This is information technology"
+            />
           </div>
 
-          <div>
-            <button className={`${styles.navigation_button}`}>
-              <img
-                src={navigation_icon_right}
-                className={`${styles.navigation_icon}`}
-                alt="This is the right navigation"
-              />
-            </button>
-          </div>
+        </div>
+
+        <div>
+          <button
+            className={`${styles.navigation_button}`}
+            onClick={slideRight}
+          >
+            <img
+              src={navigation_icon_right}
+              className={`${styles.navigation_icon}`}
+              alt="Right Navigation"
+            />
+          </button>
         </div>
       </div>
+    </div>
 
     </div>
   );
