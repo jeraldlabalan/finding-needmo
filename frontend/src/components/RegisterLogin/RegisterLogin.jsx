@@ -1,12 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './RegisterLogin.module.css';
 import logo from '../../assets/logo2.svg';
+import { useLocation } from 'react-router-dom'; // Import useLocation for query params
 
 function RegisterLogin() {
-  
-  // Logic for changing forms
-  const [isSignUp, setIsSignUp] = useState(true);
 
+  const location = useLocation(); // Get current location object
+  const [isSignUp, setIsSignUp] = useState(true); // Default form is Sign Up
+
+   // Logic para ma-direct sa sign up or log in form kung galing sa landing page
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const formType = queryParams.get('form'); // 'login' or 'register'
+    if (formType === 'login') setIsSignUp(false);
+    if (formType === 'register') setIsSignUp(true);
+  }, [location]);
+
+
+  // Toggle for sign up and log in form
   const toggleForm = () => {
     setIsSignUp((prev) => !prev);
   };
@@ -16,7 +27,7 @@ function RegisterLogin() {
       <div className={styles.content}>
         <img src={logo} alt="This is our logo" className={styles.logo} />
 
-        {/* Conditional Rendering for Sign-Up Form */}
+        {/* Sign-Up Form */}
         {isSignUp && (
           <div className={styles.signup_content} id="signup">
             <h2 className={styles.title}>Sign Up</h2>
@@ -43,22 +54,21 @@ function RegisterLogin() {
               </div>
             </div>
             <div className={styles.signup_button_container}>
-              <button type="submit" className={styles.signup_button}>
-                Sign Up
-              </button>
+              <button type="submit" className={styles.signup_button}>Sign Up</button>
             </div>
 
             <div className={styles.dont_have_an_account_container}>
-               <p className={styles.dont_have_an_account}>Already have an account?  
-                  <span className={styles.dont_have_an_account_sign_up} onClick={toggleForm}>
-                   Log In. 
-                 </span>
-               </p>
-             </div>
+              <p className={styles.dont_have_an_account}>
+                Already have an account?  
+                <span className={styles.dont_have_an_account_sign_up} onClick={toggleForm}>
+                  Log In.
+                </span>
+              </p>
+            </div>
           </div>
         )}
 
-        {/* Conditional Rendering for Login Form */}
+        {/* Login Form */}
         {!isSignUp && (
           <div className={styles.login_content} id="login">
             <h2 className={styles.title}>Log In</h2>
@@ -67,9 +77,7 @@ function RegisterLogin() {
               <input type="text" className={styles.input_field} placeholder="Enter password" />
             </div>
             <div className={styles.login_button_container}>
-              <button type="submit" className={styles.login_button}>
-                Log In
-              </button>
+              <button type="submit" className={styles.login_button}>Log In</button>
             </div>
             <div className={styles.forgot_password_container}>
               <a href="#" className={styles.forgot_password}>
@@ -77,12 +85,13 @@ function RegisterLogin() {
               </a>
             </div>
             <div className={styles.dont_have_an_account_container}>
-               <p className={styles.dont_have_an_account}>Don't have an account?  
-                  <span className={styles.dont_have_an_account_sign_up} onClick={toggleForm}>
-                   Sign Up. 
-                 </span>
-               </p>
-             </div>
+              <p className={styles.dont_have_an_account}>
+                Don't have an account?  
+                <span className={styles.dont_have_an_account_sign_up} onClick={toggleForm}>
+                  Sign Up.
+                </span>
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -91,4 +100,3 @@ function RegisterLogin() {
 }
 
 export default RegisterLogin;
-
