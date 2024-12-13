@@ -2,11 +2,59 @@ import React, { useState, useEffect } from 'react';
 import styles from './RegisterLogin.module.css';
 import logo from '../../assets/logo2.svg';
 import { useLocation } from 'react-router-dom'; // Import useLocation for query params
+import axios from 'axios';
 
 function RegisterLogin() {
 
   const location = useLocation(); // Get current location object
   const [isSignUp, setIsSignUp] = useState(true); // Default form is Sign Up
+  const [signUpValues, setSignUpValues] = useState({
+    accRole: '',
+    email: '',
+    password: '',
+    confirmPass: '',
+  });
+
+  const submitEmailPass = () =>{
+    if(signUpValues.password !== signUpValues.confirmPass){
+      alert("Passwords don't match");
+    } else if(!signUpValues.password || signUpValues.password === "" || !signUpValues.confirmPass || signUpValues.confirmPass === "" ){
+      alert("Password is required");
+    } else{
+
+      axios.post('http://localhost:8080/sendPin', {email: signUpValues.email})
+      .then((res) => {
+        if(res.data.message === "Verification code sent. Check your email."){
+          //TODO: TRIGGER FOR EMAIL VERIFICATION POPUP/CONTAINER DITO
+          alert(res.data.message);
+          setSignUpValues({
+            accRole: '',
+            email: '',
+            password: '',
+            confirmPass: '',
+          });
+
+          console.log(signUpValues.accRole);
+        } else{
+          alert(res.data.message);
+          setSignUpValues({
+            accRole: '',
+            email: '',
+            password: '',
+            confirmPass: '',
+          });
+        }
+      })
+      .catch((err) => {
+        alert("Error: " + err);
+      })
+    }
+  }
+
+  const handleSignUpOnChange = (e) => {
+    const { name, value } = e.target;
+    setSignUpValues({...signUpValues, [name]: value})
+  }
 
    // Logic para ma-direct sa sign up or log in form kapag galing sa landing page
   useEffect(() => {
@@ -32,29 +80,29 @@ function RegisterLogin() {
           <div className={styles.signup_content} id="signup">
             <h2 className={styles.title}>Sign Up</h2>
             <div className={styles.signup_fields}>
-              <input type="text" className={styles.input_field} placeholder="Enter your email" />
-              <input type="text" className={styles.input_field} placeholder="Create your password" />
-              <input type="text" className={styles.input_field} placeholder="Confirm your password" />
+              <input type="text" name="email" value={signUpValues.email} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Enter your email" required />
+              <input type="password" name="password" value={signUpValues.password} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Create your password" required />
+              <input type="password" name="confirmPass" value={signUpValues.confirmPass} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Confirm your password" required />
             </div>
             <div className={styles.signup_radio_container}>
               <h4 className={styles.signup_radio_title}>Sign Up as</h4>
               <div className={styles.signup_radio_buttons_container}>
                 <div className={styles.radio_field}>
                   <label>
-                    <input type="radio" name="role" value="student" />
+                    <input type="radio" name="accRole" value="Student" checked={signUpValues.accRole === "Student"} onChange={handleSignUpOnChange} />
                     student
                   </label>
                 </div>
                 <div className={styles.radio_field}>
                   <label>
-                    <input type="radio" name="role" value="instructor" />
+                    <input type="radio" name="accRole" value="Educator" checked={signUpValues.accRole === "Educator"} onChange={handleSignUpOnChange} />
                     educator
                   </label>
                 </div>
               </div>
             </div>
             <div className={styles.signup_button_container}>
-              <button type="submit" className={styles.signup_button}>Sign Up</button>
+              <button type="submit" onClick={submitEmailPass} className={styles.signup_button}>Sign Up</button>
             </div>
 
             <div className={styles.dont_have_an_account_container}>
