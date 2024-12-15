@@ -75,7 +75,7 @@ function Landing() {
             by students<span className={styles.blue}>.</span>
           </h1>
           <p className={styles.content_subtitle}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate quo eligendi fugit nihil quae voluptatum sit commodi, fugiat omnis? Autem ea non aut unde quos dolor
+            Discover new knowledge, uncover insights and share educational contents that matter the most. <strong>Finding Needmo</strong> is an educational content repository and search engine <strong>for students, by students</strong>. 
           </p>
           <div className={styles.content_search_bar_container}>
             <input
