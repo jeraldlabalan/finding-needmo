@@ -81,7 +81,7 @@ function Landing() {
             <input
               type="text"
               className={styles.content_search_bar}
-              placeholder="Search"
+              placeholder="Start Searching..."
               onKeyDown={handleKeyPress} 
             />
             <button
