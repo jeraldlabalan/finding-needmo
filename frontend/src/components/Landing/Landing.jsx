@@ -1,16 +1,13 @@
-import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import styles from '/src/components/Landing/Landing.module.css';
-import logo from '../../assets/logo.png';
-import landing_photo from '../../assets/landing-photo.png';
-import search_icon from '../../assets/search-icon.png';
-import navigation_icon from '../../assets/navigation-icon.png';
-import navigation_icon_right from '../../assets/navigation-icon-right.png';
-import computer_science from '../../assets/computer-science.png';
-import information_technology from '../../assets/information-technology.png';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import styles from "/src/components/Landing/Landing.module.css";
+import logo from "../../assets/logo.png";
+import landing_photo from "../../assets/landing-photo.png";
+import search_icon from "../../assets/search-icon.png";
+import computer_science from "../../assets/computer-science.png";
+import information_technology from "../../assets/information-technology.png";
 
 function Landing() {
-  
   // Modal logic
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -26,24 +23,112 @@ function Landing() {
 
   // Press event, kapag pinindot yung enter sa keyboard, mati-trigger yung modal
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       openModal();
     }
   };
 
-  const slideRef = useRef(null);
+  const [searchInput, setSearchInput] = useState("");
 
-  const slideLeft = () => {
-    if (slideRef.current) {
-      slideRef.current.scrollLeft -= slideRef.current.offsetWidth; // Move left by container width
-    }
+  // For typing animation of the placeholder of search bar. Naka-loop.
+  const fullText = "Start Searching...";
+  const [placeholderText, setPlaceholderText] = useState("");
+  const [isCursorVisible, setIsCursorVisible] = useState(true);
+  const [typingIndex, setTypingIndex] = useState(0);
+  const [isErasing, setIsErasing] = useState(false);
+  const [isTypingActive, setIsTypingActive] = useState(true); // For tracking if typing animation is active
+  const [isInputFocused, setIsInputFocused] = useState(false); // For tracking focus state of the input field
+
+  useEffect(() => {
+    if (!isTypingActive || isInputFocused) return;
+
+    const typingSpeed = 200;
+    const erasingSpeed = 200;
+
+    const typingInterval = setInterval(() => {
+      if (typingIndex < fullText.length && !isErasing) {
+        setPlaceholderText((prev) => prev + fullText[typingIndex]);
+        setTypingIndex((prev) => prev + 1);
+      }
+    }, typingSpeed);
+
+    const erasingInterval = setInterval(() => {
+      if (typingIndex === fullText.length && !isErasing) {
+        setIsErasing(true);
+      }
+      if (isErasing && typingIndex > 0) {
+        setPlaceholderText((prev) => prev.slice(0, -1));
+        setTypingIndex((prev) => prev - 1);
+      } else if (isErasing && typingIndex === 0) {
+        setIsErasing(false);
+      }
+    }, erasingSpeed);
+
+    return () => {
+      clearInterval(typingInterval);
+      clearInterval(erasingInterval);
+    };
+  }, [typingIndex, isErasing, isTypingActive, isInputFocused]);
+
+  // For cursor visibility
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      if (!isInputFocused) {
+        setIsCursorVisible((prev) => !prev);
+      }
+    }, 500);
+    return () => clearInterval(cursorInterval);
+  }, [isInputFocused]);
+
+  const handleFocus = () => {
+    setIsInputFocused(true);
+    setIsTypingActive(false);
+    setIsCursorVisible(false);
+    setPlaceholderText("");
   };
 
-  const slideRight = () => {
-    if (slideRef.current) {
-      slideRef.current.scrollLeft += slideRef.current.offsetWidth; // Move right by container width
-    }
+  const handleBlur = () => {
+    setIsInputFocused(false);
+    setIsTypingActive(true);
+    setIsCursorVisible(true);
+    setTypingIndex(0);
+    setPlaceholderText("");
+    setSearchInput("");
   };
+
+  const handleSearchButtonClick = () => {
+    openModal();
+  };
+
+  const resetTypingAnimation = () => {
+    setTypingIndex(0);
+    setPlaceholderText("");
+    setIsTypingActive(true);
+  };
+
+  const handleCancel = () => {
+    if (searchInput.trim() !== "") {
+      resetTypingAnimation();
+      setSearchInput("");
+    }
+    closeModal();
+  };
+
+  const handleModalButtonClick = (action) => {
+    setSearchInput("");
+    resetTypingAnimation();
+    if (action === "close") closeModal();
+  };
+
+  // Para lang ma-make sure na may animations a slide content container kapag nag-load na page
+  useEffect(() => {
+    const container = document.querySelector(
+      `.${styles.slide_content_container}`
+    );
+    if (container) {
+      container.classList.add(styles.animate);
+    }
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -52,13 +137,11 @@ function Landing() {
           <img src={logo} className={styles.logo} />
         </div>
         <div className={styles.login_join_now_div}>
-        <Link to="/registerlogin?form=login">
-          <button
-            className={`${styles.button} ${styles.login_button}`}
-          >
-            log in
-          </button>
-        </Link>
+          <Link to="/registerlogin?form=login">
+            <button className={`${styles.button} ${styles.login_button}`}>
+              log in
+            </button>
+          </Link>
           <button
             className={`${styles.button} ${styles.join_now_button}`}
             onClick={openModal} // Open modal on join_now_button click
@@ -75,18 +158,25 @@ function Landing() {
             by students<span className={styles.blue}>.</span>
           </h1>
           <p className={styles.content_subtitle}>
-            Discover new knowledge, uncover insights and share educational contents that matter the most. <strong>Finding Needmo</strong> is an educational content repository and search engine <strong>for students, by students</strong>. 
+            Discover new knowledge, uncover insights and share educational
+            contents that matter the most. <strong>Finding Needmo</strong> is an
+            educational content repository and search engine{" "}
+            <strong>for students, by students</strong>.
           </p>
           <div className={styles.content_search_bar_container}>
             <input
               type="text"
               className={styles.content_search_bar}
-              placeholder="Start Searching..."
-              onKeyDown={handleKeyPress} 
+              placeholder={placeholderText + (isCursorVisible ? "|" : "")}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={handleKeyPress}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
             />
             <button
               className={styles.search_button}
-              onClick={openModal} 
+              onClick={handleSearchButtonClick}
             >
               <img
                 src={search_icon}
@@ -113,29 +203,40 @@ function Landing() {
             className={styles.modal_content}
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
           >
-
-          
-            <h2 className={styles.modal_title}>
-              join us
-            </h2>
+            <h2 className={styles.modal_title}>join us</h2>
             <p className={styles.modal_subtitle}>
-              Create an account to unlock features, stay updated and connect with students and educators around the world.
+              Create an account to unlock features, stay updated and connect
+              with students and educators around the world.
             </p>
 
             <div className={styles.modal_buttons_container}>
+              <Link
+                to="/registerlogin?form=login"
+                className={`${styles.login_button} ${styles.modal_button}`}
+              >
+                <button
+                  className={`${styles.login_button} ${styles.modal_button}`}
+                  onClick={() => handleModalButtonClick("login")}
+                >
+                  log in
+                </button>
+              </Link>
 
-            <Link to="/registerlogin?form=login" className={`${styles.login_button} ${styles.modal_button}`} >
-              <button className={`${styles.login_button} ${styles.modal_button}`}>
-                log in
-              </button>
-            </Link>
-
-            <Link to="/registerlogin?form=form" className={`${styles.login_button} ${styles.modal_button}`}>
-              <button className={`${styles.signup_button} ${styles.modal_button}`}>
-                sign up
-              </button>
-            </Link>
-              <button className={`${styles.close_button} ${styles.modal_button}`} onClick={closeModal}>
+              <Link
+                to="/registerlogin?form=form"
+                className={`${styles.login_button} ${styles.modal_button}`}
+              >
+                <button
+                  className={`${styles.signup_button} ${styles.modal_button}`}
+                  onClick={() => handleModalButtonClick("signup")}
+                >
+                  sign up
+                </button>
+              </Link>
+              <button
+                className={`${styles.close_button} ${styles.modal_button}`}
+                onClick={handleCancel}
+              >
                 cancel
               </button>
             </div>
@@ -143,70 +244,41 @@ function Landing() {
         </div>
       )}
 
-  <div className={styles.footer}>
-      <div className={styles.footer_title_container}>
-        <h3 className={styles.footer_title}>Materials</h3>
-      </div>
-
-      <div className={styles.footer_slide_container}>
-        <div>
-          <button
-            className={`${styles.navigation_button}`}
-            onClick={slideLeft}
-          >
-            <img
-              src={navigation_icon}
-              className={`${styles.navigation_icon}`}
-              alt="Left Navigation"
-            />
-          </button>
+      <div className={styles.footer}>
+        <div className={styles.footer_title_container}>
+          <h3 className={styles.footer_title}>Materials</h3>
         </div>
 
-        <div className={styles.slide_content_container} ref={slideRef}>
+        <div className={styles.footer_slide_container}>
+          <div className={styles.slide_content_container}>
+            <div className={styles.slide_content}>
+              <img
+                src={computer_science}
+                className={styles.slide_topic}
+                alt="This is computer science"
+              />
+              <img
+                src={information_technology}
+                className={styles.slide_topic}
+                alt="This is information technology"
+              />
+            </div>
 
-          <div className={styles.slide_content}>
-            <img
-              src={computer_science}
-              className={styles.slide_topic}
-              alt="This is computer science"
-            />
-            <img
-              src={information_technology}
-              className={styles.slide_topic}
-              alt="This is information technology"
-            />
+            <div className={styles.slide_content}>
+              <img
+                src={computer_science}
+                className={styles.slide_topic}
+                alt="This is computer science"
+              />
+              <img
+                src={information_technology}
+                className={styles.slide_topic}
+                alt="This is information technology"
+              />
+            </div>
           </div>
-
-          <div className={styles.slide_content}>
-            <img
-              src={computer_science}
-              className={styles.slide_topic}
-              alt="This is computer science"
-            />
-            <img
-              src={information_technology}
-              className={styles.slide_topic}
-              alt="This is information technology"
-            />
-          </div>
-
-        </div>
-
-        <div>
-          <button
-            className={`${styles.navigation_button}`}
-            onClick={slideRight}
-          >
-            <img
-              src={navigation_icon_right}
-              className={`${styles.navigation_icon}`}
-              alt="Right Navigation"
-            />
-          </button>
         </div>
       </div>
-    </div>
-
     </div>
   );
 }
