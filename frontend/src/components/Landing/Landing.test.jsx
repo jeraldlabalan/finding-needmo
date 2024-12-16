@@ -182,7 +182,7 @@ describe("Search Bar", () => {
   });
 
   test("Typing animation works correctly", async () => { //NAGLOLOKO 'TONG HAYOP NA 'TO. MINSAN PASSED, MINSAN FAILED.
-    jest.setTimeout(10000); // O 'DI KAYA RITO BAGUHIN MO
+    jest.setTimeout(5000); // O 'DI KAYA RITO BAGUHIN MO
     render(
       <Router>
         <Landing />
@@ -195,7 +195,7 @@ describe("Search Bar", () => {
       () => {
         expect(inputElement.placeholder).toBe("Start Searching...");
       },
-      { timeout: 20000 } //ADJUST MO HERE KAPAG NAG-FAIL 'TO
+      { timeout: 5000 } //ADJUST MO HERE KAPAG NAG-FAIL 'TO
     );
   });
 
