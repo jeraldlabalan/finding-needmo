@@ -190,6 +190,9 @@
 .slide_content_container {
   display: flex;
   width: 100%;
+}
+
+.animate {
   animation: scrollSlide 5s linear infinite;
   will-change: transform;
   transform: translateX(0);

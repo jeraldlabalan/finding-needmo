@@ -12,9 +12,7 @@ module.exports = {
     "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/fileMock.js",
   },
 
-  transformIgnorePatterns: [
-    "/node_modules/(?!your-dependency-to-transform)/", // If you're using a module that needs transpiling
-  ],
+  transformIgnorePatterns: ["/node_modules/(?!your-dependency-to-transform)/"],
 
   transform: {
     "^.+\\.[t|j]sx?$": "babel-jest",

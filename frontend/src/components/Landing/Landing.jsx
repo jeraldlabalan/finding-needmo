@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styles from "/src/components/Landing/Landing.module.css";
-import logo from "../../assets/logo.png";
-import landing_photo from "../../assets/landing-photo.png";
-import search_icon from "../../assets/search-icon.png";
-import computer_science from "../../assets/computer-science.png";
-import information_technology from "../../assets/information-technology.png";
+import logo from "/src/assets/logo.png";
+import landing_photo from "/src/assets/landing-photo.png";
+import search_icon from "/src/assets/search-icon.png";
+import computer_science from "/src/assets/computer-science.png";
+import information_technology from "/src/assets/information-technology.png";
 
 function Landing() {
   // Modal logic
@@ -94,6 +94,7 @@ function Landing() {
     setTypingIndex(0);
     setPlaceholderText("");
     setSearchInput("");
+    setPlaceholderText("");
   };
 
   const handleSearchButtonClick = () => {
@@ -110,6 +111,8 @@ function Landing() {
     if (searchInput.trim() !== "") {
       resetTypingAnimation();
       setSearchInput("");
+      setPlaceholderText("");
+      setIsCursorVisible(false);
     }
     closeModal();
   };
@@ -120,7 +123,7 @@ function Landing() {
     if (action === "close") closeModal();
   };
 
-  // Para lang ma-make sure na may animations a slide content container kapag nag-load na page
+  // Para lang ma-make sure na may animations sa slide content container kapag nag-load na page
   useEffect(() => {
     const container = document.querySelector(
       `.${styles.slide_content_container}`
@@ -134,7 +137,7 @@ function Landing() {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.logo_div}>
-          <img src={logo} className={styles.logo} />
+          <img src={logo} className={styles.logo} alt="logo" />
         </div>
         <div className={styles.login_join_now_div}>
           <Link to="/registerlogin?form=login">
@@ -163,8 +166,12 @@ function Landing() {
             educational content repository and search engine{" "}
             <strong>for students, by students</strong>.
           </p>
-          <div className={styles.content_search_bar_container}>
+          <div
+            data-testid="search-container"
+            className={styles.content_search_bar_container}
+          >
             <input
+              data-testid="search-input"
               type="text"
               className={styles.content_search_bar}
               placeholder={placeholderText + (isCursorVisible ? "|" : "")}
@@ -198,12 +205,21 @@ function Landing() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className={styles.modal_overlay} onClick={closeModal}>
+        <div
+          className={styles.modal_overlay}
+          onClick={closeModal}
+          data-testid="modal"
+          role="dialog"
+          aria-labelledby="modal-title"
+          aria-hidden={!isModalOpen}
+        >
           <div
             className={styles.modal_content}
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
           >
-            <h2 className={styles.modal_title}>join us</h2>
+            <h2 id="modal-title" className={styles.modal_title}>
+              join us
+            </h2>
             <p className={styles.modal_subtitle}>
               Create an account to unlock features, stay updated and connect
               with students and educators around the world.
@@ -215,6 +231,7 @@ function Landing() {
                 className={`${styles.login_button} ${styles.modal_button}`}
               >
                 <button
+                  data-testid="login-button"
                   className={`${styles.login_button} ${styles.modal_button}`}
                   onClick={() => handleModalButtonClick("login")}
                 >
@@ -244,14 +261,17 @@ function Landing() {
         </div>
       )}
 
-      <div className={styles.footer}>
+      <div className={styles.footer} data-testid="footer">
         <div className={styles.footer_title_container}>
           <h3 className={styles.footer_title}>Materials</h3>
         </div>
 
         <div className={styles.footer_slide_container}>
-          <div className={styles.slide_content_container}>
-            <div className={styles.slide_content}>
+          <div
+            className={`${styles.slide_content_container} ${styles.animate}`}
+            data-testid="slide-content-container"
+          >
+            <div data-testid="slide-content" className={styles.slide_content}>
               <img
                 src={computer_science}
                 className={styles.slide_topic}
@@ -264,7 +284,7 @@ function Landing() {
               />
             </div>
 
-            <div className={styles.slide_content}>
+            <div data-testid="slide-content" className={styles.slide_content}>
               <img
                 src={computer_science}
                 className={styles.slide_topic}
