@@ -1,19 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import styles from './RegisterLogin.module.css';
 import logo from '../../assets/logo2.svg';
-import { useLocation } from 'react-router-dom'; // Import useLocation for query params
+import email_icon from '../../assets/email.png'
+import verified_icon from '../../assets/verified_icon.png'
+import { useLocation, useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
 
 function RegisterLogin() {
 
   const location = useLocation(); // Get current location object
+
   const [isSignUp, setIsSignUp] = useState(true); // Default form is Sign Up
+
   const [signUpValues, setSignUpValues] = useState({
     accRole: '',
     email: '',
     password: '',
     confirmPass: '',
   });
+
+
+  // Verification Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1); // Step 1: Enter PIN, Step 2: Success message
+  const [pin, setPin] = useState(""); // State to store the entered pin
+  const navigate = useNavigate();
+
+
+  // Function to open the modal
+  const openModal = () => {
+    setIsModalOpen(true);
+    setCurrentStep(1); // Reset to step 1 when modal opens
+  };
+
+
+  // Function to close the modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleGoToLogin = () => {
+    closeModal(); // Close the modal
+    navigate('/registerlogin?form=login'); // Redirect to login form
+  };
+
+
+  // Handle PIN submission
+  const handleVerifyPin = () => {
+
+    // Logic to check if the entered PIN is correct
+    if (pin === "123456") {  // Replace with your actual verification logic
+      setCurrentStep(2); // Move to step 2 (success)
+    } else {
+      alert("Incorrect PIN, please try again.");
+    }
+  };
 
   const submitEmailPass = () =>{
     if(signUpValues.password !== signUpValues.confirmPass){
@@ -25,7 +66,9 @@ function RegisterLogin() {
       axios.post('http://localhost:8080/sendPin', {email: signUpValues.email})
       .then((res) => {
         if(res.data.message === "Verification code sent. Check your email."){
-          //TODO: TRIGGER FOR EMAIL VERIFICATION POPUP/CONTAINER DITO
+
+          openModal(); // Triggers Verification Modal
+
           alert(res.data.message);
           setSignUpValues({
             accRole: '',
@@ -80,7 +123,8 @@ function RegisterLogin() {
           <div className={styles.signup_content} id="signup">
             <h2 className={styles.title}>Sign Up</h2>
             <div className={styles.signup_fields}>
-              <input type="text" name="email" value={signUpValues.email} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Enter your email" required />
+              <input type="text" 
+              name="email" value={signUpValues.email} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Enter your email" required />
               <input type="password" name="password" value={signUpValues.password} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Create your password" required />
               <input type="password" name="confirmPass" value={signUpValues.confirmPass} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Confirm your password" required />
             </div>
@@ -102,7 +146,7 @@ function RegisterLogin() {
               </div>
             </div>
             <div className={styles.signup_button_container}>
-              <button type="submit" onClick={submitEmailPass} className={styles.signup_button}>Sign Up</button>
+              <button type="submit"  onClick={submitEmailPass} className={styles.signup_button}>Sign Up</button>
             </div>
 
             <div className={styles.dont_have_an_account_container}>
@@ -142,6 +186,73 @@ function RegisterLogin() {
             </div>
           </div>
         )}
+
+        {/* Modal */}
+        {isModalOpen && (
+        <div className={styles.verify_modal_overlay} onClick={closeModal}>
+          <div className={styles.modal_content} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.close_button_container}>
+              <button className={styles.close_button} onClick={closeModal}>
+                <i className="fa-solid fa-x"></i>
+              </button>
+            </div>
+            {currentStep === 1 && (
+              <>
+              <div className={styles.modal_title_container}>
+              <img src={email_icon} className={styles.email_icon} alt="Email icon" />
+              <h2 className={styles.modal_title}>Verify Your Email Address</h2>
+              </div>
+
+          
+                <div className={styles.modal_subtitle_container}>
+                  <p className={styles.modal_subtitle}>
+                    A verification code has been sent to
+                  </p>
+                  <p className={styles.modal_subtitle_email}>elainequisquino@gmail.com</p>
+                </div>
+                <div className={styles.modal_instruction_container}>
+                  <p className={styles.modal_instruction}>
+                    Please check your inbox and enter the verification code. The code will expire in
+                    <span className={styles.modal_instruction_time}>5:00</span>
+                  </p>
+                </div>
+                <div className={styles.modal_input_container}>
+                  <h3 className={styles.input_title}>Enter PIN</h3>
+                  <input
+                    type="text"
+                    className={styles.verification_input_field}
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value)} // Update pin state
+                  />
+                </div>
+                <div className={styles.modal_verify_button}>
+                  <button type="submit" className={styles.verify_button} onClick={handleVerifyPin}>Verify</button>
+                </div>
+              </>
+            )}
+
+            {currentStep === 2 && (
+              <div className={styles.success_message_container}>
+                <div className={styles.modal_title_container}>
+                  <img src={verified_icon} className={styles.verified_icon} alt="Email icon" />
+                  <h2 className={styles.modal_title}>ACCOUNT VERIFIED SUCCESSFULLY</h2>
+                </div>
+
+                <div className={styles.modal_subtitle_container}>
+                  <p className={styles.modal_subtitle}>
+                    Your email has been successfully verified!
+                  </p>
+                </div>
+                
+                <button className={styles.back_to_login} onClick={handleGoToLogin}>
+                  Go To Login
+                </button>
+              
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );

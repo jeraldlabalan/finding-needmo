@@ -46,6 +46,16 @@
   color: var(--title-color-dark);
 }
 
+.verification_input_field {
+  height: 40px;
+  border-radius: 50px;
+  padding: 16px;
+  width: 50%;
+  border: none;
+  background-color: #DDDDDD;
+  color: var(--title-color-dark);
+}
+
 .signup_content .title {
   margin-bottom: 25px;
 }
@@ -116,7 +126,9 @@
   padding: 0 20px;
 }
 
-.signup_button_container .signup_button {
+.signup_button_container .signup_button,
+.verify_button,
+.back_to_login {
   width: 100%;
   height: 40px;
   text-transform: uppercase;
@@ -160,4 +172,123 @@
   cursor: pointer;
 }
 
+/* Modal */
+
+.verify_modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+
+
+.verify_modal_overlay .modal_content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 30%;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.verify_modal_overlay .success_message_container {
+  gap: 20px;
+}
+
+
+
+.modal_content .close_button_container {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  justify-items: flex-end;
+  width: 100%;
+  margin-bottom: -20px;
+}
+
+.close_button_container .close_button {
+  background: none;
+  align-self: flex-end;
+  justify-self: flex-end;
+  font-size: 10px;
+  font-weight: var(--font-semi-bold);
+}
+
+.modal_content .modal_title_container {
+}
+
+.modal_title_container .email_icon {
+  width: 40px;
+}
+
+.modal_title_container .modal_title {
+  text-transform: capitalize;
+}
+
+.modal_content .modal_subtitle_container {
+
+}
+
+
+.modal_subtitle_container .modal_subtitle::first-letter {
+  text-transform: uppercase;
+}
+
+.modal_subtitle_container .modal_subtitle_email,
+.modal_instruction_container .modal_instruction_time {
+  font-weight: var(--font-semi-bold);
+  color: var(--title-color-dark);
+}
+
+.modal_content .modal_instruction_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal_instruction_container .modal_instruction {
+  font-size: var(--tiny-font-size);
+}
+
+.modal_instruction_container .modal_instruction_time {
+  margin-left: 5px;
+}
+
+.modal_content .modal_input_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 8px;
+  width: 100%;
+}
+
+.modal_input_container .input_title {
+  text-transform: capitalize;
+}
+
+.modal_content .modal_verify_button {
+  width: 100%;
+}
+
+
+.verified_icon {
+  width: 40px;
+}
+
+.back_to_login {
+  margin-top: 50px;
+}
 
