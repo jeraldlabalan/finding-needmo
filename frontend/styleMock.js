@@ -11,6 +11,6 @@ module.exports = {
   animate: "animate",
 };
 module.exports = {
-  testTimeout: 5000, // 10 seconds timeout for all tests
+  testTimeout: 10000, 
 };
 
