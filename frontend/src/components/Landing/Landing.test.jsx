@@ -181,8 +181,8 @@ describe("Search Bar", () => {
     expect(screen.getByText(/join us/i)).toBeInTheDocument();
   });
 
-  test("Typing animation works correctly", async () => {
-    jest.setTimeout(10000);
+  test("Typing animation works correctly", async () => { //NAGLOLOKO 'TONG HAYOP NA 'TO. MINSAN PASSED, MINSAN FAILED.
+    jest.setTimeout(1000);
     render(
       <Router>
         <Landing />
