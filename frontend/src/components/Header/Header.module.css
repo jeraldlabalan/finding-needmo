@@ -6,6 +6,17 @@
   justify-content: flex-end;
   height: 100px;
   background-color: transparent;
+  gap: 60px;
+}
+
+.profile_menu_container {
+  position: relative; /* Anchor point for dropdown */
+  width: 100%;
+  padding: 10px 0;
+  display: flex;
+  justify-content: flex-end;
+  background-color: transparent;
+  gap: 60px;
 }
 
 .profile_menu {
@@ -18,13 +29,19 @@
   position: relative;
   box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.2);
   margin-top: auto;
+  background-color: none;
 }
+
+
 
 .profile_menu .default_profile {
   width: inherit;
   border-radius: 50%;
+  position: relative;
 
 }
+
+
 
 .profile_menu:hover {
   background-color: #f0f0f0;
@@ -33,7 +50,7 @@
 .dropdown_menu {
   position: absolute;
   top: 100%; /* Para palaging sa taas ng header nag-a-appear */
-  right: 100; /* Align to the right side */
+  right: 0; /* Align to the right side */
   background-color: #DDDDDD;
   border: 1px solid #ddd;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -44,6 +61,7 @@
   border-radius: 1.65rem;
   padding: 10px 2px;
 }
+
 
 .dropdown_menu ul {
   list-style: none;
@@ -71,12 +89,6 @@
   margin-top: 0;
 }
 
-.dropdown_menu li:last-child {
-  border-bottom: none;
-  width: 50%;
-  justify-self: center;
-}
-
 .dropdown_menu li:hover {
   background-color: #F5F5F5 ;
 }
@@ -93,4 +105,23 @@ li .dropdown_menu_logo {
   color: #333; 
   padding: 0 10px; 
   height: 25px;
+}
+
+
+.notification_menu {
+  margin-top: auto;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  background-color: transparent;
+}
+
+.notification_icon {
+  width: inherit;
+  background-color: none;
+}
+
+.notification_dropdown_menu li {
+  height: 60px;
+  padding: 0 10px;
 }

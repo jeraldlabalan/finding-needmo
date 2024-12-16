@@ -3,7 +3,7 @@ import styles from './Home.module.css'
 import Header from '../Header/Header'
 import home_logo from '../../assets/logo2.svg'
 import search_icon from '../../assets/search-icon.png'
-import download_icon from '../../assets/download_button.jpg'
+import download_icon from '../../assets/download_icon.png'
 
 function Home() {
   return (
