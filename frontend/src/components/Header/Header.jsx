@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom";
 import styles from "./Header.module.css";
 import notification from "../../assets/notification_icon.png";
@@ -8,14 +8,41 @@ import account_settings from "../../assets/account-settings.jpg";
 import logout from "../../assets/logout.jpg";
 import search_history from "../../assets/search-history.jpg";
 import manage_content from "../../assets/manage-content.jpg";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import logoutFunction from '../logoutFunction.jsx';
 
 function Header() {
   const location = useLocation(); // For detecting active path
   const [activeDropdown, setActiveDropdown] = useState(null); // Manages active dropdown state
+  const [userEmail, setUserEmail] = useState("");
+
+  //Reuse in other pages that requires logging in
+  const navigate = useNavigate();
+  axios.defaults.withCredentials = true;
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080")
+      .then((res) => {
+        if (res.data.valid) {
+          setUserEmail(res.data.email);
+        } else {
+          navigate("/registerlogin");
+        }
+      })
+      .catch((err) => {
+        console.error("Error validating user session:", err);
+      });
+  }, []);
+  //Reuse in other pages that requires logging in
 
   const toggleDropdown = (menu) => {
     setActiveDropdown((prev) => (prev === menu ? null : menu));
   };
+
+  const handleLogout = () => {
+    logoutFunction(navigate);
+};
 
   return (
     <div className={styles.header_container}>
@@ -112,7 +139,7 @@ function Header() {
               </Link>
             </li>
             <li>
-              <Link to="/logout">
+              <Link onClick={handleLogout}>
                 <img
                   src={logout}
                   className={styles.dropdown_menu_logo}

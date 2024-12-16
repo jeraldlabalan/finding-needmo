@@ -1,11 +1,34 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import styles from './Home.module.css'
 import Header from '../Header/Header'
 import home_logo from '../../assets/logo2.svg'
 import search_icon from '../../assets/search-icon.png'
 import download_icon from '../../assets/download_icon.png'
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Home() {
+  const [userEmail, setUserEmail] = useState("");
+
+  //Reuse in other pages that requires logging in
+  const navigate = useNavigate();
+  axios.defaults.withCredentials = true;
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080")
+      .then((res) => {
+        if (res.data.valid) {
+          setUserEmail(res.data.email);
+        } else {
+          navigate("/registerlogin");
+        }
+      })
+      .catch((err) => {
+        console.error("Error validating user session:", err);
+      });
+  }, []);
+  //Reuse in other pages that requires logging in
+
   return (
     <div className={styles.container}>
       <div className={styles.header_container}>

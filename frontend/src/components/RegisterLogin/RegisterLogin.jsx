@@ -3,7 +3,7 @@ import styles from './RegisterLogin.module.css';
 import logo from '../../assets/logo2.svg';
 import email_icon from '../../assets/email.png'
 import verified_icon from '../../assets/verified_icon.png'
-import { useLocation, useNavigate } from 'react-router-dom'; 
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function RegisterLogin() {
@@ -17,13 +17,18 @@ function RegisterLogin() {
     email: '',
     password: '',
     confirmPass: '',
+    pin: '',
+  });
+
+  const [loginValues, setLoginValues] = useState({
+    loginEmail: '',
+    loginPass: '',
   });
 
 
   // Verification Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1); // Step 1: Enter PIN, Step 2: Success message
-  const [pin, setPin] = useState(""); // State to store the entered pin
   const navigate = useNavigate();
 
 
@@ -45,61 +50,142 @@ function RegisterLogin() {
   };
 
 
-  // Handle PIN submission
-  const handleVerifyPin = () => {
+  axios.defaults.withCredentials = true;
 
-    // Logic to check if the entered PIN is correct
-    if (pin === "123456") {  // Replace with your actual verification logic
-      setCurrentStep(2); // Move to step 2 (success)
-    } else {
-      alert("Incorrect PIN, please try again.");
-    }
-  };
+  useEffect(() => {
+    axios.get('http://localhost:8080')
+      .then(res => {
+        if (res.data.valid) {
+          if (res.data.role === 'Student') {
+            navigate('/home');
+          } else if (res.data.role === 'Educator') {
+            navigate('/home');
+          }
+        } else {
+          navigate('/registerlogin?form=login');
+        }
+      })
+      .catch(err => alert("Error: " + err))
+  }, []);
 
-  const submitEmailPass = () =>{
-    if(signUpValues.password !== signUpValues.confirmPass){
-      alert("Passwords don't match");
-    } else if(!signUpValues.password || signUpValues.password === "" || !signUpValues.confirmPass || signUpValues.confirmPass === "" ){
-      alert("Password is required");
-    } else{
+  const submitLogin = (e) => {
+    e.preventDefault();
 
-      axios.post('http://localhost:8080/sendPin', {email: signUpValues.email})
+    axios.post('http://localhost:8080/login', loginValues)
       .then((res) => {
-        if(res.data.message === "Verification code sent. Check your email."){
+        if (res.data.isLoggedIn && res.data.status === 'Active') {
+          const role = res.data.role;
 
-          openModal(); // Triggers Verification Modal
-
+          if (role === 'Student') {
+            navigate('/home');
+          } else if (role === 'Educator') {
+            navigate('/home');
+          } else {
+            navigate('/registerlogin?form=login'); // Fallback route if role is not recognized
+          }
+        } else if (res.data.isLoggedIn === false) {
           alert(res.data.message);
-          setSignUpValues({
-            accRole: '',
-            email: '',
-            password: '',
-            confirmPass: '',
-          });
-
-          console.log(signUpValues.accRole);
-        } else{
-          alert(res.data.message);
-          setSignUpValues({
-            accRole: '',
-            email: '',
-            password: '',
-            confirmPass: '',
-          });
+          res.data.isLoggedIn = false;
         }
       })
       .catch((err) => {
-        alert("Error: " + err);
-      })
+        alert("Error logging in: " + err);
+        console.error(err);
+      });
+  };
+
+
+  // Handle PIN submission
+  const handleVerifyPin = async () => {
+    const pin = signUpValues.pin.trim();
+    if (!pin || pin.length !== 6) return alert("Please enter the correct 6-digit PIN.");
+
+    try {
+      const response = await axios.post('http://localhost:8080/verifyPin', signUpValues);
+
+      if (response.data.message === "Verified") {
+        const response1 = await axios.post('http://localhost:8080/submitSignUp', signUpValues);
+        if (response1.data.message === "Sign up credentials saved successfully") {
+          closeModal();
+          navigate('/registerlogin?form=login');
+          setIsModalOpen(true);
+          setCurrentStep(2);
+        } else {
+          alert(response1.data.message);
+        }
+      } else {
+        alert(response.data.message);
+      }
+    } catch (err) {
+      alert(`Error: ${err.response?.data?.message || err.message}`);
+    }
+  };
+
+  const submitEmailPass = () => {
+    if (signUpValues.password !== signUpValues.confirmPass) {
+      alert("Passwords don't match");
+    } else if (!signUpValues.password || signUpValues.password === "" || !signUpValues.confirmPass || signUpValues.confirmPass === "") {
+      alert("Password is required");
+    } else {
+      if (signUpValues.accRole === "Educator") {
+        const email = signUpValues.email.trim();
+
+        // Regex for dcs-prefixed email format
+        const validEmailRegex = /^dcs\.[a-zA-Z]+\.[a-zA-Z]+@cvsu\.edu\.ph$/;
+
+        if (!validEmailRegex.test(email)) {
+          alert("Please enter a valid email in the format: dcs.firstname.lastname@cvsu.edu.ph");
+          return;
+        } else {
+          axios.post('http://localhost:8080/sendPin', { email: signUpValues.email })
+            .then((res) => {
+              if (res.data.message === "Verification code sent. Check your email.") {
+
+                openModal(); // Triggers Verification Modal
+
+                alert(res.data.message);
+
+                console.log(signUpValues.accRole);
+              } else {
+                alert(res.data.message);
+              }
+            })
+            .catch((err) => {
+              alert("Error: " + err);
+            })
+        }
+      } else if (signUpValues.accRole === "Student") {
+        axios.post('http://localhost:8080/sendPin', { email: signUpValues.email })
+          .then((res) => {
+            if (res.data.message === "Verification code sent. Check your email.") {
+
+              openModal(); // Triggers Verification Modal
+
+              alert(res.data.message);
+
+              console.log(signUpValues.accRole);
+            } else {
+              alert(res.data.message);
+            }
+          })
+          .catch((err) => {
+            alert("Error: " + err);
+          })
+      }
     }
   }
 
   const handleSignUpOnChange = (e) => {
     const { name, value } = e.target;
-    setSignUpValues({...signUpValues, [name]: value})
+    setSignUpValues({ ...signUpValues, [name]: value })
   }
 
-   // Logic para ma-direct sa sign up or log in form kapag galing sa landing page
+  const handleLoginOnChange = (e) => {
+    const { name, value } = e.target;
+    setLoginValues({ ...loginValues, [name]: value })
+  }
+
+  // Logic para ma-direct sa sign up or log in form kapag galing sa landing page
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const formType = queryParams.get('form'); // 'login' or 'register'
@@ -123,8 +209,8 @@ function RegisterLogin() {
           <div className={styles.signup_content} id="signup">
             <h2 className={styles.title}>Sign Up</h2>
             <div className={styles.signup_fields}>
-              <input type="text" 
-              name="email" value={signUpValues.email} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Enter your email" required />
+              <input type="text"
+                name="email" value={signUpValues.email} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Enter your email" required />
               <input type="password" name="password" value={signUpValues.password} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Create your password" required />
               <input type="password" name="confirmPass" value={signUpValues.confirmPass} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Confirm your password" required />
             </div>
@@ -146,12 +232,12 @@ function RegisterLogin() {
               </div>
             </div>
             <div className={styles.signup_button_container}>
-              <button type="submit"  onClick={submitEmailPass} className={styles.signup_button}>Sign Up</button>
+              <button type="submit" onClick={submitEmailPass} className={styles.signup_button}>Sign Up</button>
             </div>
 
             <div className={styles.dont_have_an_account_container}>
               <p className={styles.dont_have_an_account}>
-                Already have an account?  
+                Already have an account?
                 <span className={styles.dont_have_an_account_sign_up} onClick={toggleForm}>
                   Log In.
                 </span>
@@ -165,11 +251,11 @@ function RegisterLogin() {
           <div className={styles.login_content} id="login">
             <h2 className={styles.title}>Log In</h2>
             <div className={styles.signup_fields}>
-              <input type="text" className={styles.input_field} placeholder="Enter email" />
-              <input type="text" className={styles.input_field} placeholder="Enter password" />
+              <input type="text" name='loginEmail' onChange={handleLoginOnChange} className={styles.input_field} placeholder="Enter email" />
+              <input type="password" name='loginPass' onChange={handleLoginOnChange} className={styles.input_field} placeholder="Enter password" />
             </div>
             <div className={styles.login_button_container}>
-              <button type="submit" className={styles.login_button}>Log In</button>
+              <button type="submit" className={styles.login_button} onClick={submitLogin}>Log In</button>
             </div>
             <div className={styles.forgot_password_container}>
               <a href="#" className={styles.forgot_password}>
@@ -178,7 +264,7 @@ function RegisterLogin() {
             </div>
             <div className={styles.dont_have_an_account_container}>
               <p className={styles.dont_have_an_account}>
-                Don't have an account?  
+                Don't have an account?
                 <span className={styles.dont_have_an_account_sign_up} onClick={toggleForm}>
                   Sign Up.
                 </span>
@@ -189,70 +275,71 @@ function RegisterLogin() {
 
         {/* Modal */}
         {isModalOpen && (
-        <div className={styles.verify_modal_overlay} onClick={closeModal}>
-          <div className={styles.modal_content} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.close_button_container}>
-              <button className={styles.close_button} onClick={closeModal}>
-                <i className="fa-solid fa-x"></i>
-              </button>
-            </div>
-            {currentStep === 1 && (
-              <>
-              <div className={styles.modal_title_container}>
-              <img src={email_icon} className={styles.email_icon} alt="Email icon" />
-              <h2 className={styles.modal_title}>Verify Your Email Address</h2>
-              </div>
-
-          
-                <div className={styles.modal_subtitle_container}>
-                  <p className={styles.modal_subtitle}>
-                    A verification code has been sent to
-                  </p>
-                  <p className={styles.modal_subtitle_email}>elainequisquino@gmail.com</p>
-                </div>
-                <div className={styles.modal_instruction_container}>
-                  <p className={styles.modal_instruction}>
-                    Please check your inbox and enter the verification code. The code will expire in
-                    <span className={styles.modal_instruction_time}>5:00</span>
-                  </p>
-                </div>
-                <div className={styles.modal_input_container}>
-                  <h3 className={styles.input_title}>Enter PIN</h3>
-                  <input
-                    type="text"
-                    className={styles.verification_input_field}
-                    value={pin}
-                    onChange={(e) => setPin(e.target.value)} // Update pin state
-                  />
-                </div>
-                <div className={styles.modal_verify_button}>
-                  <button type="submit" className={styles.verify_button} onClick={handleVerifyPin}>Verify</button>
-                </div>
-              </>
-            )}
-
-            {currentStep === 2 && (
-              <div className={styles.success_message_container}>
-                <div className={styles.modal_title_container}>
-                  <img src={verified_icon} className={styles.verified_icon} alt="Email icon" />
-                  <h2 className={styles.modal_title}>ACCOUNT VERIFIED SUCCESSFULLY</h2>
-                </div>
-
-                <div className={styles.modal_subtitle_container}>
-                  <p className={styles.modal_subtitle}>
-                    Your email has been successfully verified!
-                  </p>
-                </div>
-                
-                <button className={styles.back_to_login} onClick={handleGoToLogin}>
-                  Go To Login
+          <div className={styles.verify_modal_overlay} onClick={closeModal}>
+            <div className={styles.modal_content} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.close_button_container}>
+                <button className={styles.close_button} onClick={closeModal}>
+                  <i className="fa-solid fa-x"></i>
                 </button>
-              
               </div>
-            )}
+              {currentStep === 1 && (
+                <>
+                  <div className={styles.modal_title_container}>
+                    <img src={email_icon} className={styles.email_icon} alt="Email icon" />
+                    <h2 className={styles.modal_title}>Verify Your Email Address</h2>
+                  </div>
+
+
+                  <div className={styles.modal_subtitle_container}>
+                    <p className={styles.modal_subtitle}>
+                      A verification code has been sent to
+                    </p>
+                    <p className={styles.modal_subtitle_email}>{signUpValues.email}</p>
+                  </div>
+                  <div className={styles.modal_instruction_container}>
+                    <p className={styles.modal_instruction}>
+                      Please check your inbox and enter the verification code. The code will expire in
+                      <span className={styles.modal_instruction_time}>5 minutes</span>
+                    </p>
+                  </div>
+                  <div className={styles.modal_input_container}>
+                    <h3 className={styles.input_title}>Enter PIN</h3>
+                    <input
+                      type="tel"
+                      name='pin'
+                      className={styles.verification_input_field}
+                      value={signUpValues.pin}
+                      onChange={handleSignUpOnChange}
+                    />
+                  </div>
+                  <div className={styles.modal_verify_button}>
+                    <button type="submit" className={styles.verify_button} onClick={handleVerifyPin}>Verify</button>
+                  </div>
+                </>
+              )}
+
+              {currentStep === 2 && (
+                <div className={styles.success_message_container}>
+                  <div className={styles.modal_title_container}>
+                    <img src={verified_icon} className={styles.verified_icon} alt="Email icon" />
+                    <h2 className={styles.modal_title}>ACCOUNT VERIFIED SUCCESSFULLY</h2>
+                  </div>
+
+                  <div className={styles.modal_subtitle_container}>
+                    <p className={styles.modal_subtitle}>
+                      Your email has been successfully verified!
+                    </p>
+                  </div>
+
+                  <button className={styles.back_to_login} onClick={handleGoToLogin}>
+                    Go To Login
+                  </button>
+
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     </div>
   );
