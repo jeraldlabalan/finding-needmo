@@ -73,7 +73,7 @@ function RegisterLogin() {
 
     axios.post('http://localhost:8080/login', loginValues)
       .then((res) => {
-        if (res.data.isLoggedIn && res.data.status === 'Active') {
+        if (res.data.isLoggedIn) {
           const role = res.data.role;
 
           if (role === 'Student') {
@@ -105,19 +105,48 @@ function RegisterLogin() {
 
       if (response.data.message === "Verified") {
         const response1 = await axios.post('http://localhost:8080/submitSignUp', signUpValues);
-        if (response1.data.message === "Sign up credentials saved successfully") {
+        if (response1.data.message === "Sign up credentials and profile saved successfully") {
           closeModal();
           navigate('/registerlogin?form=login');
           setIsModalOpen(true);
           setCurrentStep(2);
+
+          setSignUpValues({
+            accRole: '',
+            email: '',
+            password: '',
+            confirmPass: '',
+            pin: '',
+          });
         } else {
           alert(response1.data.message);
+          setSignUpValues({
+            accRole: '',
+            email: '',
+            password: '',
+            confirmPass: '',
+            pin: '',
+          });
         }
       } else {
         alert(response.data.message);
+        setSignUpValues({
+          accRole: '',
+          email: '',
+          password: '',
+          confirmPass: '',
+          pin: '',
+        });
       }
     } catch (err) {
       alert(`Error: ${err.response?.data?.message || err.message}`);
+      setSignUpValues({
+        accRole: '',
+        email: '',
+        password: '',
+        confirmPass: '',
+        pin: '',
+      });
     }
   };
 
