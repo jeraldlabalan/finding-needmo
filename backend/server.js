@@ -6,6 +6,7 @@ import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import cron from 'node-cron';
+import bcrypt from 'bcrypt';
 
 const app = express();
 app.use(express.json());
@@ -79,15 +80,22 @@ cron.schedule("0 0 * * *", () => {
 //LOGOUT
 app.post("/logout", (req, res) => {
     if (req.session) {
-        req.session.destroy((err) => {
+        const updatedStatus = `UPDATE user SET LastLoginAt = NOW(), Status = 'Active' WHERE Email = ?`;
+        db.query(updatedStatus, req.session.email, (err, updateRes) => {
             if (err) {
-                console.error("Error destroying session:", err);
-                return res.json({ valid: false, message: "Logout failed." });
-            }
+                return res.json({ message: "Error in server: " + err });
+            } else if (updateRes.affectedRows > 0) {
+                req.session.destroy((err) => {
+                    if (err) {
+                        console.error("Error destroying session:", err);
+                        return res.json({ valid: false, message: "Logout failed." });
+                    }
 
-            res.clearCookie("connect.sid"); // Session cookie
-            return res.json({ valid: false, message: "Logout successful." });
-        });
+                    res.clearCookie("connect.sid"); // Session cookie
+                    return res.json({ valid: false, message: "Logout successful." });
+                });
+            }
+        })
     } else {
         return res.json({ valid: false, message: "No active session." });
     }
@@ -109,21 +117,58 @@ app.get('/', (req, res) => {
     }
 })
 
+
 app.post('/login', (req, res) => {
-    const sql = `SELECT * FROM user WHERE Email = ? AND Password = ?`;
+    const sql = `SELECT * FROM user WHERE Email = ?`;
     const { loginEmail, loginPass } = req.body;
 
-    db.query(sql, [loginEmail, loginPass], (err, result) => {
+    db.query(sql, [loginEmail], (err, result) => {
         if (err) return res.json({ message: "Error in server" + err });
 
         const user = result[0];
         if (result.length > 0) {
-            if (user.Status === "Inactive") {
-                const updateStatus = `UPDATE user SET LastLoginAt = NOW(), Status = 'Active' WHERE Email = ?`;
-                db.query(updateStatus, user.Email, (err, updateStatusRes) => {
-                    if (err) {
-                        return res.json({ message: "Error in server" + err })
-                    } else if (updateStatusRes.affectedRows > 0) {
+            // Compare the provided password with the hashed password in the database
+            bcrypt.compare(loginPass, user.Password, (err, isMatch) => {
+                if (err) {
+                    return res.json({ message: "Error in password comparison" });
+                }
+                if (isMatch) {
+                    if (user.Status === "Inactive") {
+                        const updateStatus = `UPDATE user SET LastLoginAt = NOW(), Status = 'Active' WHERE Email = ?`;
+                        db.query(updateStatus, user.Email, (err, updateStatusRes) => {
+                            if (err) {
+                                return res.json({ message: "Error in server" + err });
+                            } else if (updateStatusRes.affectedRows > 0) {
+                                const profileGetName = `SELECT * FROM profile WHERE User = ?`;
+                                db.query(profileGetName, user.UserID, (err, getNameRes) => {
+                                    if (err) {
+                                        return res.json({ message: "Error in server: " } + err);
+                                    } else if (getNameRes.length > 0) {
+                                        const profile = getNameRes[0];
+
+                                        req.session.userID = user.UserID;
+                                        req.session.role = user.Role;
+                                        req.session.email = user.Email;
+                                        req.session.firstname = profile.Firstname;
+                                        req.session.lastname = profile.Lastname;
+
+                                        return res.json({
+                                            message: 'Login successful',
+                                            role: req.session.role,
+                                            email: req.session.email,
+                                            userID: req.session.userID,
+                                            status: user.Status,
+                                            firstname: req.session.firstname,
+                                            lastname: req.session.lastname,
+                                            isLoggedIn: true
+                                        });
+                                    } else {
+                                        return res.json({ message: "Invalid credentials", isLoggedIn: false });
+                                    }
+                                });
+                            }
+                        });
+                    } else if (user.Status === "Active") {
                         const profileGetName = `SELECT * FROM profile WHERE User = ?`;
                         db.query(profileGetName, user.UserID, (err, getNameRes) => {
                             if (err) {
@@ -148,44 +193,16 @@ app.post('/login', (req, res) => {
                                     isLoggedIn: true
                                 });
                             } else {
-                                return res.json({ message: "Invalid credentials", isLoggedIn: false })
+                                return res.json({ message: "Invalid credentials", isLoggedIn: false });
                             }
-                        })
-                    }
-                })
-
-            } else if (user.Status === "Active") {
-                const profileGetName = `SELECT * FROM profile WHERE User = ?`;
-                db.query(profileGetName, user.UserID, (err, getNameRes) => {
-                    if (err) {
-                        return res.json({ message: "Error in server: " } + err);
-                    } else if (getNameRes.length > 0) {
-                        const profile = getNameRes[0];
-
-                        req.session.userID = user.UserID;
-                        req.session.role = user.Role;
-                        req.session.email = user.Email;
-                        req.session.firstname = profile.Firstname;
-                        req.session.lastname = profile.Lastname;
-
-                        return res.json({
-                            message: 'Login successful',
-                            role: req.session.role,
-                            email: req.session.email,
-                            userID: req.session.userID,
-                            status: user.Status,
-                            firstname: req.session.firstname,
-                            lastname: req.session.lastname,
-                            isLoggedIn: true
                         });
-                    } else {
-                        return res.json({ message: "Invalid credentials", isLoggedIn: false })
                     }
-                })
-            }
-
+                } else {
+                    return res.json({ message: "Incorrect password", isLoggedIn: false });
+                }
+            });
         } else {
-            return res.json({ message: "Invalid credentials", isLoggedIn: false })
+            return res.json({ message: "Invalid credentials", isLoggedIn: false });
         }
     });
 });
@@ -276,48 +293,53 @@ app.post('/verifyPin', (req, res) => {
 
 //STORE SIGN UP INFO IN DB
 app.post('/submitSignUp', (req, res) => {
+    const { email, confirmPass, accRole } = req.body;
 
-    // Insert into the user table
-    const sql = `INSERT INTO user (Email, Password, Role, Status) VALUES (?,?,?,?)`;
-    const values = [
-        req.body.email,
-        req.body.confirmPass,
-        req.body.accRole,
-        "Active",
-    ];
-
-    db.query(sql, values, (err, userResult) => {
+    // Hash the password before storing it in the database
+    bcrypt.hash(confirmPass, 10, (err, hashedPassword) => {
         if (err) {
-            return res.json({ message: "Error in server: " + err });
-        } else if (userResult.affectedRows > 0) {
-            // Get the userID from the insert result
-            const userID = userResult.insertId;
-            console.log("Inserted userID:", userID);  // Log userID to confirm
-
-            // Check if userID is valid
-            if (!userID) {
-                return res.json({ message: "UserID is null, cannot create profile" });
-            }
-
-            // Now insert into the profile table using the userID
-            const profileQuery = `INSERT INTO profile (User, School) VALUES (?,?)`;
-            const profileValues = [
-                userID,  // Use the inserted userID
-                "Cavite State University - Bacoor Campus"
-            ];
-
-            db.query(profileQuery, profileValues, (err, profileResult) => {
-                if (err) {
-                    return res.json({ message: "Error in server while creating profile: " + err });
-                } else if (profileResult.affectedRows > 0) {
-                    return res.json({ message: "Sign up credentials and profile saved successfully" });
-                } else {
-                    return res.json({ message: "Failed to create profile" });
-                }
-            });
-        } else {
-            return res.json({ message: "Failed to create an account" });
+            return res.json({ message: "Error hashing password: " + err });
         }
+
+        // Insert into the user table with hashed password
+        const sql = `INSERT INTO user (Email, Password, Role, Status) VALUES (?,?,?,?)`;
+        const values = [
+            email,
+            hashedPassword,  // Store hashed password
+            accRole,
+            "Active",
+        ];
+
+        db.query(sql, values, (err, userResult) => {
+            if (err) {
+                return res.json({ message: "Error in server: " + err });
+            } else if (userResult.affectedRows > 0) {
+                const userID = userResult.insertId;
+                console.log("Inserted userID:", userID);
+
+                if (!userID) {
+                    return res.json({ message: "UserID is null, cannot create profile" });
+                }
+
+                const profileQuery = `INSERT INTO profile (User, School) VALUES (?,?)`;
+                const profileValues = [
+                    userID,
+                    "Cavite State University - Bacoor Campus"
+                ];
+
+                db.query(profileQuery, profileValues, (err, profileResult) => {
+                    if (err) {
+                        return res.json({ message: "Error in server while creating profile: " + err });
+                    } else if (profileResult.affectedRows > 0) {
+                        return res.json({ message: "Sign up credentials and profile saved successfully" });
+                    } else {
+                        return res.json({ message: "Failed to create profile" });
+                    }
+                });
+            } else {
+                return res.json({ message: "Failed to create an account" });
+            }
+        });
     });
 });
 
