@@ -209,6 +209,104 @@ app.post('/login', (req, res) => {
 
 let verificationPins = {};
 
+//FORGOT PASS
+app.post('/sendOTP', (req, res) => {
+    const email = req.body.email;
+    const emailQuery = `SELECT * FROM user WHERE Email = ?`;
+    db.query(emailQuery, req.body.email, (err, emailRes) => {
+        if (err) {
+            return res.json({ message: "Error in server: " + err });
+        } else if (emailRes.length > 0) {
+            const randomPin = Math.floor(100000 + Math.random() * 900000);
+            verificationPins[email] = { pin: randomPin, createdAt: Date.now() };
+
+            const emailBody = `
+            We received a request to reset the password for your account.
+
+            CODE: ${randomPin}
+
+            If you didn't make the request, ignore this email. Otherwise, you can reset your password.`;
+
+            const mailOptions = {
+                from: 'virtualangel921@gmail.com',
+                to: email,
+                subject: 'Password Reset Verification Code',
+                text: emailBody,
+            };
+
+            try {
+                transporter.sendMail(mailOptions);
+                console.log(emailRes);
+                console.log(emailBody);
+                return res.json({ message: "Verification code sent. Check your email." });
+
+            } catch (emailError) {
+                return res.json({ message: "Error sending verification code to your email", error: emailError.message });
+            }
+        } else {
+            return res.json({ message: "Email does not exist" });
+        }
+    })
+})
+
+app.post('/verifyOTP', (req, res) => {
+
+    const email = req.body.email;
+    const pin = req.body.otp;
+
+    console.log(`PIN verification for email: ${email}, stored PIN: ${verificationPins[email]?.pin}`);
+
+    // Check if PIN has expired
+    if (verificationPins[email]) {
+        const pinData = verificationPins[email];
+        const pinAge = Date.now() - pinData.createdAt;
+
+        if (pinAge > PIN_EXPIRATION_TIME) {
+            delete verificationPins[email];
+            return res.json({ message: "PIN has expired. Please request a new one." });
+        }
+
+        // If PIN is still valid, proceed to verify it
+        if (pinData.pin === parseInt(pin)) {
+            delete verificationPins[email]; // Successfully verified, remove the PIN
+            return res.json({ message: "Verified" });
+        } else {
+            return res.json({ message: "Incorrect PIN. Please try again." });
+        }
+    }
+
+    return res.json({ message: "PIN not found. Please request a new one." });
+})
+
+app.post('/resetPass', (req, res) => {
+    const { email, confirmPass } = req.body;
+
+    // Hash the password before storing it in the database
+    bcrypt.hash(confirmPass, 10, (err, hashedPassword) => {
+        if (err) {
+            return res.json({ message: "Error hashing password: " + err });
+        }
+
+        // Insert into the user table with hashed password
+        const updatePass = `UPDATE user SET Password = ? WHERE Email = ?`;
+        const values = [
+            hashedPassword,  // Store hashed password
+            email
+        ];
+
+        db.query(updatePass, values, (err, userResult) => {
+            if (err) {
+                return res.json({ message: "Error in server: " + err });
+            } else if (userResult.affectedRows > 0) {
+                return res.json({message: "Password reset successfully."});
+            } else {
+                return res.json({ message: "Failed to reset password" });
+            }
+        });
+    });
+})
+
+//SIGN UP
 app.post('/sendPIN', (req, res) => {
     const email = req.body.email;
 
@@ -249,7 +347,7 @@ app.post('/sendPIN', (req, res) => {
     })
 })
 
-const PIN_EXPIRATION_TIME = 1 * 60 * 1000; // 5 minutes in milliseconds
+const PIN_EXPIRATION_TIME = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 setInterval(() => {
     for (let email in verificationPins) {
