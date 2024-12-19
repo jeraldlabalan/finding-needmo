@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './RegisterLogin.module.css';
 import logo from '../../assets/logo2.svg';
 import email_icon from '../../assets/email.png'
 import verified_icon from '../../assets/verified_icon.png'
-import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 
 function RegisterLogin() {
 
@@ -287,9 +289,9 @@ function RegisterLogin() {
               <button type="submit" className={styles.login_button} onClick={submitLogin}>Log In</button>
             </div>
             <div className={styles.forgot_password_container}>
-              <a href="#" className={styles.forgot_password}>
+              <Link to="/forgotpassword" className={styles.forgot_password}>
                 Forgot Password?
-              </a>
+              </Link>
             </div>
             <div className={styles.dont_have_an_account_container}>
               <p className={styles.dont_have_an_account}>
