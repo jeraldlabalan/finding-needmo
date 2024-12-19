@@ -164,7 +164,7 @@ function ForgotPassword() {
                 className={styles.lock_icon}
                 alt="Lock icon"
               />
-              <h2 className={styles.step3_title}>reset your password</h2>
+              <h2 className={styles.step3_title}>password changed</h2>
             </div>
 
             <div className={styles.step3_subtitle_container}>
