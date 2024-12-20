@@ -4,6 +4,7 @@ import Landing from '/src/components/Landing/Landing.jsx';
 import RegisterLogin from './components/RegisterLogin/RegisterLogin';
 import Header from './components/Header/Header';
 import Home from './components/Home/Home';
+import ForgotPassword from './components/ForgotPassword/ForgotPassword';
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
         <Route path='/' element={<Landing />} />
         <Route path='/registerlogin' element={<RegisterLogin />} />
         <Route path='/home' element={<Home />} />
+        <Route path='/forgotpassword' element={<ForgotPassword />} />
       </Routes>
     </Router>
   )

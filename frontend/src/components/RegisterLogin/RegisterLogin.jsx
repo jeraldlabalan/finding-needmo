@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './RegisterLogin.module.css';
 import logo from '../../assets/logo2.svg';
 import email_icon from '../../assets/email.png'
 import verified_icon from '../../assets/verified_icon.png'
-import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function RegisterLogin() {
 
@@ -65,7 +69,7 @@ function RegisterLogin() {
           navigate('/registerlogin?form=login');
         }
       })
-      .catch(err => alert("Error: " + err))
+      .catch(err => toast.err("Error" + err, {autoClose: 4000}))
   }, []);
 
   const submitLogin = (e) => {
@@ -84,12 +88,16 @@ function RegisterLogin() {
             navigate('/registerlogin?form=login'); // Fallback route if role is not recognized
           }
         } else if (res.data.isLoggedIn === false) {
-          alert(res.data.message);
+          toast.error(res.data.message, {
+            autoClose: 3000
+          });
           res.data.isLoggedIn = false;
         }
       })
       .catch((err) => {
-        alert("Error logging in: " + err);
+        toast.error("Error logging in: " + err, {
+          autoClose: 4000
+        });
         console.error(err);
       });
   };
@@ -98,7 +106,11 @@ function RegisterLogin() {
   // Handle PIN submission
   const handleVerifyPin = async () => {
     const pin = signUpValues.pin.trim();
-    if (!pin || pin.length !== 6) return alert("Please enter the correct 6-digit PIN.");
+    if (!pin || pin.length !== 6) {
+      return toast.error("Please enter the correct 6-digit PIN.", {
+        autoClose: 4000
+      });
+    }
 
     try {
       const response = await axios.post('http://localhost:8080/verifyPin', signUpValues);
@@ -119,7 +131,9 @@ function RegisterLogin() {
             pin: '',
           });
         } else {
-          alert(response1.data.message);
+          toast.error(response1.data.message, {
+            autoClose: 4000
+          });
           setSignUpValues({
             accRole: '',
             email: '',
@@ -129,7 +143,9 @@ function RegisterLogin() {
           });
         }
       } else {
-        alert(response.data.message);
+        toast.error(response.data.message, {
+          autoClose: 4000
+        });
         setSignUpValues({
           accRole: '',
           email: '',
@@ -139,7 +155,9 @@ function RegisterLogin() {
         });
       }
     } catch (err) {
-      alert(`Error: ${err.response?.data?.message || err.message}`);
+      toast.error(`Error: ${err.response?.data?.message || err.message}`, {
+        autoClose: 5000
+      });
       setSignUpValues({
         accRole: '',
         email: '',
@@ -152,9 +170,9 @@ function RegisterLogin() {
 
   const submitEmailPass = () => {
     if (signUpValues.password !== signUpValues.confirmPass) {
-      alert("Passwords don't match");
+      toast.error("Passwords don't match");
     } else if (!signUpValues.password || signUpValues.password === "" || !signUpValues.confirmPass || signUpValues.confirmPass === "") {
-      alert("Password is required");
+      toast.error("Password is required");
     } else {
       if (signUpValues.accRole === "Educator") {
         const email = signUpValues.email.trim();
@@ -163,7 +181,7 @@ function RegisterLogin() {
         const validEmailRegex = /^dcs\.[a-zA-Z]+\.[a-zA-Z]+@cvsu\.edu\.ph$/;
 
         if (!validEmailRegex.test(email)) {
-          alert("Please enter a valid email in the format: dcs.firstname.lastname@cvsu.edu.ph");
+          toast.error("Please enter a valid email in the format: dcs.firstname.lastname@cvsu.edu.ph")
           return;
         } else {
           axios.post('http://localhost:8080/sendPin', { email: signUpValues.email })
@@ -172,15 +190,21 @@ function RegisterLogin() {
 
                 openModal(); // Triggers Verification Modal
 
-                alert(res.data.message);
+                toast.success(res.data.message, {
+                  autoClose: 3000
+                })
 
                 console.log(signUpValues.accRole);
               } else {
-                alert(res.data.message);
+                toast.error(res.data.message, {
+                  autoClose: 4000
+                });
               }
             })
             .catch((err) => {
-              alert("Error: " + err);
+              toast.error("Error: " + err, {
+                autoClose: 4000
+              });
             })
         }
       } else if (signUpValues.accRole === "Student") {
@@ -190,15 +214,20 @@ function RegisterLogin() {
 
               openModal(); // Triggers Verification Modal
 
-              alert(res.data.message);
-
+              toast.success(res.data.message, {
+                autoClose: 3000
+              })
               console.log(signUpValues.accRole);
             } else {
-              alert(res.data.message);
+              toast.error(res.data.message, {
+                autoClose: 4000
+              });
             }
           })
           .catch((err) => {
-            alert("Error: " + err);
+            toast.error("Error: " + err, {
+              autoClose: 4000
+            });
           })
       }
     }
@@ -230,6 +259,7 @@ function RegisterLogin() {
 
   return (
     <div className={styles.container}>
+      <ToastContainer position='top-center'/>
       <div className={styles.content}>
         <img src={logo} alt="This is our logo" className={styles.logo} />
 
@@ -238,7 +268,7 @@ function RegisterLogin() {
           <div className={styles.signup_content} id="signup">
             <h2 className={styles.title}>Sign Up</h2>
             <div className={styles.signup_fields}>
-              <input type="text"
+              <input type="email"
                 name="email" value={signUpValues.email} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Enter your email" required />
               <input type="password" name="password" value={signUpValues.password} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Create your password" required />
               <input type="password" name="confirmPass" value={signUpValues.confirmPass} className={styles.input_field} onChange={handleSignUpOnChange} placeholder="Confirm your password" required />
@@ -280,16 +310,16 @@ function RegisterLogin() {
           <div className={styles.login_content} id="login">
             <h2 className={styles.title}>Log In</h2>
             <div className={styles.signup_fields}>
-              <input type="text" name='loginEmail' onChange={handleLoginOnChange} className={styles.input_field} placeholder="Enter email" />
+              <input type="email" name='loginEmail' onChange={handleLoginOnChange} className={styles.input_field} placeholder="Enter email" />
               <input type="password" name='loginPass' onChange={handleLoginOnChange} className={styles.input_field} placeholder="Enter password" />
             </div>
             <div className={styles.login_button_container}>
               <button type="submit" className={styles.login_button} onClick={submitLogin}>Log In</button>
             </div>
             <div className={styles.forgot_password_container}>
-              <a href="#" className={styles.forgot_password}>
+              <Link to="/forgotpassword" className={styles.forgot_password}>
                 Forgot Password?
-              </a>
+              </Link>
             </div>
             <div className={styles.dont_have_an_account_container}>
               <p className={styles.dont_have_an_account}>
