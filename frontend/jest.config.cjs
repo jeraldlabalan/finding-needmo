@@ -9,7 +9,7 @@ module.exports = {
     "\\.(css|less)$": "identity-obj-proxy",
     "\\.css$": "<rootDir>/styleMock.js",
     "\\.(css|less|scss|sass)$": "<rootDir>/styleMock.js",
-    "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/fileMock.js",
+    "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/styleMock.js",
   },
 
   transformIgnorePatterns: ["/node_modules/(?!your-dependency-to-transform)/"],
