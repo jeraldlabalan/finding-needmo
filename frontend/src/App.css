@@ -24,7 +24,7 @@
     /* NOTE: .5rem = 8px | 1rem = 16px */
     --big-font-size: 3.5rem;
     --h1-font-size: 2.25rem;
-    --h2-font-size: 1.75rem;
+    --h2-font-size: 1.65rem;
     --h3-font-size: 1.25rem;
     --normal-font-size: 1rem;
     --small-font-size: 0.875rem;
@@ -51,8 +51,35 @@
     --z-fixed: 100;
     --z-modal: 1000;
   }
-  
 
+
+/* Customize the entire scrollbar */
+::-webkit-scrollbar {
+  width: 12px; 
+  height: 12px; 
+}
+
+/* Customize the scrollbar track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px; 
+}
+
+/* Customize the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background: #dddddd;
+  border-radius: 12px; 
+}
+
+/* Hover effect on the scrollbar thumb */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+/* Customize the scrollbar corner (for overlapping scrollbars) */
+::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
 
 * {
     margin: 0;
