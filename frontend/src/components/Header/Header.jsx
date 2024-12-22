@@ -11,11 +11,14 @@ import manage_content from "../../assets/manage-content.jpg";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logoutFunction from '../logoutFunction.jsx';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Header() {
   const location = useLocation(); // For detecting active path
   const [activeDropdown, setActiveDropdown] = useState(null); // Manages active dropdown state
   const [userEmail, setUserEmail] = useState("");
+  const [uploadedPFP, setUploadedPFP] = useState(null);
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -36,6 +39,25 @@ function Header() {
   }, []);
   //Reuse in other pages that requires logging in
 
+  useEffect(() => {
+    axios.get('http://localhost:8080/getProfile')
+    .then((res) => {
+      const {message, pfp} = res.data;
+      if(message === "User profile fetched successfully"){
+        setUploadedPFP(pfp);
+      } else {
+        toast.error(message, {
+          autoClose: 5000
+        })
+      }
+    })
+    .catch((err) => {
+      toast.error("Error: " + err, {
+        autoClose: 5000
+      })
+    })
+  }, []);
+
   const toggleDropdown = (menu) => {
     setActiveDropdown((prev) => (prev === menu ? null : menu));
   };
@@ -46,6 +68,7 @@ function Header() {
 
   return (
     <div className={styles.header_container}>
+      <ToastContainer position='top-center' />
       {/* Notification Menu */}
       <div className={styles.profile_menu_container}>
       <button
@@ -69,7 +92,7 @@ function Header() {
         onClick={() => toggleDropdown("profile")}
       >
         <img
-          src={default_profile}
+          src={uploadedPFP}
           className={styles.default_profile}
           alt="Profile Icon"
         />

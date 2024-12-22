@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import styles from "./Profile.module.css";
 import Header from "../Header/Header";
 import default_photo from "../../assets/default-profile-photo.jpg";
@@ -18,6 +18,10 @@ import file_icon_black from "../../assets/file-icon-black.png";
 import add_file_icon from "../../assets/add-file-icon.png";
 import delete_file_icon_black from "../../assets/delete-file-icon-black.png";
 import delete_file_icon_white from "../../assets/delete-file-icon-white.png";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Profile() {
   // Modal logic
@@ -28,6 +32,115 @@ function Profile() {
   const [isDeleteContentModalOpen, setIsDeleteContentModalOpen] = useState(false);
   const [currentStepDelete, setCurrentStepDelete] = useState(1);
   const [currentStepArchive, setCurrentStepArchive] = useState(1);
+
+  const [csContributions, setCSContributions] = useState(0);
+  const [itContributions, setITContributions] = useState(0);
+
+  const [userEmail, setUserEmail] = useState("");
+  const [userColumns, setUserColumns] = useState([]);
+  const [profileColumns, setProfileColumns] = useState([]);
+  const [uploadedPFP, setUploadedPFP] = useState(null);
+
+  const [profileInfo, setProfileInfo] = useState({
+    uploadPFP: null,
+    pfpURL: '',
+    firstName: '',
+    lastName: '',
+    position: '',
+    program: '',
+  });
+
+
+  //Reuse in other pages that requires logging in
+  const navigate = useNavigate();
+  axios.defaults.withCredentials = true;
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080")
+      .then((res) => {
+        if (res.data.valid) {
+          setUserEmail(res.data.email);
+        } else {
+          navigate("/registerlogin");
+        }
+      })
+      .catch((err) => {
+        console.error("Error validating user session:", err);
+      });
+  }, []);
+  //Reuse in other pages that requires logging in
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/getEduContributions")
+    .then((res) => {
+      if(res.data.message === "Contributions fetched"){
+        setCSContributions(res.data.csCount);
+        setITContributions(res.data.itCount);
+      }
+    })
+  })
+
+  useEffect(() => {
+    axios.get('http://localhost:8080/getProfile')
+      .then((res) => {
+        const { message, pfp, userData, profileData } = res.data;
+        if (message === "User profile fetched successfully") {
+          setUserColumns(userData);
+          setProfileColumns(profileData);
+          setUploadedPFP(pfp);
+
+          setProfileInfo({
+            uploadPFP: pfp || null,
+            pfpURL: pfp || '',
+            firstName: profileData.Firstname || '',
+            lastName: profileData.Lastname || '',
+            position: profileData.Position || '',
+            program: profileData.Program || '',
+          });
+        } else {
+          toast.error(message, {
+            autoClose: 5000
+          })
+        }
+      })
+      .catch((err) => {
+        toast.error("Error: " + err, {
+          autoClose: 5000
+        })
+      })
+  }, []);
+
+  const saveProfileChanges = () => {
+    const data = new FormData();
+    if (profileInfo.uploadPFP) {
+      data.append("uploadPFP", profileInfo.uploadPFP);
+    }
+    data.append("pfpURL", profileInfo.pfpURL);
+    data.append("firstName", profileInfo.firstName);
+    data.append("lastName", profileInfo.lastName);
+    data.append("position", profileInfo.position);
+    data.append("program", profileInfo.program || null);
+
+
+    axios.post("http://localhost:8080/saveEducProfileChanges", data, {
+      headers: { "Content-Type": "multipart/form-data", },
+    })
+      .then((res) => {
+        if (res.data.message === "Changes saved") {
+          console.log("Changes saved:", res.data);
+          setUploadedPFP(`http://localhost:8080/${res.data.pfpURL}`);
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+      })
+      .catch((err) => {
+        toast.error("Error: " + err, {
+          autoClose: 5000
+        })
+      })
+  }
 
   const nextStepArchive = () => {
     setCurrentStepArchive((prev) => (prev < 2 ? prev + 1 : prev));
@@ -79,8 +192,30 @@ function Profile() {
     setIsDeleteContentModalOpen(false);
   }
 
+  // Function to handle the file upload change
+  const handleUploadChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file); // Create a URL for the selected image
+      setProfileInfo(prevState => ({
+        ...prevState,
+        uploadPFP: file,   // Store the file itself
+        pfpURL: url,       // Store the image URL for previewing
+      }));
+    }
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setProfileInfo((prevState) => ({
+      ...prevState,
+      [name]: value, // Dynamically update state
+    }));
+  };
+
   return (
     <div className={styles.container}>
+      <ToastContainer position='top-center' />
       <div className={styles.header_container}>
         <Header />
       </div>
@@ -88,17 +223,17 @@ function Profile() {
       <div className={styles.content}>
         <div className={styles.upper_content}>
           <div className={styles.profile_photo_container}>
-            <img src={default_photo} alt="profile photo" />
+            <img src={uploadedPFP} alt="profile photo" />
           </div>
           <div className={styles.name_and_role_container}>
-            <h1 className={styles.name}>elaine quisquino</h1>
+            <h1 className={styles.name}>{profileColumns.Firstname} {profileColumns.Lastname}</h1>
             <div className={styles.role_container}>
               <img
                 src={role_icon}
                 className={styles.role_icon}
                 alt="role icon"
               />
-              <span className={styles.role}>Educator</span>
+              <span className={styles.role}>{userColumns.Role}</span>
             </div>
           </div>
         </div>
@@ -110,11 +245,11 @@ function Profile() {
               <div className={styles.contributions_counts}>
                 <div className={styles.counts_group}>
                   <p className={styles.count_title}>information technology</p>
-                  <h3 className={styles.count}>12</h3>
+                  <h3 className={styles.count}>{csContributions}</h3>
                 </div>
                 <div className={styles.counts_group}>
                   <p className={styles.count_title}>computer science</p>
-                  <h3 className={styles.count}>20</h3>
+                  <h3 className={styles.count}>{itContributions}</h3>
                 </div>
               </div>
             </div>
@@ -128,7 +263,7 @@ function Profile() {
                     alt="information icon"
                   />
                   <p className={styles.info}>
-                    Instructor II at
+                    {profileColumns.Position === null ? "______" : profileColumns.Position} at
                     <span className={styles.bolded_text}>
                       Cavite State University
                     </span>
@@ -143,7 +278,9 @@ function Profile() {
                   />
                   <p className={styles.info}>
                     Bachelor of Science in
-                    <span className={styles.bolded_text}>Computer Science</span>
+                    <span className={styles.bolded_text}>{profileColumns.Program === 1 ? "Computer Science" 
+                    : profileColumns.Program === 2 ? "Information Technology"
+                  : "_______"}</span>
                   </p>
                 </div>
               </div>
@@ -302,22 +439,14 @@ function Profile() {
 
             {/* EDIT PROFILE Modal */}
             {isEditProfileModalOpen && (
-              <div
-                className={styles.modal_overlay}
-                onClick={closeEditProfileModal}
-              >
+              <div className={styles.modal_overlay} onClick={closeEditProfileModal}>
                 <div
                   className={styles.modal_content}
                   onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
                 >
-                  {/* Modal Content Here */}
-
                   <div className={styles.modal_header}>
-                    <h2 className={styles.header_title}>edit profile</h2>
-                    <button
-                      className={styles.header_close_button}
-                      onClick={closeEditProfileModal}
-                    >
+                    <h2 className={styles.header_title}>Edit Profile</h2>
+                    <button className={styles.header_close_button} onClick={closeEditProfileModal}>
                       <img
                         src={modal_close_icon}
                         className={styles.header_close_icon}
@@ -329,17 +458,23 @@ function Profile() {
                   <div className={styles.modal_profile_container}>
                     <div className={styles.profile_container}>
                       <img
-                        src={default_photo}
+                        src={profileInfo.uploadPFP ? profileInfo.pfpURL : uploadedPFP}
                         className={styles.modal_profile_photo}
                         alt="profile photo"
                       />
-                      <button className={styles.edit_profile_photo_button}>
-                        <img
-                          src={edit_profile_icon}
-                          className={styles.edit_profile_icon}
-                          alt="edit profile photo icon"
-                        />
-                      </button>
+                      <input
+                        type="file"
+                        id="uploadPFP"
+                        name="uploadPFP"
+                        className={styles.edit_profile_photo_button}
+                        accept="image/*"
+                        onChange={handleUploadChange}
+                      />
+                      <img
+                        src={edit_profile_icon}
+                        className={styles.edit_profile_icon}
+                        alt="edit profile photo icon"
+                      />
                     </div>
                   </div>
 
@@ -349,14 +484,22 @@ function Profile() {
                         <input
                           type="text"
                           name="firstName"
+                          id="firstname"
+                          value={profileInfo.firstName}
                           placeholder="First name"
-                          className={` ${styles.name}`}
+                          className={styles.name}
+                          onChange={handleInputChange}
+                          required
                         />
                         <input
                           type="text"
                           name="lastName"
+                          value={profileInfo.lastName}
+                          id="lastName"
                           placeholder="Last name"
-                          className={` ${styles.name}`}
+                          className={styles.name}
+                          onChange={handleInputChange}
+                          required
                         />
                       </div>
 
@@ -364,35 +507,40 @@ function Profile() {
                         name="position"
                         className={styles.modal_info_input}
                         id="position"
+                        onChange={handleInputChange}
+                        value={profileInfo.position || ''}
+                        required
                       >
-                        <option value="Instructor I">Instructor I</option>
-                        <option value="Instructor II">Instructor II</option>
-                        <option value="Instructor III">Instructor III</option>
+                        <option value={null}>Your position</option>
+                        <option value="Instructor 1">Instructor 1</option>
+                        <option value="Instructor 2">Instructor 2</option>
+                        <option value="Instructor 3">Instructor 3</option>
                       </select>
 
                       <select
                         name="program"
                         className={styles.modal_info_input}
                         id="program"
+                        onChange={handleInputChange}
+                        value={profileInfo.program || null}
+                        required
                       >
-                        <option value="Bachelor of Science in Computer Science">
-                          Bachelor of Science in Computer Science
-                        </option>
-                        <option value="Bachelor of Science in Information Technology">
-                          Bachelor of Science in Information Technology
-                        </option>
+                        <option value={null}>Select Program</option>
+                        <option value="1">Bachelor of Science in Computer Science</option>
+                        <option value="2">Bachelor of Science in Information Technology</option>
                       </select>
                     </div>
                   </div>
 
                   <div className={styles.save_changes_button_container}>
-                    <button className={styles.save_changes_button}>
-                      save changes
+                    <button onClick={saveProfileChanges} className={styles.save_changes_button}>
+                      Save Changes
                     </button>
                   </div>
                 </div>
               </div>
             )}
+
 
             {/* ADD Content Modal */}
             {isAddContentModalOpen && (
@@ -922,18 +1070,18 @@ function Profile() {
 
                   {currentStepArchive === 2 && (
                     <>
-                        <p className={styles.archive_and_delete_confirmation}>
-                          Archived ‘Arrays’ successfully.
-                        </p>
+                      <p className={styles.archive_and_delete_confirmation}>
+                        Archived ‘Arrays’ successfully.
+                      </p>
 
-                        <div className={styles.view_button_container}>
-                          <button
-                            className={`${styles.view_archived_contents_button}`}
-                          >
-                            view archived contents
-                          </button>
-                        </div>
-      
+                      <div className={styles.view_button_container}>
+                        <button
+                          className={`${styles.view_archived_contents_button}`}
+                        >
+                          view archived contents
+                        </button>
+                      </div>
+
                     </>
                   )}
                 </div>
@@ -981,7 +1129,7 @@ function Profile() {
                     <>
                       <div className={styles.archive_and_delete_content}>
                         <p className={styles.archive_and_delete_confirmation}>
-                        Are you sure you want to delete ‘Network Topologies’? Type ‘Network Topologies’ to confirm.
+                          Are you sure you want to delete ‘Network Topologies’? Type ‘Network Topologies’ to confirm.
                         </p>
 
                         <div
@@ -1008,18 +1156,18 @@ function Profile() {
 
                   {currentStepDelete === 2 && (
                     <>
-                        <p className={styles.archive_and_delete_confirmation}>
-                          Deleted ‘Network Topologies’ successfully.
-                        </p>
+                      <p className={styles.archive_and_delete_confirmation}>
+                        Deleted ‘Network Topologies’ successfully.
+                      </p>
 
-                        <div className={styles.view_button_container}>
-                          <button
-                            className={`${styles.view_archived_contents_button}`}
-                          >
-                            view deleted contents
-                          </button>
-                        </div>
-      
+                      <div className={styles.view_button_container}>
+                        <button
+                          className={`${styles.view_archived_contents_button}`}
+                        >
+                          view deleted contents
+                        </button>
+                      </div>
+
                     </>
                   )}
                 </div>

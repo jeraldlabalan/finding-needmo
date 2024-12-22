@@ -81,10 +81,13 @@ function RegisterLogin() {
           const role = res.data.role;
 
           if (role === 'Student') {
+            toast.dismiss();
             navigate('/home');
           } else if (role === 'Educator') {
+            toast.dismiss();
             navigate('/home');
           } else {
+            toast.dismiss();
             navigate('/registerlogin?form=login'); // Fallback route if role is not recognized
           }
         } else if (res.data.isLoggedIn === false) {
@@ -130,6 +133,7 @@ function RegisterLogin() {
             confirmPass: '',
             pin: '',
           });
+          toast.dismiss();
         } else {
           toast.error(response1.data.message, {
             autoClose: 4000
@@ -235,12 +239,14 @@ function RegisterLogin() {
 
   const handleSignUpOnChange = (e) => {
     const { name, value } = e.target;
-    setSignUpValues({ ...signUpValues, [name]: value })
+    setSignUpValues({ ...signUpValues, [name]: value });
+    toast.dismiss();
   }
 
   const handleLoginOnChange = (e) => {
     const { name, value } = e.target;
-    setLoginValues({ ...loginValues, [name]: value })
+    setLoginValues({ ...loginValues, [name]: value });
+    toast.dismiss();
   }
 
   // Logic para ma-direct sa sign up or log in form kapag galing sa landing page
