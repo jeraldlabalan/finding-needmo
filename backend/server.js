@@ -59,6 +59,18 @@ const upload = multer({ storage });
 
 app.use("/uploads", express.static("uploads"));
 
+
+app.get('/getCourses', (req, res) => {
+    const sql = `SELECT * FROM course`;
+    db.query(sql, (err, result) => {
+        if(err){
+            return res.json({message: "Error in server: " + err});
+        }
+
+        return res.json(result);
+    })
+})
+
 app.get('/getEduContributions', (req, res) =>{
     const csCount = `SELECT COUNT(*) AS CSCount FROM content WHERE CreatedBy = ? AND IsArchived = ? AND isDeleted = ? AND Program = 1`;
     const itCount = `SELECT COUNT(*) AS ITCount FROM content WHERE CreatedBy = ? AND IsArchived = ? AND isDeleted = ? AND Program = 2`;

@@ -50,6 +50,14 @@ function Profile() {
     program: '',
   });
 
+  const [courses, setCourses] = useState([]);
+  const [contentFiles, setContentFiles] = useState([]);
+  const [contentDetails, setContentDetails] = useState({
+    title: '',
+    description: '',
+    subject: '',
+    program: '',
+  });
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -69,6 +77,66 @@ function Profile() {
       });
   }, []);
   //Reuse in other pages that requires logging in
+
+  const handleContentFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files); // Convert FileList to array
+    setContentFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
+  };
+
+  const handleContentFileRemove = (index) => {
+    setContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+
+  const handleAddContentChange = (e) =>{
+    const { name, value } = e.target;
+    setContentDetails({ ...contentDetails, [name]: value });
+  };
+
+  const handleAddContent = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    // Append content details to FormData
+    Object.entries(contentDetails).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    // Append files to FormData
+  contentFiles.forEach((file) => {
+    formData.append("contentFiles", file);
+  });
+
+    // Axios request to upload files
+  axios
+  .post("http://localhost:8080/uploadContent", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
+  .then((response) => {
+    console.log("Upload success:", response.data);
+    alert("Content uploaded successfully!");
+  })
+  .catch((error) => {
+    console.error("Upload error:", error);
+    alert("Failed to upload content.");
+  });
+
+};
+
+  //get courses
+  useEffect(() => {
+    axios.get("http://localhost:8080/getCourses")
+    .then((res) => {
+      console.log(res.data);
+      setCourses(res.data);
+    })
+    .catch((err) => {
+      toast.error("Error: " + err,{
+        autoClose: 4000
+      })
+    })
+  },[]);
 
   useEffect(() => {
     axios.get("http://localhost:8080/getEduContributions")
@@ -584,6 +652,8 @@ function Profile() {
                       name="title"
                       id="title"
                       placeholder="Title"
+                      value={contentDetails.title}
+                      onChange={handleAddContentChange}
                     />
 
                     <textarea
@@ -591,30 +661,33 @@ function Profile() {
                       id="description"
                       className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
                       placeholder="Write description here..."
+                      value={contentDetails.description}
+                      onChange={handleAddContentChange}
                     ></textarea>
 
                     <select
                       name="subject"
                       id="subject"
                       className={`${styles.modal_content_input} ${styles.modal_content_select}`}
+                      value={contentDetails.subject}
+                      onChange={handleAddContentChange}
                     >
-                      <option value="">Subject</option>
-                      <option value="Software Engineering II">
-                        Software Engineering II
-                      </option>
-                      <option value="Computer Programming I">
-                        Computer Programming I
-                      </option>
+                      <option value={null} selected>Subject</option>
+                      {courses.map((course) => (
+                        <option value={course.Course} key={course.Course}> {course.Title} </option>
+                      ))}
                     </select>
 
                     <select
                       name="program"
                       id="program"
                       className={`${styles.modal_content_input} ${styles.modal_content_select}`}
+                      value={contentDetails.program}
+                      onChange={handleAddContentChange}
                     >
-                      <option value="">Program</option>
-                      <option value="Computer Science">Computer Science</option>
-                      <option value="Information Technology">
+                      <option value={null} selected>Program</option>
+                      <option value="1">Computer Science</option>
+                      <option value="2">
                         Information Technology
                       </option>
                     </select>
@@ -629,127 +702,32 @@ function Profile() {
                     <div className={styles.modal_file_container}>
                       {" "}
                       {/* Dito yung mga uploaded files */}
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
+                      {contentFiles.map((file, index) => (
+                        <div
+                        key={index}
+                        className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}
                       >
                         <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
+                          src={file_icon_white} // Use appropriate file icon
+                          className={styles.file_icon}
                           alt="file icon"
                         />
-                        <p className={styles.file_name}>CP1_Arrays</p>
+                        <p className={styles.file_name}>{file.name}</p> {/* Display file name */}
                         <img
-                          src={delete_file_icon_white}
+                          src={delete_file_icon_white} // Use appropriate delete icon
                           className={styles.file_icon}
                           alt="remove file icon"
+                          onClick={() => handleContentFileRemove(index)} // Remove file
                         />
                       </div>
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
-                      >
-                        <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_white}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
-                      >
-                        <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_white}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
-                      >
-                        <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_white}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
+                      ))}
+
                       <div className={`${styles.file} ${styles.add_file}`}>
+                        <input 
+                          type="file"
+                          multiple
+                          onChange={handleContentFileChange} 
+                        />
                         <img
                           src={add_file_icon}
                           className={styles.file_icon}
