@@ -57,7 +57,26 @@ function Profile() {
     description: '',
     subject: '',
     program: '',
+    course: '',
+    keyword: '',
   });
+
+  const [filteredSubjects, setFilteredSubjects] = useState([]);
+  const [selectedRequest, setSelectedRequest] = useState([]);
+
+  const [uploadedContent, setUploadedContent] = useState([]);
+
+  useEffect(() => {
+    // Fetch the uploaded content data
+    axios.get('http://localhost:8080/getUploadedContent')
+      .then(response => {
+        if (response.data.uploadedContent) {
+          setUploadedContent(response.data.uploadedContent);
+        }
+        console.log(response.data);
+      })
+      .catch(error => console.error("Error fetching content:", error));
+  }, []);
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -87,65 +106,92 @@ function Profile() {
     setContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
-  const handleAddContentChange = (e) =>{
+  const handleAddContentChange = (e) => {
     const { name, value } = e.target;
-    setContentDetails({ ...contentDetails, [name]: value });
+
+    setContentDetails((prevDetails) => {
+      const updatedDetails = { ...prevDetails, [name]: value };
+
+      // Handle program change
+      if (name === "program") {
+        // Only clear subjects when the program is changed to a valid value
+        if (value === null || value === "") {
+          updatedDetails.subject = null; // Clear subject if program is reset
+        }
+      }
+
+      return updatedDetails;
+    });
   };
 
   const handleAddContent = (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-    // Append content details to FormData
-    Object.entries(contentDetails).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
+    contentFiles.forEach((contentFile) => formData.append("contentFiles", contentFile));
+    formData.append("title", contentDetails.title);
+    formData.append("description", contentDetails.description);
+    formData.append("subject", contentDetails.subject);
+    formData.append("program", contentDetails.program);
+    formData.append("keyword", contentDetails.keyword);
 
-    // Append files to FormData
-  contentFiles.forEach((file) => {
-    formData.append("contentFiles", file);
-  });
+    axios
+      .post("http://localhost:8080/uploadContent", formData)
+      .then((res) => {
+        console.log("Upload success:", res.data);
+        toast.success("Upload success", {
+          autoClose: 2000
+        });
 
-    // Axios request to upload files
-  axios
-  .post("http://localhost:8080/uploadContent", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  })
-  .then((response) => {
-    console.log("Upload success:", response.data);
-    alert("Content uploaded successfully!");
-  })
-  .catch((error) => {
-    console.error("Upload error:", error);
-    alert("Failed to upload content.");
-  });
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Upload error:", err);
+      });
 
-};
+  };
+
+  useEffect(() => {
+
+    // If program is selected, filter the courses accordingly
+    if (contentDetails.program) {
+      const filtered = courses.filter(
+        (course) => course.Program === parseInt(contentDetails.program)
+      );
+      console.log("Filtered Subjects:", filtered);
+      setFilteredSubjects(filtered);
+    } else {
+      console.log("Program not selected, clearing subjects...");
+      setFilteredSubjects([]); // Clear subjects when no program is selected
+    }
+  }, [contentDetails.program, courses]); // Run when program or courses change
+
 
   //get courses
   useEffect(() => {
     axios.get("http://localhost:8080/getCourses")
-    .then((res) => {
-      console.log(res.data);
-      setCourses(res.data);
-    })
-    .catch((err) => {
-      toast.error("Error: " + err,{
-        autoClose: 4000
+      .then((res) => {
+        console.log(res.data);
+        setCourses(res.data);
       })
-    })
-  },[]);
+      .catch((err) => {
+        toast.error("Error: " + err, {
+          autoClose: 4000
+        })
+      })
+  }, []);
+
 
   useEffect(() => {
     axios.get("http://localhost:8080/getEduContributions")
-    .then((res) => {
-      if(res.data.message === "Contributions fetched"){
-        setCSContributions(res.data.csCount);
-        setITContributions(res.data.itCount);
-      }
-    })
+      .then((res) => {
+        if (res.data.message === "Contributions fetched") {
+          setCSContributions(res.data.csCount);
+          setITContributions(res.data.itCount);
+        }
+      })
   })
 
   useEffect(() => {
@@ -281,6 +327,11 @@ function Profile() {
     }));
   };
 
+  const handleRowClick = (details) => {
+    setSelectedRequest(details);
+    setIsEditContentModalOpen(true);
+  };
+
   return (
     <div className={styles.container}>
       <ToastContainer position='top-center' />
@@ -313,11 +364,11 @@ function Profile() {
               <div className={styles.contributions_counts}>
                 <div className={styles.counts_group}>
                   <p className={styles.count_title}>information technology</p>
-                  <h3 className={styles.count}>{csContributions}</h3>
+                  <h3 className={styles.count}>{itContributions}</h3>
                 </div>
                 <div className={styles.counts_group}>
                   <p className={styles.count_title}>computer science</p>
-                  <h3 className={styles.count}>{itContributions}</h3>
+                  <h3 className={styles.count}>{csContributions}</h3>
                 </div>
               </div>
             </div>
@@ -346,9 +397,9 @@ function Profile() {
                   />
                   <p className={styles.info}>
                     Bachelor of Science in
-                    <span className={styles.bolded_text}>{profileColumns.Program === 1 ? "Computer Science" 
-                    : profileColumns.Program === 2 ? "Information Technology"
-                  : "_______"}</span>
+                    <span className={styles.bolded_text}>{profileColumns.Program === 1 ? "Computer Science"
+                      : profileColumns.Program === 2 ? "Information Technology"
+                        : "_______"}</span>
                   </p>
                 </div>
               </div>
@@ -376,132 +427,54 @@ function Profile() {
 
             <div className={styles.content_cards_container}>
               <div className={styles.content_cards}>
-                <div className={styles.card}>
-                  <div className={styles.card_info}>
-                    <h4 className={styles.card_title}>
-                      Advanced Object Oriented Programming
-                    </h4>
-                    <p className={styles.card_subtitle}>
-                      Software Engineering II
-                    </p>
-                  </div>
 
-                  <div className={styles.card_action_container}>
-                    <div className={styles.card_actions}>
-                      <button className={styles.action}>
-                        <img
-                          src={edit_icon}
-                          className={styles.action_icon}
-                          onClick={openEditContentModal}
-                          alt="edit icon"
-                        />
-                      </button>
+                {uploadedContent.length > 0 ? (
+                  uploadedContent.map(details => (
+                    <div className={styles.card} key={details.ContentID}>
+                      <div className={styles.card_info}>
+                        <h4 className={styles.card_title}>{details.Title}</h4>
+                        <p className={styles.card_subtitle}>
+                          {details.CourseTitle}
+                        </p>
+                      </div>
 
-                      <button className={styles.action}>
-                        <img
-                          src={clock_back_icon}
-                          className={styles.action_icon}
-                          alt="clock back icon"
-                          onClick={openArchiveContentModal}
-                        />
-                      </button>
+                      <div className={styles.card_action_container}>
+                        <div className={styles.card_actions}>
+                          <button onClick={() => handleRowClick(details)} className={styles.action}>
+                            <img
+                              src={edit_icon}
+                              className={styles.action_icon}
+                              onClick={openEditContentModal}
+                              alt="edit icon"
+                            />
+                          </button>
 
-                      <button className={styles.action}>
-                        <img
-                          src={delete_icon}
-                          className={styles.action_icon}
-                          alt="delete icon"
-                          onClick={openDeleteContentModal}
-                        />
-                      </button>
+                          <button className={styles.action}>
+                            <img
+                              src={clock_back_icon}
+                              className={styles.action_icon}
+                              onClick={openArchiveContentModal}
+                              alt="clock back icon"
+                            />
+                          </button>
+
+                          <button className={styles.action}>
+                            <img
+                              src={delete_icon}
+                              className={styles.action_icon}
+                              alt="delete icon"
+                              onClick={openDeleteContentModal}
+                            />
+                          </button>
+                        </div>
+                        <span className={details.Program === 1 ? styles.program_cs
+                        : details.Program === 2 ? styles.program_it : ""}>
+                          {details.Program === 1 ? "Computer Science" 
+                        : details.Program === 2 ? "Information Technology" : ""}</span>
+                      </div>
                     </div>
-                    <span className={styles.program_cs}>computer science</span>
-                  </div>
-                </div>
-
-                <div className={styles.card}>
-                  <div className={styles.card_info}>
-                    <h4 className={styles.card_title}>Array</h4>
-                    <p className={styles.card_subtitle}>
-                      Computer Programming I
-                    </p>
-                  </div>
-
-                  <div className={styles.card_action_container}>
-                    <div className={styles.card_actions}>
-                      <button className={styles.action}>
-                        <img
-                          src={edit_icon}
-                          className={styles.action_icon}
-                          onClick={openEditContentModal}
-                          alt="edit icon"
-                        />
-                      </button>
-
-                      <button className={styles.action}>
-                        <img
-                          src={clock_back_icon}
-                          className={styles.action_icon}
-                          onClick={openArchiveContentModal}
-                          alt="clock back icon"
-                        />
-                      </button>
-
-                      <button className={styles.action}>
-                        <img
-                          src={delete_icon}
-                          className={styles.action_icon}
-                          alt="delete icon"
-                          onClick={openDeleteContentModal}
-                        />
-                      </button>
-                    </div>
-                    <span className={styles.program_cs}>computer science</span>
-                  </div>
-                </div>
-
-                <div className={styles.card}>
-                  <div className={styles.card_info}>
-                    <h4 className={styles.card_title}>Network Topologies</h4>
-                    <p className={styles.card_subtitle}>
-                      Networks and Communications
-                    </p>
-                  </div>
-
-                  <div className={styles.card_action_container}>
-                    <div className={styles.card_actions}>
-                      <button className={styles.action}>
-                        <img
-                          src={edit_icon}
-                          className={styles.action_icon}
-                          onClick={openEditContentModal}
-                          alt="edit icon"
-                        />
-                      </button>
-
-                      <button className={styles.action}>
-                        <img
-                          src={clock_back_icon}
-                          className={styles.action_icon}
-                          onClick={openArchiveContentModal}
-                          alt="clock back icon"
-                        />
-                      </button>
-
-                      <button className={styles.action}>
-                        <img
-                          src={delete_icon}
-                          className={styles.action_icon}
-                          alt="delete icon"
-                          onClick={openDeleteContentModal}
-                        />
-                      </button>
-                    </div>
-                    <span className={styles.program_it}>
-                      information technology
-                    </span>
-                  </div>
-                </div>
+                  ))) : (<p>No uploaded content found.</p>)}
+                
               </div>
             </div>
 
@@ -666,36 +639,46 @@ function Profile() {
                     ></textarea>
 
                     <select
-                      name="subject"
-                      id="subject"
-                      className={`${styles.modal_content_input} ${styles.modal_content_select}`}
-                      value={contentDetails.subject}
-                      onChange={handleAddContentChange}
-                    >
-                      <option value={null} selected>Subject</option>
-                      {courses.map((course) => (
-                        <option value={course.Course} key={course.Course}> {course.Title} </option>
-                      ))}
-                    </select>
-
-                    <select
                       name="program"
                       id="program"
                       className={`${styles.modal_content_input} ${styles.modal_content_select}`}
                       value={contentDetails.program}
                       onChange={handleAddContentChange}
                     >
-                      <option value={null} selected>Program</option>
+                      <option value={null}>Program</option>
                       <option value="1">Computer Science</option>
                       <option value="2">
                         Information Technology
                       </option>
                     </select>
 
+                    <select
+                      name="subject"
+                      id="subject"
+                      className={`${styles.modal_content_input} ${styles.modal_content_select}`}
+                      value={contentDetails.subject}
+                      onChange={handleAddContentChange}
+                    >
+                      <option value={null}>Subject</option>
+                      {filteredSubjects.length > 0 ? (
+                        filteredSubjects
+                          .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
+                          .map((course) => (
+                            <option value={course.CourseID} key={course.CourseID}>
+                              {course.Title} {/* Display course title */}
+                            </option>
+                          ))
+                      ) : (
+                        <option disabled>No subjects available</option> // Fallback message
+                      )}
+                    </select>
+
                     <textarea
                       name="keyword"
                       id="keyword"
-                      placeholder="Write keywords here..."
+                      value={contentDetails.keyword}
+                      onChange={handleAddContentChange}
+                      placeholder="Write keywords here (e.g. webdev, appdev, gamedev)..."
                       className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
                     ></textarea>
 
@@ -704,29 +687,29 @@ function Profile() {
                       {/* Dito yung mga uploaded files */}
                       {contentFiles.map((file, index) => (
                         <div
-                        key={index}
-                        className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_white} // Use appropriate file icon
-                          className={styles.file_icon}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>{file.name}</p> {/* Display file name */}
-                        <img
-                          src={delete_file_icon_white} // Use appropriate delete icon
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                          onClick={() => handleContentFileRemove(index)} // Remove file
-                        />
-                      </div>
+                          key={index}
+                          className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}
+                        >
+                          <img
+                            src={file_icon_white} // Use appropriate file icon
+                            className={styles.file_icon}
+                            alt="file icon"
+                          />
+                          <p className={styles.file_name}>{file.name}</p> {/* Display file name */}
+                          <img
+                            src={delete_file_icon_white} // Use appropriate delete icon
+                            className={styles.file_icon}
+                            alt="remove file icon"
+                            onClick={() => handleContentFileRemove(index)} // Remove file
+                          />
+                        </div>
                       ))}
 
                       <div className={`${styles.file} ${styles.add_file}`}>
-                        <input 
+                        <input
                           type="file"
                           multiple
-                          onChange={handleContentFileChange} 
+                          onChange={handleContentFileChange}
                         />
                         <img
                           src={add_file_icon}
@@ -738,7 +721,7 @@ function Profile() {
                     </div>
                   </div>
                   <div className={styles.save_changes_button_container}>
-                    <button className={styles.save_changes_button}>
+                    <button className={styles.save_changes_button} onClick={handleAddContent}>
                       add content
                     </button>
                   </div>
@@ -747,7 +730,7 @@ function Profile() {
             )}
 
             {/* EDIT Content Modal */}
-            {isEditContentModalOpen && (
+            {isEditContentModalOpen && selectedRequest && (
               <div
                 className={styles.modal_overlay}
                 onClick={closeEditContentModal}
@@ -788,6 +771,7 @@ function Profile() {
                       name="title"
                       id="title"
                       placeholder="Title"
+                      value={selectedRequest.Title}
                     />
 
                     <textarea
@@ -795,38 +779,48 @@ function Profile() {
                       id="description"
                       className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
                       placeholder="Write description here..."
+                      value={selectedRequest.Description}
                     ></textarea>
-
-                    <select
-                      name="subject"
-                      id="subject"
-                      className={`${styles.modal_content_input} ${styles.modal_content_select}`}
-                    >
-                      <option value="">Subject</option>
-                      <option value="Software Engineering II">
-                        Software Engineering II
-                      </option>
-                      <option value="Computer Programming I">
-                        Computer Programming I
-                      </option>
-                    </select>
 
                     <select
                       name="program"
                       id="program"
+                      onChange={handleAddContentChange}
                       className={`${styles.modal_content_input} ${styles.modal_content_select}`}
                     >
-                      <option value="">Program</option>
-                      <option value="Computer Science">Computer Science</option>
-                      <option value="Information Technology">
+                      <option value={selectedRequest.Program}>{selectedRequest.Program === 1 ? "Computer Science"
+                      : selectedRequest.Program === 2 ? "Information Technology" : ""}</option>
+                      <option value="1">Computer Science</option>
+                      <option value="2">
                         Information Technology
                       </option>
                     </select>
+
+                    <select
+                      name="subject"
+                      id="subject"
+                      onChange={handleAddContentChange}
+                      className={`${styles.modal_content_input} ${styles.modal_content_select}`}
+                    >
+                      <option value={selectedRequest.Course}>{selectedRequest.CourseTitle}</option>
+                      {filteredSubjects.length > 0 ? (
+                        filteredSubjects
+                          .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
+                          .map((course) => (
+                            <option value={course.CourseID} key={course.CourseID}>
+                              {course.Title} {/* Display course title */}
+                            </option>
+                          ))
+                      ) : (
+                        <option disabled>No subjects available</option> // Fallback message
+                      )}
+                    </select>                  
 
                     <textarea
                       name="keyword"
                       id="keyword"
                       placeholder="Write keywords here..."
+                      value={selectedRequest.Tags}
                       className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
                     ></textarea>
 
@@ -834,8 +828,6 @@ function Profile() {
                       <div
                         className={`${styles.file} ${styles.file_icon_white}`}
                       >
-                        {" "}
-                        {/* Dito yung mga uploaded files */}
                         <img
                           src={file_icon_white}
                           className={`${styles.file_icon}`}
@@ -849,53 +841,7 @@ function Profile() {
                         />
                       </div>
 
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
-                      >
-                        <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_white}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
 
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
-                      >
-                        <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_white}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
-                      >
-                        <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_white}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
 
                       <div
                         className={`${styles.file} ${styles.file_icon_black}`}
@@ -913,53 +859,6 @@ function Profile() {
                         />
                       </div>
 
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
 
                       <div className={`${styles.file} ${styles.add_file}`}>
                         <img

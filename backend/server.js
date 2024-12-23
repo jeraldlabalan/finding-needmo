@@ -59,19 +59,128 @@ const upload = multer({ storage });
 
 app.use("/uploads", express.static("uploads"));
 
+app.get('/getUploadedContent', (req, res) => {
+    const sql = `
+        SELECT * 
+        FROM content 
+        WHERE CreatedBy = ? AND IsArchived = ? AND IsDeleted = ? 
+        ORDER BY UploadedAt DESC
+        LIMIT 3
+    `;
+    
+    // Query for the content
+    db.query(sql, [req.session.userID, 0, 0], (err, result) => {
+        if (err) {
+            return res.json({ message: "Error in server: " + err });
+        } else if (result.length > 0) {
+            // Get the course IDs from the content result
+            const courseIds = result.map(item => item.Course);
+
+            // Create placeholders for the course IDs
+            const placeholders = courseIds.map(() => '?').join(', ');
+            const getCourseTitle = `SELECT * FROM course WHERE CourseID IN (${placeholders})`;
+
+            // Query for the courses
+            db.query(getCourseTitle, courseIds, (err, courseRes) => {
+                if (err) {
+                    return res.json({ message: "Error in server: " + err });
+                } else if (courseRes.length > 0) {
+                    // Add the course titles to the result
+                    result.forEach(content => {
+                        const course = courseRes.find(c => c.CourseID === content.Course);
+                        if (course) {
+                            content.CourseTitle = course.Title; // Add course title to the content object
+                        }
+                    });
+
+                    // Parse the Files JSON data before sending to frontend
+                    result.forEach(item => {
+                        item.Files = JSON.parse(item.Files);  // Ensure Files is in a proper object format
+                    });
+
+                    // Send back the data including course titles
+                    return res.json({ uploadedContent: result });
+                } else {
+                    return res.json({ message: "No course titles found." });
+                }
+            });
+        } else {
+            return res.json({ message: "No uploaded content found." });
+        }
+    });
+});
+
+
+app.post("/uploadContent", upload.array("contentFiles"), (req, res) => {
+    const { title, description, subject, program, keyword } = req.body;
+
+    // Map uploaded files to include metadata
+    const filesMetadata = req.files.map((file) => {
+        const fileExtension = file.originalname.split('.').pop(); // Extract extension
+        return {
+            originalName: file.originalname,
+            path: file.path,
+            mimetype: file.mimetype,
+            size: file.size,
+            extension: fileExtension, // Add extension
+        };
+    });
+
+    const totalFileSize = filesMetadata.reduce((acc, file) => acc + file.size, 0);
+
+    // Extract all file extensions as a comma-separated string or JSON array
+    const fileFormats = filesMetadata.map((file) => file.extension).join(','); // e.g., "pptx,mp4,docx"
+
+    // Get current datetime
+    const datetimeUpload = new Date();
+
+    // Save to database
+    const sql = `INSERT INTO content (CreatedBy, Program, Title, Description, Course, Files, Format, FileSize, Tags, UploadedAt)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    db.query(
+        sql,
+        [
+            req.session.userID,
+            program,
+            title,
+            description,
+            subject,
+            JSON.stringify(filesMetadata), // Save metadata as JSON
+            fileFormats, // Store file extensions
+            totalFileSize, // Total size of all files
+            keyword,
+            datetimeUpload,
+        ],
+        (err, result) => {
+            if (err) {
+                console.error("Error saving content:", err);
+                return res.json({ message: "Database error: " + err });
+            }
+
+            res.json({
+                message: "Content uploaded successfully!",
+                contentId: result.insertId,
+                totalFileSize,
+                fileFormats,
+            });
+        }
+    );
+});
+
+
 
 app.get('/getCourses', (req, res) => {
     const sql = `SELECT * FROM course`;
     db.query(sql, (err, result) => {
-        if(err){
-            return res.json({message: "Error in server: " + err});
+        if (err) {
+            return res.json({ message: "Error in server: " + err });
         }
 
         return res.json(result);
     })
 })
 
-app.get('/getEduContributions', (req, res) =>{
+app.get('/getEduContributions', (req, res) => {
     const csCount = `SELECT COUNT(*) AS CSCount FROM content WHERE CreatedBy = ? AND IsArchived = ? AND isDeleted = ? AND Program = 1`;
     const itCount = `SELECT COUNT(*) AS ITCount FROM content WHERE CreatedBy = ? AND IsArchived = ? AND isDeleted = ? AND Program = 2`;
 
@@ -88,13 +197,13 @@ app.get('/getEduContributions', (req, res) =>{
     ];
 
     db.query(csCount, csValues, (err, csRes) => {
-        if(err){
-            return res.json({message: "Error in server: " + err});
+        if (err) {
+            return res.json({ message: "Error in server: " + err });
         }
-        
+
         db.query(itCount, itValues, (err, itRes) => {
-            if(err){
-                return res.json({message: "Error in server: " + err});
+            if (err) {
+                return res.json({ message: "Error in server: " + err });
             }
 
             res.json({
@@ -129,16 +238,16 @@ app.post('/saveEducProfileChanges', upload.single("uploadPFP"), (req, res) => {
         req.session.userID
     ];
 
-    db.query(sql, values, (err, result) =>{
-        if(err){
-            console.log("err" , err);
-            return res.json({message: "Error in server: " + err});
-        } else if(result.affectedRows > 0){
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.log("err", err);
+            return res.json({ message: "Error in server: " + err });
+        } else if (result.affectedRows > 0) {
             console.log("success", result);
-            return res.json({message: "Changes saved", pfpURL: pfpPath});
-        } else{
-            console.log("failed",result);
-            return res.json({message: "Failed to save changes"});
+            return res.json({ message: "Changes saved", pfpURL: pfpPath });
+        } else {
+            console.log("failed", result);
+            return res.json({ message: "Failed to save changes" });
         }
     })
 })
@@ -149,13 +258,13 @@ app.get('/getProfile', (req, res) => {
     const profileQuery = `SELECT * FROM profile WHERE User = ?`;
 
     db.query(userQuery, req.session.email, (err, userRes) => {
-        if(err){
-            return res.json({message: "Error in server: " + err});
-        } else if(userRes.length > 0){
+        if (err) {
+            return res.json({ message: "Error in server: " + err });
+        } else if (userRes.length > 0) {
             db.query(profileQuery, userRes[0].UserID, (err, profileRes) => {
-                if(err){
-                    return res.json({message: "Error in server: " + err});        
-                } else if(profileRes.length > 0){
+                if (err) {
+                    return res.json({ message: "Error in server: " + err });
+                } else if (profileRes.length > 0) {
                     const pfp = `http://localhost:8080/${profileRes[0].Picture}`;
 
                     console.log(userRes);
@@ -167,11 +276,11 @@ app.get('/getProfile', (req, res) => {
                         profileData: profileRes[0]
                     })
                 } else {
-                    return res.json({message: "Error fetching user user profile"});
+                    return res.json({ message: "Error fetching user user profile" });
                 }
             })
-        } else{
-            return res.json({message: "Error fetching user login credentials"});
+        } else {
+            return res.json({ message: "Error fetching user login credentials" });
         }
     })
 })
@@ -431,7 +540,7 @@ app.post('/resetPass', (req, res) => {
             if (err) {
                 return res.json({ message: "Error in server: " + err });
             } else if (userResult.affectedRows > 0) {
-                return res.json({message: "Password reset successfully."});
+                return res.json({ message: "Password reset successfully." });
             } else {
                 return res.json({ message: "Failed to reset password" });
             }
