@@ -59,6 +59,177 @@ const upload = multer({ storage });
 
 app.use("/uploads", express.static("uploads"));
 
+app.post('/deleteUploadedContent', (req, res) => {
+    const { contentID, title } = req.body;
+
+    console.log("Received Data for Archiving:", {
+        contentID,
+        title,
+        userID: req.session.userID
+    });
+
+    const sql = `UPDATE content 
+    SET UpdatedAt = NOW(), 
+        IsDeleted = 1,
+        DeletedAt = NOW()
+    WHERE ContentID = ? AND CreatedBy = ?`;
+
+    db.query(sql, [contentID, req.session.userID], (err, result) => {
+        if (err) {
+            console.error("Error deleting content:", err);
+            return res.json({ message: "Error in server: " + err });
+        } else if (result.affectedRows > 0) {
+            console.log("Content archived successfully!");
+            return res.json({ message: "Content deleted successfully!" });
+        } else {
+            console.log("Failed to archive content");
+            return res.json({ message: "Failed to delete content" });
+        }
+    });
+});
+
+app.post('/archiveUploadedContent', (req, res) => {
+    const { contentID, title } = req.body;
+
+    console.log("Received Data for Archiving:", {
+        contentID,
+        title,
+        userID: req.session.userID
+    });
+
+    const sql = `UPDATE content 
+    SET UpdatedAt = NOW(), 
+        IsArchived = 1 
+    WHERE ContentID = ? AND CreatedBy = ?`;
+
+    db.query(sql, [contentID, req.session.userID], (err, result) => {
+        if (err) {
+            console.error("Error archiving content:", err);
+            return res.json({ message: "Error in server: " + err });
+        } else if (result.affectedRows > 0) {
+            console.log("Content archived successfully!");
+            return res.json({ message: "Content archived successfully!" });
+        } else {
+            console.log("Failed to archive content");
+            return res.json({ message: "Failed to archive content" });
+        }
+    });
+});
+
+app.get('/getContentPrograms', (req, res) => {
+    const sql = `SELECT ProgramID, Name FROM program`;
+    db.query(sql, (err, result) => {
+        if (err) {
+            return res.json({ message: "Error in server: " + err });
+        }
+
+        return res.json(result);
+    })
+})
+
+app.get('/getContentSubjects', (req, res) => {
+    const { program } = req.query;
+    const sql = 'SELECT * FROM course WHERE Program = ?';
+    db.query(sql, [program], (err, result) => {
+      if (err) {
+        return res.status(500).json({ message: "Database error: " + err });
+      }
+      res.json(result);
+    });
+})
+
+app.post('/editUploadedContent', upload.array("editContentFiles"), (req, res) => {
+    try {
+        const { contentID, title, description, subject, program, keyword, existingFiles } = req.body;
+        const files = req.files;
+
+        console.log("Received Data:", {
+            contentID,
+            title,
+            description,
+            subject,
+            program,
+            keyword,
+            files,
+            existingFiles
+        });
+
+        if (!contentID || !title || !description || !subject || !program || !keyword) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        // Check if the subject (CourseID) exists in the course table
+        const checkCourseSql = 'SELECT * FROM course WHERE CourseID = ?';
+        db.query(checkCourseSql, [subject], (err, courseResult) => {
+            if (err) {
+                console.error("Error checking course:", err);
+                return res.status(500).json({ message: "Database error: " + err });
+            }
+
+            if (courseResult.length === 0) {
+                console.log("Invalid CourseID:", subject);
+                return res.status(400).json({ message: "Invalid CourseID" });
+            }
+
+            const existingFilesMetadata = existingFiles ? [JSON.parse(existingFiles)] : [];
+            const newFilesMetadata = files.map(file => ({
+                originalName: file.originalname,
+                path: file.path,
+                mimeType: file.mimetype,
+                size: file.size
+            }));
+
+            const allFilesMetadata = [...existingFilesMetadata, ...newFilesMetadata];
+
+            console.log("All Files Metadata:", allFilesMetadata);
+
+            const datetimeUpload = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+            const sql = `
+                UPDATE content
+                SET Title = ?,
+                    Description = ?,
+                    Course = ?,
+                    Program = ?,
+                    Files = ?,
+                    Tags = ?,
+                    UploadedAt = ?,
+                    UpdatedAt = NOW()
+                WHERE ContentID = ? AND CreatedBy = ?
+            `;
+
+            db.query(
+                sql,
+                [
+                    title,
+                    description,
+                    subject,
+                    program,
+                    JSON.stringify(allFilesMetadata), // Save metadata as JSON
+                    keyword,
+                    datetimeUpload,
+                    contentID,
+                    req.session.userID
+                ],
+                (err, result) => {
+                    if (err) {
+                        console.error("Error saving content:", err);
+                        return res.status(500).json({ message: "Database error: " + err });
+                    }
+
+                    res.json({
+                        message: "Content edited successfully!",
+                        contentId: contentID,
+                    });
+                }
+            );
+        });
+    } catch (error) {
+        console.error("Unexpected error:", error);
+        return res.status(500).json({ message: "Unexpected error occurred" });
+    }
+});
+
 app.get('/getUploadedContent', (req, res) => {
     const sql = `
         SELECT * 
@@ -95,10 +266,11 @@ app.get('/getUploadedContent', (req, res) => {
 
                     // Parse the Files JSON data before sending to frontend
                     result.forEach(item => {
-                        item.Files = JSON.parse(item.Files);  // Ensure Files is in a proper object format
-                    });
+                        item.Files = item.Files ? JSON.parse(item.Files) : [];  // Ensure Files is in a proper object format
+                      });
 
                     // Send back the data including course titles
+                    console.log("Uploaded content:", result);
                     return res.json({ uploadedContent: result });
                 } else {
                     return res.json({ message: "No course titles found." });
