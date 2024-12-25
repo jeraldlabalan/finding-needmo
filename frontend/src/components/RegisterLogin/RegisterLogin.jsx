@@ -69,7 +69,7 @@ function RegisterLogin() {
           navigate('/registerlogin?form=login');
         }
       })
-      .catch(err => toast.err("Error" + err, {autoClose: 4000}))
+      .catch(err => toast.error("Error" + err, {autoClose: 4000}))
   }, []);
 
   const submitLogin = (e) => {

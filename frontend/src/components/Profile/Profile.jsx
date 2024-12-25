@@ -57,7 +57,26 @@ function Profile() {
     description: '',
     subject: '',
     program: '',
+    course: '',
+    keyword: '',
   });
+
+  const [filteredSubjects, setFilteredSubjects] = useState([]);
+  const [selectedRequest, setSelectedRequest] = useState([]);
+
+  const [uploadedContent, setUploadedContent] = useState([]);
+
+  useEffect(() => {
+    // Fetch the uploaded content data
+    axios.get('http://localhost:8080/getUploadedContent')
+      .then(response => {
+        if (response.data.uploadedContent) {
+          setUploadedContent(response.data.uploadedContent);
+        }
+        console.log(response.data);
+      })
+      .catch(error => console.error("Error fetching content:", error));
+  }, []);
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -87,65 +106,237 @@ function Profile() {
     setContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
-  const handleAddContentChange = (e) =>{
+  const handleAddContentChange = (e) => {
     const { name, value } = e.target;
-    setContentDetails({ ...contentDetails, [name]: value });
+
+    setContentDetails((prevDetails) => {
+      const updatedDetails = { ...prevDetails, [name]: value };
+
+      // Handle program change
+      if (name === "program") {
+        // Only clear subjects when the program is changed to a valid value
+        if (value === null || value === "") {
+          updatedDetails.subject = null; // Clear subject if program is reset
+        }
+      }
+
+      return updatedDetails;
+    });
+  };
+
+  const [programs, setPrograms] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [editContent, setEditContent] = useState({
+    contentID: selectedRequest.ContentID,
+    title: selectedRequest.Title,
+    description: selectedRequest.Description,
+    subject: selectedRequest.Course,
+    program: selectedRequest.Program,
+    course: selectedRequest.Course,
+    courseTitle: selectedRequest.CourseTitle, // Add courseTitle
+    keyword: selectedRequest.Tags,
+    files: selectedRequest.Files, // Initialize files
+  });
+
+  const [editContentFiles, setEditContentFiles] = useState(selectedRequest.Files || []); // Files for editing content
+
+  const handleEditContentFiles = (e) => {
+    const selectedFiles = Array.from(e.target.files); // Convert FileList to array
+    const newFiles = selectedFiles.map(file => ({
+      originalName: file.name,
+      file: file, // Store the actual file object
+      mimeType: file.type,
+      size: file.size
+    }));
+  
+    console.log("New Files:", newFiles);
+  
+    setEditContentFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    setEditContent((prevContent) => ({
+      ...prevContent,
+      files: [...prevContent.files, ...newFiles]
+    }));
+  };
+  
+  const handleEditContentFileRemove = (index) => {
+    console.log("Removing file at index:", index);
+  
+    setEditContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setEditContent((prevContent) => ({
+      ...prevContent,
+      files: prevContent.files.filter((_, i) => i !== index)
+    }));
+  };
+  
+
+  useEffect(() => {
+    if (selectedRequest) {
+      console.log("Selected Request:", selectedRequest.Course);
+      setEditContent({
+        contentID: selectedRequest.ContentID,
+        title: selectedRequest.Title,
+        description: selectedRequest.Description,
+        subject: selectedRequest.Course, // Ensure this is correctly set
+        program: selectedRequest.Program,
+        courseID: selectedRequest.Course,
+        courseTitle: selectedRequest.CourseTitle, // Add courseTitle
+        keyword: selectedRequest.Tags,
+        files: Array.isArray(selectedRequest.Files) ? selectedRequest.Files : [], // Ensure files is an array
+      });
+  
+      setEditContentFiles(Array.isArray(selectedRequest.Files) ? selectedRequest.Files : []); // Ensure files is an array
+    }
+  }, [selectedRequest]);
+
+  const handleEditContentChange = (e) => {
+    const { name, value } = e.target;
+    setEditContent((prevRequest) => ({
+      ...prevRequest,
+      [name]: value,
+    }));
   };
 
   const handleAddContent = (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-    // Append content details to FormData
-    Object.entries(contentDetails).forEach(([key, value]) => {
-      formData.append(key, value);
+    contentFiles.forEach((contentFile) => formData.append("contentFiles", contentFile));
+    formData.append("title", contentDetails.title);
+    formData.append("description", contentDetails.description);
+    formData.append("subject", contentDetails.subject);
+    formData.append("program", contentDetails.program);
+    formData.append("keyword", contentDetails.keyword);
+
+    axios
+      .post("http://localhost:8080/uploadContent", formData)
+      .then((res) => {
+        console.log("Upload success:", res.data);
+        toast.success("Upload success", {
+          autoClose: 2000
+        });
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Upload error:", err);
+      });
+
+  };
+
+  const handleEditContent = (e) => {
+    e.preventDefault();
+  
+    const formData = new FormData();
+    editContentFiles.forEach((editContentFile) => {
+      if (editContentFile.file) {
+        formData.append("editContentFiles", editContentFile.file); // Append the actual file object
+      } else {
+        formData.append("existingFiles", JSON.stringify(editContentFile)); // Append existing file metadata
+      }
     });
+    formData.append("contentID", editContent.contentID);
+    formData.append("title", editContent.title);
+    formData.append("description", editContent.description);
+    formData.append("subject", editContent.subject); // Ensure this is a valid CourseID
+    formData.append("program", editContent.program);
+    formData.append("keyword", editContent.keyword);
+  
+    console.log("Form Data:", {
+      contentID: editContent.contentID,
+      title: editContent.title,
+      description: editContent.description,
+      subject: editContent.subject,
+      program: editContent.program,
+      keyword: editContent.keyword,
+      files: editContentFiles
+    });
+  
+    axios
+      .post("http://localhost:8080/editUploadedContent", formData)
+      .then((res) => {
+        console.log("Edit success:", res.data);
+        toast.success("Edit success", {
+          autoClose: 2000
+        });
+  
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Edit error:", err);
+      });
+  };
 
-    // Append files to FormData
-  contentFiles.forEach((file) => {
-    formData.append("contentFiles", file);
-  });
+  useEffect(() => {
+    axios.get("http://localhost:8080/getContentPrograms")
+      .then((res) => {
+        console.log(res.data);
+        setPrograms(res.data);
+      })
+      .catch((err) => {
+        toast.error("Error: " + err, {
+          autoClose: 4000
+        })
+      })
+  }, []);
 
-    // Axios request to upload files
-  axios
-  .post("http://localhost:8080/uploadContent", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  })
-  .then((response) => {
-    console.log("Upload success:", response.data);
-    alert("Content uploaded successfully!");
-  })
-  .catch((error) => {
-    console.error("Upload error:", error);
-    alert("Failed to upload content.");
-  });
+  useEffect(() => {
+    if (editContent.program) {
+      axios.get(`http://localhost:8080/getContentSubjects?program=${editContent.program}`)
+        .then((res) => {
+          console.log(res.data);
+          setSubjects(res.data);
+        })
+        .catch((err) => {
+          toast.error("Error: " + err, {
+            autoClose: 4000
+          })
+        })
+    }
+  }, [editContent.program]);
 
-};
+  useEffect(() => {
+
+    // If program is selected, filter the courses accordingly
+    if (contentDetails.program) {
+      const filtered = courses.filter(
+        (course) => course.Program === parseInt(contentDetails.program)
+      );
+      console.log("Filtered Subjects:", filtered);
+      setFilteredSubjects(filtered);
+    } else {
+      console.log("Program not selected, clearing subjects...");
+      setFilteredSubjects([]); // Clear subjects when no program is selected
+    }
+  }, [contentDetails.program, courses]); // Run when program or courses change
+
 
   //get courses
   useEffect(() => {
     axios.get("http://localhost:8080/getCourses")
-    .then((res) => {
-      console.log(res.data);
-      setCourses(res.data);
-    })
-    .catch((err) => {
-      toast.error("Error: " + err,{
-        autoClose: 4000
+      .then((res) => {
+        console.log(res.data);
+        setCourses(res.data);
       })
-    })
-  },[]);
+      .catch((err) => {
+        toast.error("Error: " + err, {
+          autoClose: 4000
+        })
+      })
+  }, []);
+
 
   useEffect(() => {
     axios.get("http://localhost:8080/getEduContributions")
-    .then((res) => {
-      if(res.data.message === "Contributions fetched"){
-        setCSContributions(res.data.csCount);
-        setITContributions(res.data.itCount);
-      }
-    })
+      .then((res) => {
+        if (res.data.message === "Contributions fetched") {
+          setCSContributions(res.data.csCount);
+          setITContributions(res.data.itCount);
+        }
+      })
   })
 
   useEffect(() => {
@@ -210,14 +401,6 @@ function Profile() {
       })
   }
 
-  const nextStepArchive = () => {
-    setCurrentStepArchive((prev) => (prev < 2 ? prev + 1 : prev));
-  };
-
-  const nextStepDelete = () => {
-    setCurrentStepDelete((prev) => (prev < 2 ? prev + 1 : prev));
-  };
-
   // Function to open the modals
   const openEditProfileModal = () => {
     setIsEditProfileModalOpen(true);
@@ -235,9 +418,6 @@ function Profile() {
     setIsAddContentModalOpen(true);
   };
 
-  const openDeleteContentModal = () => {
-    setIsDeleteContentModalOpen(true)
-  }
 
   // Function to close the modals
   const closeEditProfileModal = () => {
@@ -250,6 +430,9 @@ function Profile() {
 
   const closeArchiveContentModal = () => {
     setIsArchiveContentModalOpen(false);
+  if (isArchiveSuccess) {
+    window.location.reload();
+  }
   };
 
   const closeAddContentModal = () => {
@@ -258,6 +441,9 @@ function Profile() {
 
   const closeDeleteContentModal = () => {
     setIsDeleteContentModalOpen(false);
+    if (isDeleteSuccess) {
+      window.location.reload();
+    }
   }
 
   // Function to handle the file upload change
@@ -273,6 +459,93 @@ function Profile() {
     }
   };
 
+  const [archiveContent, setArchiveContent] = useState({
+    contentID: '',
+    archive: '',
+  });
+  const [isArchiveSuccess, setIsArchiveSuccess] = useState(false);
+
+  const handleArchiveContentChange = (e) => {
+    const { name, value } = e.target;
+    setArchiveContent((prevContent) => ({
+      ...prevContent,
+      [name]: value
+    }));
+  };
+
+  const handleArchiveContent = () => {
+    if(archiveContent.archive !== selectedRequest.Title || !archiveContent.archive) {
+      toast.error("Title does not match", {
+        autoClose: 2000
+      });
+      return;
+    }
+
+    const data = {
+      contentID: selectedRequest.ContentID,
+      title: archiveContent.archive
+    };
+
+    axios.post("http://localhost:8080/archiveUploadedContent", data)
+      .then((res) => {
+        console.log("Archive success:", res.data);
+        toast.success("Archive success", {
+          autoClose: 2000
+        });
+
+        setCurrentStepArchive((prev) => (prev < 2 ? prev + 1 : prev));
+        setIsArchiveSuccess(true);
+      })
+      .catch((err) => {
+        console.error("Archive error:", err);
+        setIsArchiveSuccess(false);
+      });
+  }
+
+
+  const [deleteContent, setDeleteContent] = useState({
+    contentID: '',
+    delete: '',
+  });
+  const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
+
+  const handleDeleteContentChange = (e) => {
+    const { name, value } = e.target;
+    setDeleteContent((prevContent) => ({
+      ...prevContent,
+      [name]: value
+    }));
+  };
+
+  const handleDeleteContent = () => {
+    if(deleteContent.delete !== selectedRequest.Title || !deleteContent.delete) {
+      toast.error("Title does not match", {
+        autoClose: 2000
+      });
+      return;
+    }
+
+    const data = {
+      contentID: selectedRequest.ContentID,
+      title: deleteContent.delete
+    };
+
+    axios.post("http://localhost:8080/deleteUploadedContent", data)
+      .then((res) => {
+        console.log("Delete success:", res.data);
+        toast.success("Delete success", {
+          autoClose: 2000
+        });
+
+        setCurrentStepDelete((prev) => (prev < 2 ? prev + 1 : prev));
+        setIsDeleteSuccess(true);
+      })
+      .catch((err) => {
+        console.error("Archive error:", err);
+        setIsDeleteSuccess(false);
+      });
+  }
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setProfileInfo((prevState) => ({
@@ -280,6 +553,31 @@ function Profile() {
       [name]: value, // Dynamically update state
     }));
   };
+
+  const handleEditRow = (details) => {
+    setSelectedRequest({
+      ...details,
+      files: details.Files
+    });
+    setIsEditContentModalOpen(true);
+  };
+
+  const handleArchiveRow = (details) => {
+    setSelectedRequest({
+      ...details,
+      files: details.Files
+    });
+    setIsArchiveContentModalOpen(true);
+    toast.dismiss();
+  };
+
+  const handleDeleteRow = (details) => {
+    setSelectedRequest({
+      ...details,
+      files: details.Files
+    });
+    setIsDeleteContentModalOpen(true);
+  }
 
   return (
     <div className={styles.container}>
@@ -313,11 +611,11 @@ function Profile() {
               <div className={styles.contributions_counts}>
                 <div className={styles.counts_group}>
                   <p className={styles.count_title}>information technology</p>
-                  <h3 className={styles.count}>{csContributions}</h3>
+                  <h3 className={styles.count}>{itContributions}</h3>
                 </div>
                 <div className={styles.counts_group}>
                   <p className={styles.count_title}>computer science</p>
-                  <h3 className={styles.count}>{itContributions}</h3>
+                  <h3 className={styles.count}>{csContributions}</h3>
                 </div>
               </div>
             </div>
@@ -346,9 +644,9 @@ function Profile() {
                   />
                   <p className={styles.info}>
                     Bachelor of Science in
-                    <span className={styles.bolded_text}>{profileColumns.Program === 1 ? "Computer Science" 
-                    : profileColumns.Program === 2 ? "Information Technology"
-                  : "_______"}</span>
+                    <span className={styles.bolded_text}>{profileColumns.Program === 1 ? "Computer Science"
+                      : profileColumns.Program === 2 ? "Information Technology"
+                        : "_______"}</span>
                   </p>
                 </div>
               </div>
@@ -376,132 +674,54 @@ function Profile() {
 
             <div className={styles.content_cards_container}>
               <div className={styles.content_cards}>
-                <div className={styles.card}>
-                  <div className={styles.card_info}>
-                    <h4 className={styles.card_title}>
-                      Advanced Object Oriented Programming
-                    </h4>
-                    <p className={styles.card_subtitle}>
-                      Software Engineering II
-                    </p>
-                  </div>
 
-                  <div className={styles.card_action_container}>
-                    <div className={styles.card_actions}>
-                      <button className={styles.action}>
-                        <img
-                          src={edit_icon}
-                          className={styles.action_icon}
-                          onClick={openEditContentModal}
-                          alt="edit icon"
-                        />
-                      </button>
+                {uploadedContent.length > 0 ? (
+                  uploadedContent.map(details => (
+                    <div className={styles.card} key={details.ContentID}>
+                      <div className={styles.card_info}>
+                        <h4 className={styles.card_title}>{details.Title}</h4>
+                        <p className={styles.card_subtitle}>
+                          {details.CourseTitle}
+                        </p>
+                      </div>
 
-                      <button className={styles.action}>
-                        <img
-                          src={clock_back_icon}
-                          className={styles.action_icon}
-                          alt="clock back icon"
-                          onClick={openArchiveContentModal}
-                        />
-                      </button>
+                      <div className={styles.card_action_container}>
+                        <div className={styles.card_actions}>
+                          <button onClick={() => handleEditRow(details)} className={styles.action}>
+                            <img
+                              src={edit_icon}
+                              className={styles.action_icon}
+                              onClick={openEditContentModal}
+                              alt="edit icon"
+                            />
+                          </button>
 
-                      <button className={styles.action}>
-                        <img
-                          src={delete_icon}
-                          className={styles.action_icon}
-                          alt="delete icon"
-                          onClick={openDeleteContentModal}
-                        />
-                      </button>
+                          <button onClick={() => handleArchiveRow(details)} className={styles.action}>
+                            <img
+                              src={clock_back_icon}
+                              className={styles.action_icon}
+                              onClick={openArchiveContentModal}
+                              alt="clock back icon"
+                            />
+                          </button>
+
+                          <button className={styles.action}>
+                            <img
+                              src={delete_icon}
+                              className={styles.action_icon}
+                              alt="delete icon"
+                              onClick={() => handleDeleteRow(details)}
+                            />
+                          </button>
+                        </div>
+                        <span className={details.Program === 1 ? styles.program_cs
+                        : details.Program === 2 ? styles.program_it : ""}>
+                          {details.Program === 1 ? "Computer Science" 
+                        : details.Program === 2 ? "Information Technology" : ""}</span>
+                      </div>
                     </div>
-                    <span className={styles.program_cs}>computer science</span>
-                  </div>
-                </div>
-
-                <div className={styles.card}>
-                  <div className={styles.card_info}>
-                    <h4 className={styles.card_title}>Array</h4>
-                    <p className={styles.card_subtitle}>
-                      Computer Programming I
-                    </p>
-                  </div>
-
-                  <div className={styles.card_action_container}>
-                    <div className={styles.card_actions}>
-                      <button className={styles.action}>
-                        <img
-                          src={edit_icon}
-                          className={styles.action_icon}
-                          onClick={openEditContentModal}
-                          alt="edit icon"
-                        />
-                      </button>
-
-                      <button className={styles.action}>
-                        <img
-                          src={clock_back_icon}
-                          className={styles.action_icon}
-                          onClick={openArchiveContentModal}
-                          alt="clock back icon"
-                        />
-                      </button>
-
-                      <button className={styles.action}>
-                        <img
-                          src={delete_icon}
-                          className={styles.action_icon}
-                          alt="delete icon"
-                          onClick={openDeleteContentModal}
-                        />
-                      </button>
-                    </div>
-                    <span className={styles.program_cs}>computer science</span>
-                  </div>
-                </div>
-
-                <div className={styles.card}>
-                  <div className={styles.card_info}>
-                    <h4 className={styles.card_title}>Network Topologies</h4>
-                    <p className={styles.card_subtitle}>
-                      Networks and Communications
-                    </p>
-                  </div>
-
-                  <div className={styles.card_action_container}>
-                    <div className={styles.card_actions}>
-                      <button className={styles.action}>
-                        <img
-                          src={edit_icon}
-                          className={styles.action_icon}
-                          onClick={openEditContentModal}
-                          alt="edit icon"
-                        />
-                      </button>
-
-                      <button className={styles.action}>
-                        <img
-                          src={clock_back_icon}
-                          className={styles.action_icon}
-                          onClick={openArchiveContentModal}
-                          alt="clock back icon"
-                        />
-                      </button>
-
-                      <button className={styles.action}>
-                        <img
-                          src={delete_icon}
-                          className={styles.action_icon}
-                          alt="delete icon"
-                          onClick={openDeleteContentModal}
-                        />
-                      </button>
-                    </div>
-                    <span className={styles.program_it}>
-                      information technology
-                    </span>
-                  </div>
-                </div>
+                  ))) : (<p>No uploaded content found.</p>)}
+                
               </div>
             </div>
 
@@ -666,36 +886,46 @@ function Profile() {
                     ></textarea>
 
                     <select
-                      name="subject"
-                      id="subject"
-                      className={`${styles.modal_content_input} ${styles.modal_content_select}`}
-                      value={contentDetails.subject}
-                      onChange={handleAddContentChange}
-                    >
-                      <option value={null} selected>Subject</option>
-                      {courses.map((course) => (
-                        <option value={course.Course} key={course.Course}> {course.Title} </option>
-                      ))}
-                    </select>
-
-                    <select
                       name="program"
                       id="program"
                       className={`${styles.modal_content_input} ${styles.modal_content_select}`}
                       value={contentDetails.program}
                       onChange={handleAddContentChange}
                     >
-                      <option value={null} selected>Program</option>
+                      <option value={null}>Program</option>
                       <option value="1">Computer Science</option>
                       <option value="2">
                         Information Technology
                       </option>
                     </select>
 
+                    <select
+                      name="subject"
+                      id="subject"
+                      className={`${styles.modal_content_input} ${styles.modal_content_select}`}
+                      value={contentDetails.subject}
+                      onChange={handleAddContentChange}
+                    >
+                      <option value={null}>Subject</option>
+                      {filteredSubjects.length > 0 ? (
+                        filteredSubjects
+                          .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
+                          .map((course) => (
+                            <option value={course.CourseID} key={course.CourseID}>
+                              {course.Title} {/* Display course title */}
+                            </option>
+                          ))
+                      ) : (
+                        <option disabled>No subjects available</option> // Fallback message
+                      )}
+                    </select>
+
                     <textarea
                       name="keyword"
                       id="keyword"
-                      placeholder="Write keywords here..."
+                      value={contentDetails.keyword}
+                      onChange={handleAddContentChange}
+                      placeholder="Write keywords here (e.g. webdev, appdev, gamedev)..."
                       className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
                     ></textarea>
 
@@ -704,29 +934,29 @@ function Profile() {
                       {/* Dito yung mga uploaded files */}
                       {contentFiles.map((file, index) => (
                         <div
-                        key={index}
-                        className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_white} // Use appropriate file icon
-                          className={styles.file_icon}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>{file.name}</p> {/* Display file name */}
-                        <img
-                          src={delete_file_icon_white} // Use appropriate delete icon
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                          onClick={() => handleContentFileRemove(index)} // Remove file
-                        />
-                      </div>
+                          key={index}
+                          className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}
+                        >
+                          <img
+                            src={file_icon_white} // Use appropriate file icon
+                            className={styles.file_icon}
+                            alt="file icon"
+                          />
+                          <p className={styles.file_name}>{file.name}</p> {/* Display file name */}
+                          <img
+                            src={delete_file_icon_white} // Use appropriate delete icon
+                            className={styles.file_icon}
+                            alt="remove file icon"
+                            onClick={() => handleContentFileRemove(index)} // Remove file
+                          />
+                        </div>
                       ))}
 
                       <div className={`${styles.file} ${styles.add_file}`}>
-                        <input 
+                        <input
                           type="file"
                           multiple
-                          onChange={handleContentFileChange} 
+                          onChange={handleContentFileChange}
                         />
                         <img
                           src={add_file_icon}
@@ -738,7 +968,7 @@ function Profile() {
                     </div>
                   </div>
                   <div className={styles.save_changes_button_container}>
-                    <button className={styles.save_changes_button}>
+                    <button className={styles.save_changes_button} onClick={handleAddContent}>
                       add content
                     </button>
                   </div>
@@ -747,241 +977,146 @@ function Profile() {
             )}
 
             {/* EDIT Content Modal */}
-            {isEditContentModalOpen && (
-              <div
-                className={styles.modal_overlay}
-                onClick={closeEditContentModal}
-              >
-                <div
-                  className={`${styles.modal_content} ${styles.modal_content_container}`}
-                  onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
-                >
-                  {/* Modal Content Here */}
+    {isEditContentModalOpen && selectedRequest && (
+      <div className={styles.modal_overlay} onClick={closeEditContentModal}>
+        <div
+          className={`${styles.modal_content} ${styles.modal_content_container}`}
+          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+        >
+          <div className={styles.modal_content_header}>
+            <button className={styles.header_close_button} onClick={closeEditContentModal}>
+              <img
+                src={modal_close_icon}
+                className={styles.header_close_icon}
+                alt="close icon"
+              />
+            </button>
+          </div>
+          <div className={styles.modal_content_info_container}>
+            <div className={styles.subheader_container}>
+              <img
+                src={edit_content_icon}
+                className={styles.subheader_icon}
+                alt="edit content icon"
+              />
+              <h2 className={styles.subheader_description}>
+                Edit Content
+              </h2>
+            </div>
 
-                  <div className={styles.modal_content_header}>
-                    <button
-                      className={styles.header_close_button}
-                      onClick={closeEditContentModal}
-                    >
-                      <img
-                        src={modal_close_icon}
-                        className={styles.header_close_icon}
-                        alt="close icon"
-                      />
-                    </button>
-                  </div>
-                  <div className={styles.modal_content_info_container}>
-                    <div className={styles.subheader_container}>
-                      <img
-                        src={edit_content_icon}
-                        className={styles.subheader_icon}
-                        alt="edit content icon"
-                      />
-                      <h2 className={styles.subheader_description}>
-                        Edit Content
-                      </h2>
-                    </div>
+            <input
+              type="text"
+              name="contentID"
+              value={editContent.contentID}
+              onChange={handleEditContentChange}
+              style={{ display: 'none' }} // Hide the input field
+            />
 
-                    <input
-                      type="text"
-                      className={`${styles.modal_content_input} ${styles.modal_content_text}`}
-                      name="title"
-                      id="title"
-                      placeholder="Title"
-                    />
+            <input
+              type="text"
+              className={`${styles.modal_content_input} ${styles.modal_content_text}`}
+              name="title"
+              id="title"
+              placeholder="Title"
+              value={editContent.title}
+              onChange={handleEditContentChange}
+            />
 
-                    <textarea
-                      name="description"
-                      id="description"
-                      className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
-                      placeholder="Write description here..."
-                    ></textarea>
+            <textarea
+              name="description"
+              id="description"
+              className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
+              placeholder="Write description here..."
+              value={editContent.description}
+              onChange={handleEditContentChange}
+            ></textarea>
 
-                    <select
-                      name="subject"
-                      id="subject"
-                      className={`${styles.modal_content_input} ${styles.modal_content_select}`}
-                    >
-                      <option value="">Subject</option>
-                      <option value="Software Engineering II">
-                        Software Engineering II
-                      </option>
-                      <option value="Computer Programming I">
-                        Computer Programming I
-                      </option>
-                    </select>
+<select
+        name="program"
+        value={editContent.program}
+        onChange={handleEditContentChange}
+        className={`${styles.modal_content_input} ${styles.modal_content_select}`}
+      >
+        {programs.map((program) => (
+          <option key={program.ProgramID} value={program.ProgramID}>
+            {program.Name === "Bachelor of Science in Computer Science" ? "Computer Science"
+            : program.Name === "Bachelor of Science in Information Technology" ? "Information Technology"
+            : ""}
+          </option>
+        ))}
+      </select>
+      <select
+        name="subject"
+        value={editContent.subject}
+        onChange={handleEditContentChange}
+        className={`${styles.modal_content_input} ${styles.modal_content_select}`}
+      >
+        <option value={editContent.subject}>{editContent.courseTitle}</option>
+        {subjects.length > 0 ? (
+          subjects
+            .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
+            .map((course) => (
+              <option value={course.CourseID} key={course.CourseID}>
+                {course.Title} {/* Display course title */}
+              </option>
+            ))
+        ) : (
+          <option disabled>No subjects available</option> // Fallback message
+        )}
+      </select>
 
-                    <select
-                      name="program"
-                      id="program"
-                      className={`${styles.modal_content_input} ${styles.modal_content_select}`}
-                    >
-                      <option value="">Program</option>
-                      <option value="Computer Science">Computer Science</option>
-                      <option value="Information Technology">
-                        Information Technology
-                      </option>
-                    </select>
+            <textarea
+              name="keyword"
+              id="keyword"
+              value={editContent.keyword}
+              onChange={handleEditContentChange}
+              placeholder="Write keywords here..."
+              className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
+            ></textarea>
 
-                    <textarea
-                      name="keyword"
-                      id="keyword"
-                      placeholder="Write keywords here..."
-                      className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
-                    ></textarea>
-
-                    <div className={styles.modal_file_container}>
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
-                      >
-                        {" "}
-                        {/* Dito yung mga uploaded files */}
-                        <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_white}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
-                      >
-                        <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_white}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
-                      >
-                        <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_white}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div
-                        className={`${styles.file} ${styles.file_icon_white}`}
-                      >
-                        <img
-                          src={file_icon_white}
-                          className={`${styles.file_icon}`}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_white}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div
-                        className={`${styles.file} ${styles.file_icon_black}`}
-                      >
-                        <img
-                          src={file_icon_black}
-                          className={`${styles.file_icon} `}
-                          alt="file icon"
-                        />
-                        <p className={styles.file_name}>CP1_Arrays</p>
-                        <img
-                          src={delete_file_icon_black}
-                          className={styles.file_icon}
-                          alt="remove file icon"
-                        />
-                      </div>
-
-                      <div className={`${styles.file} ${styles.add_file}`}>
-                        <img
-                          src={add_file_icon}
-                          className={styles.file_icon}
-                          alt="add file icon"
-                        />
-                        <p className={styles.button_name}>add files</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className={styles.save_changes_button_container}>
-                    <button className={styles.save_changes_button}>
-                      add content
-                    </button>
-                  </div>
-                </div>
+            <div className={styles.modal_file_container}>
+            {editContent.files && editContent.files.map((file, index) => (
+      <div key={index} className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}>
+        <img
+          src={file_icon_white} // Use appropriate file icon
+          className={styles.file_icon}
+          alt="file icon"
+        />
+        <p className={styles.file_name}>{file.originalName}</p> {/* Display file name */}
+        <img
+          src={delete_file_icon_white} // Use appropriate delete icon
+          className={styles.file_icon}
+          alt="remove file icon"
+          onClick={() => handleEditContentFileRemove(index)} // Remove file
+        />
+      </div>
+    ))}
+              <div className={`${styles.file} ${styles.add_file}`}>
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleEditContentFiles}
+                />
+                <img
+                  src={add_file_icon}
+                  className={styles.file_icon}
+                  alt="add file icon"
+                />
+                <p className={styles.button_name}>add files</p>
               </div>
-            )}
+            </div>
+            <div className={styles.save_changes_button_container}>
+              <button className={styles.save_changes_button} onClick={handleEditContent}>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
 
             {/* ARCHIVE Content Modal */}
-            {isArchiveContentModalOpen && (
+            {isArchiveContentModalOpen && selectedRequest && (
               <div
                 className={styles.modal_overlay}
                 onClick={closeArchiveContentModal}
@@ -1015,13 +1150,14 @@ function Profile() {
                       archive content
                     </h2>
                   </div>
+                  
 
                   {currentStepArchive === 1 && (
                     <>
                       <div className={styles.archive_and_delete_content}>
                         <p className={styles.archive_and_delete_confirmation}>
-                          Are you sure you want to archive ‘Arrays’? Type
-                          ‘Arrays’ to confirm.
+                          Are you sure you want to archive ‘{selectedRequest.Title}’? Type
+                          ‘{selectedRequest.Title}’ to confirm.
                         </p>
 
                         <div
@@ -1029,15 +1165,18 @@ function Profile() {
                             styles.confirm_archive_and_delete_container
                           }
                         >
+                          <input type="text" name='contentID' onChange={handleArchiveContentChange} placeholder={selectedRequest.ContentID} value={archiveContent.contentID} style={{display: "none"}} />
                           <input
                             type="text"
                             name="archive"
                             id="archive"
+                            value={archiveContent.archive}
+                            onChange={handleArchiveContentChange}
                             className={`${styles.confirm_textbox} ${styles.confirm}`}
                           />
                           <button
                             className={`${styles.confirm_button} ${styles.confirm}`}
-                            onClick={nextStepArchive}
+                            onClick={handleArchiveContent}
                           >
                             confirm
                           </button>
@@ -1049,7 +1188,7 @@ function Profile() {
                   {currentStepArchive === 2 && (
                     <>
                       <p className={styles.archive_and_delete_confirmation}>
-                        Archived ‘Arrays’ successfully.
+                        Archived ‘{selectedRequest.Title}’ successfully.
                       </p>
 
                       <div className={styles.view_button_container}>
@@ -1068,7 +1207,7 @@ function Profile() {
 
 
             {/* Delete Content Modal */}
-            {isDeleteContentModalOpen && (
+            {isDeleteContentModalOpen && selectedRequest && (
               <div
                 className={styles.modal_overlay}
                 onClick={closeDeleteContentModal}
@@ -1107,7 +1246,7 @@ function Profile() {
                     <>
                       <div className={styles.archive_and_delete_content}>
                         <p className={styles.archive_and_delete_confirmation}>
-                          Are you sure you want to delete ‘Network Topologies’? Type ‘Network Topologies’ to confirm.
+                          Are you sure you want to delete ‘{selectedRequest.Title}’? Type ‘{selectedRequest.Title}’ to confirm.
                         </p>
 
                         <div
@@ -1115,15 +1254,19 @@ function Profile() {
                             styles.confirm_archive_and_delete_container
                           }
                         >
+
+                          <input type="text" name='contentID' placeholder={selectedRequest.ContentID} value={deleteContent.contentID} onChange={handleDeleteContentChange} style={{display: 'none'}} />
                           <input
                             type="text"
-                            name="archive"
-                            id="archive"
+                            name="delete"
+                            id="delete"
+                            value={deleteContent.delete}
+                            onChange={handleDeleteContentChange}
                             className={`${styles.confirm_textbox} ${styles.confirm}`}
                           />
                           <button
                             className={`${styles.confirm_button} ${styles.confirm}`}
-                            onClick={nextStepDelete}
+                            onClick={handleDeleteContent}
                           >
                             confirm
                           </button>
@@ -1135,7 +1278,7 @@ function Profile() {
                   {currentStepDelete === 2 && (
                     <>
                       <p className={styles.archive_and_delete_confirmation}>
-                        Deleted ‘Network Topologies’ successfully.
+                        Deleted ‘{selectedRequest.Title}’ successfully.
                       </p>
 
                       <div className={styles.view_button_container}>
