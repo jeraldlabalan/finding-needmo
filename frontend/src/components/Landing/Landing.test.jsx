@@ -14,10 +14,16 @@ import styles from "/src/components/Landing/Landing.module.css";
 
 beforeAll(() => {
   jest.spyOn(screen, "debug").mockImplementation(() => {});
+
+  jest.spyOn(console, "error").mockImplementation(() => {});
+  jest.spyOn(console, "warn").mockImplementation(() => {});
 });
 
 afterAll(() => {
   screen.debug.mockRestore();
+
+  console.error.mockRestore();
+  console.warn.mockRestore();
 });
 
 describe("Unit Testing for the Landing Page", () => {

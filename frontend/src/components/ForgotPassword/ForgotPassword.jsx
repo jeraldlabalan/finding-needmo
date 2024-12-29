@@ -22,7 +22,7 @@ function ForgotPassword() {
 
   //SEND OTP
   const submitEmail = async () => {
-    console.log("Email:", values.email);
+    // console.log("Email:", values.email);
 
     if (!values.email || values.email === "") {
       return toast.error("Enter an email", {
