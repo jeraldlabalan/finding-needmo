@@ -59,6 +59,7 @@ function Profile() {
     program: '',
     course: '',
     keyword: '',
+    contentInput: '',
   });
 
   const [filteredSubjects, setFilteredSubjects] = useState([]);
@@ -76,7 +77,7 @@ function Profile() {
         console.log(response.data);
       })
       .catch(error => console.error("Error fetching content:", error));
-  }, []);
+  }, [uploadedContent]);
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -148,26 +149,26 @@ function Profile() {
       mimeType: file.type,
       size: file.size
     }));
-  
+
     console.log("New Files:", newFiles);
-  
+
     setEditContentFiles((prevFiles) => [...prevFiles, ...newFiles]);
     setEditContent((prevContent) => ({
       ...prevContent,
       files: [...prevContent.files, ...newFiles]
     }));
   };
-  
+
   const handleEditContentFileRemove = (index) => {
     console.log("Removing file at index:", index);
-  
+
     setEditContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     setEditContent((prevContent) => ({
       ...prevContent,
       files: prevContent.files.filter((_, i) => i !== index)
     }));
   };
-  
+
 
   useEffect(() => {
     if (selectedRequest) {
@@ -183,7 +184,7 @@ function Profile() {
         keyword: selectedRequest.Tags,
         files: Array.isArray(selectedRequest.Files) ? selectedRequest.Files : [], // Ensure files is an array
       });
-  
+
       setEditContentFiles(Array.isArray(selectedRequest.Files) ? selectedRequest.Files : []); // Ensure files is an array
     }
   }, [selectedRequest]);
@@ -215,9 +216,19 @@ function Profile() {
           autoClose: 2000
         });
 
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        setContentFiles([]);
+
+        setContentDetails({
+          title: '',
+          description: '',
+          subject: '',
+          program: '',
+          course: '',
+          keyword: '',
+          contentInput: '',
+        });
+
+        setIsAddContentModalOpen(false);
       })
       .catch((err) => {
         console.error("Upload error:", err);
@@ -227,7 +238,7 @@ function Profile() {
 
   const handleEditContent = (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData();
     editContentFiles.forEach((editContentFile) => {
       if (editContentFile.file) {
@@ -242,7 +253,7 @@ function Profile() {
     formData.append("subject", editContent.subject); // Ensure this is a valid CourseID
     formData.append("program", editContent.program);
     formData.append("keyword", editContent.keyword);
-  
+
     console.log("Form Data:", {
       contentID: editContent.contentID,
       title: editContent.title,
@@ -252,7 +263,7 @@ function Profile() {
       keyword: editContent.keyword,
       files: editContentFiles
     });
-  
+
     axios
       .post("http://localhost:8080/editUploadedContent", formData)
       .then((res) => {
@@ -260,7 +271,7 @@ function Profile() {
         toast.success("Edit success", {
           autoClose: 2000
         });
-  
+
         setTimeout(() => {
           window.location.reload();
         }, 2000);
@@ -430,9 +441,9 @@ function Profile() {
 
   const closeArchiveContentModal = () => {
     setIsArchiveContentModalOpen(false);
-  if (isArchiveSuccess) {
-    window.location.reload();
-  }
+    if (isArchiveSuccess) {
+      window.location.reload();
+    }
   };
 
   const closeAddContentModal = () => {
@@ -474,7 +485,7 @@ function Profile() {
   };
 
   const handleArchiveContent = () => {
-    if(archiveContent.archive !== selectedRequest.Title || !archiveContent.archive) {
+    if (archiveContent.archive !== selectedRequest.Title || !archiveContent.archive) {
       toast.error("Title does not match", {
         autoClose: 2000
       });
@@ -518,7 +529,7 @@ function Profile() {
   };
 
   const handleDeleteContent = () => {
-    if(deleteContent.delete !== selectedRequest.Title || !deleteContent.delete) {
+    if (deleteContent.delete !== selectedRequest.Title || !deleteContent.delete) {
       toast.error("Title does not match", {
         autoClose: 2000
       });
@@ -715,13 +726,13 @@ function Profile() {
                           </button>
                         </div>
                         <span className={details.Program === 1 ? styles.program_cs
-                        : details.Program === 2 ? styles.program_it : ""}>
-                          {details.Program === 1 ? "Computer Science" 
-                        : details.Program === 2 ? "Information Technology" : ""}</span>
+                          : details.Program === 2 ? styles.program_it : ""}>
+                          {details.Program === 1 ? "Computer Science"
+                            : details.Program === 2 ? "Information Technology" : ""}</span>
                       </div>
                     </div>
                   ))) : (<p>No uploaded content found.</p>)}
-                
+
               </div>
             </div>
 
@@ -954,6 +965,8 @@ function Profile() {
 
                       <div className={`${styles.file} ${styles.add_file}`}>
                         <input
+                          name='contentInput'
+                          value={contentDetails.contentInput}
                           type="file"
                           multiple
                           onChange={handleContentFileChange}
@@ -977,143 +990,143 @@ function Profile() {
             )}
 
             {/* EDIT Content Modal */}
-    {isEditContentModalOpen && selectedRequest && (
-      <div className={styles.modal_overlay} onClick={closeEditContentModal}>
-        <div
-          className={`${styles.modal_content} ${styles.modal_content_container}`}
-          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
-        >
-          <div className={styles.modal_content_header}>
-            <button className={styles.header_close_button} onClick={closeEditContentModal}>
-              <img
-                src={modal_close_icon}
-                className={styles.header_close_icon}
-                alt="close icon"
-              />
-            </button>
-          </div>
-          <div className={styles.modal_content_info_container}>
-            <div className={styles.subheader_container}>
-              <img
-                src={edit_content_icon}
-                className={styles.subheader_icon}
-                alt="edit content icon"
-              />
-              <h2 className={styles.subheader_description}>
-                Edit Content
-              </h2>
-            </div>
+            {isEditContentModalOpen && selectedRequest && (
+              <div className={styles.modal_overlay} onClick={closeEditContentModal}>
+                <div
+                  className={`${styles.modal_content} ${styles.modal_content_container}`}
+                  onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+                >
+                  <div className={styles.modal_content_header}>
+                    <button className={styles.header_close_button} onClick={closeEditContentModal}>
+                      <img
+                        src={modal_close_icon}
+                        className={styles.header_close_icon}
+                        alt="close icon"
+                      />
+                    </button>
+                  </div>
+                  <div className={styles.modal_content_info_container}>
+                    <div className={styles.subheader_container}>
+                      <img
+                        src={edit_content_icon}
+                        className={styles.subheader_icon}
+                        alt="edit content icon"
+                      />
+                      <h2 className={styles.subheader_description}>
+                        Edit Content
+                      </h2>
+                    </div>
 
-            <input
-              type="text"
-              name="contentID"
-              value={editContent.contentID}
-              onChange={handleEditContentChange}
-              style={{ display: 'none' }} // Hide the input field
-            />
+                    <input
+                      type="text"
+                      name="contentID"
+                      value={editContent.contentID}
+                      onChange={handleEditContentChange}
+                      style={{ display: 'none' }} // Hide the input field
+                    />
 
-            <input
-              type="text"
-              className={`${styles.modal_content_input} ${styles.modal_content_text}`}
-              name="title"
-              id="title"
-              placeholder="Title"
-              value={editContent.title}
-              onChange={handleEditContentChange}
-            />
+                    <input
+                      type="text"
+                      className={`${styles.modal_content_input} ${styles.modal_content_text}`}
+                      name="title"
+                      id="title"
+                      placeholder="Title"
+                      value={editContent.title}
+                      onChange={handleEditContentChange}
+                    />
 
-            <textarea
-              name="description"
-              id="description"
-              className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
-              placeholder="Write description here..."
-              value={editContent.description}
-              onChange={handleEditContentChange}
-            ></textarea>
+                    <textarea
+                      name="description"
+                      id="description"
+                      className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
+                      placeholder="Write description here..."
+                      value={editContent.description}
+                      onChange={handleEditContentChange}
+                    ></textarea>
 
-<select
-        name="program"
-        value={editContent.program}
-        onChange={handleEditContentChange}
-        className={`${styles.modal_content_input} ${styles.modal_content_select}`}
-      >
-        {programs.map((program) => (
-          <option key={program.ProgramID} value={program.ProgramID}>
-            {program.Name === "Bachelor of Science in Computer Science" ? "Computer Science"
-            : program.Name === "Bachelor of Science in Information Technology" ? "Information Technology"
-            : ""}
-          </option>
-        ))}
-      </select>
-      <select
-        name="subject"
-        value={editContent.subject}
-        onChange={handleEditContentChange}
-        className={`${styles.modal_content_input} ${styles.modal_content_select}`}
-      >
-        <option value={editContent.subject}>{editContent.courseTitle}</option>
-        {subjects.length > 0 ? (
-          subjects
-            .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
-            .map((course) => (
-              <option value={course.CourseID} key={course.CourseID}>
-                {course.Title} {/* Display course title */}
-              </option>
-            ))
-        ) : (
-          <option disabled>No subjects available</option> // Fallback message
-        )}
-      </select>
+                    <select
+                      name="program"
+                      value={editContent.program}
+                      onChange={handleEditContentChange}
+                      className={`${styles.modal_content_input} ${styles.modal_content_select}`}
+                    >
+                      {programs.map((program) => (
+                        <option key={program.ProgramID} value={program.ProgramID}>
+                          {program.Name === "Bachelor of Science in Computer Science" ? "Computer Science"
+                            : program.Name === "Bachelor of Science in Information Technology" ? "Information Technology"
+                              : ""}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      name="subject"
+                      value={editContent.subject}
+                      onChange={handleEditContentChange}
+                      className={`${styles.modal_content_input} ${styles.modal_content_select}`}
+                    >
+                      <option value={editContent.subject}>{editContent.courseTitle}</option>
+                      {subjects.length > 0 ? (
+                        subjects
+                          .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
+                          .map((course) => (
+                            <option value={course.CourseID} key={course.CourseID}>
+                              {course.Title} {/* Display course title */}
+                            </option>
+                          ))
+                      ) : (
+                        <option disabled>No subjects available</option> // Fallback message
+                      )}
+                    </select>
 
-            <textarea
-              name="keyword"
-              id="keyword"
-              value={editContent.keyword}
-              onChange={handleEditContentChange}
-              placeholder="Write keywords here..."
-              className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
-            ></textarea>
+                    <textarea
+                      name="keyword"
+                      id="keyword"
+                      value={editContent.keyword}
+                      onChange={handleEditContentChange}
+                      placeholder="Write keywords here..."
+                      className={`${styles.modal_content_input} ${styles.modal_content_textarea}`}
+                    ></textarea>
 
-            <div className={styles.modal_file_container}>
-            {editContent.files && editContent.files.map((file, index) => (
-      <div key={index} className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}>
-        <img
-          src={file_icon_white} // Use appropriate file icon
-          className={styles.file_icon}
-          alt="file icon"
-        />
-        <p className={styles.file_name}>{file.originalName}</p> {/* Display file name */}
-        <img
-          src={delete_file_icon_white} // Use appropriate delete icon
-          className={styles.file_icon}
-          alt="remove file icon"
-          onClick={() => handleEditContentFileRemove(index)} // Remove file
-        />
-      </div>
-    ))}
-              <div className={`${styles.file} ${styles.add_file}`}>
-                <input
-                  type="file"
-                  multiple
-                  onChange={handleEditContentFiles}
-                />
-                <img
-                  src={add_file_icon}
-                  className={styles.file_icon}
-                  alt="add file icon"
-                />
-                <p className={styles.button_name}>add files</p>
+                    <div className={styles.modal_file_container}>
+                      {editContent.files && editContent.files.map((file, index) => (
+                        <div key={index} className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}>
+                          <img
+                            src={file_icon_white} // Use appropriate file icon
+                            className={styles.file_icon}
+                            alt="file icon"
+                          />
+                          <p className={styles.file_name}>{file.originalName}</p> {/* Display file name */}
+                          <img
+                            src={delete_file_icon_white} // Use appropriate delete icon
+                            className={styles.file_icon}
+                            alt="remove file icon"
+                            onClick={() => handleEditContentFileRemove(index)} // Remove file
+                          />
+                        </div>
+                      ))}
+                      <div className={`${styles.file} ${styles.add_file}`}>
+                        <input
+                          type="file"
+                          multiple
+                          onChange={handleEditContentFiles}
+                        />
+                        <img
+                          src={add_file_icon}
+                          className={styles.file_icon}
+                          alt="add file icon"
+                        />
+                        <p className={styles.button_name}>add files</p>
+                      </div>
+                    </div>
+                    <div className={styles.save_changes_button_container}>
+                      <button className={styles.save_changes_button} onClick={handleEditContent}>
+                        Save Changes
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className={styles.save_changes_button_container}>
-              <button className={styles.save_changes_button} onClick={handleEditContent}>
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )}
+            )}
 
             {/* ARCHIVE Content Modal */}
             {isArchiveContentModalOpen && selectedRequest && (
@@ -1150,7 +1163,7 @@ function Profile() {
                       archive content
                     </h2>
                   </div>
-                  
+
 
                   {currentStepArchive === 1 && (
                     <>
@@ -1165,7 +1178,7 @@ function Profile() {
                             styles.confirm_archive_and_delete_container
                           }
                         >
-                          <input type="text" name='contentID' onChange={handleArchiveContentChange} placeholder={selectedRequest.ContentID} value={archiveContent.contentID} style={{display: "none"}} />
+                          <input type="text" name='contentID' onChange={handleArchiveContentChange} placeholder={selectedRequest.ContentID} value={archiveContent.contentID} style={{ display: "none" }} />
                           <input
                             type="text"
                             name="archive"
@@ -1255,7 +1268,7 @@ function Profile() {
                           }
                         >
 
-                          <input type="text" name='contentID' placeholder={selectedRequest.ContentID} value={deleteContent.contentID} onChange={handleDeleteContentChange} style={{display: 'none'}} />
+                          <input type="text" name='contentID' placeholder={selectedRequest.ContentID} value={deleteContent.contentID} onChange={handleDeleteContentChange} style={{ display: 'none' }} />
                           <input
                             type="text"
                             name="delete"
