@@ -2,19 +2,19 @@ import React, { useState } from "react";
 import styles from "./ForgotPassword.module.css";
 import lock_icon from "../../assets/lock.png";
 import { Link } from "react-router-dom";
-import verified_icon from '../../assets/verified_icon.png'
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import verified_icon from "../../assets/verified_icon.png";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
 function ForgotPassword() {
   const [currentStep, setCurrentStep] = useState(1);
   const [values, setValues] = useState({
-    email: '',
-    otp: '',
-    newPass: '',
-    confirmPass: '',
-  })
+    email: "",
+    otp: "",
+    newPass: "",
+    confirmPass: "",
+  });
 
   const nextStep = () => {
     setCurrentStep((prev) => (prev < 4 ? prev + 1 : prev));
@@ -22,82 +22,90 @@ function ForgotPassword() {
 
   //SEND OTP
   const submitEmail = async () => {
-    console.log('Email:', values.email);
+    console.log("Email:", values.email);
 
-    if (!values.email || values.email === '') {
+    if (!values.email || values.email === "") {
       return toast.error("Enter an email", {
-        autoClose: 3000
-      })
+        autoClose: 3000,
+      });
     }
     try {
-      const res1 = await axios.post('http://localhost:8080/sendOTP', values)
+      const res1 = await axios.post("http://localhost:8080/sendOTP", values);
       if (res1.data.message === "Verification code sent. Check your email.") {
         setCurrentStep((prev) => (prev < 4 ? prev + 1 : prev));
       } else {
         toast.error(res1.data.message, {
-          autoClose: 4000
-        })
+          autoClose: 4000,
+        });
       }
-
     } catch (error) {
       toast.error("Error: " + error, {
-        autoClose: 4000
-      })
+        autoClose: 4000,
+      });
     }
-  }
+  };
 
   //VERIFY OTP
   const verifyOTP = async () => {
-    if (!values.otp || values.otp === '') {
+    if (!values.otp || values.otp === "") {
       return toast.error("Please enter the correct 6-digit PIN.", {
-        autoClose: 3000
-      })
+        autoClose: 3000,
+      });
     }
 
     try {
-      const res1 = await axios.post('http://localhost:8080/verifyOTP', values)
+      const res1 = await axios.post("http://localhost:8080/verifyOTP", values);
       if (res1.data.message === "Verified") {
         setCurrentStep((prev) => (prev < 4 ? prev + 1 : prev));
       } else {
         toast.error(res1.data.message, {
-          autoClose: 4000
-        })
+          autoClose: 4000,
+        });
       }
     } catch (error) {
       toast.error("Error: " + error, {
-        autoClose: 4000
-      })
+        autoClose: 4000,
+      });
     }
-  }
+  };
 
   //SAVE NEW PASSWORD
   const handleNewPass = async () => {
     if (values.newPass !== values.confirmPass) {
       toast.error("Passwords don't match");
-    } else if (!values.newPass || values.newPass === "" || !values.confirmPass || values.confirmPass === "") {
+    } else if (
+      !values.newPass ||
+      values.newPass === "" ||
+      !values.confirmPass ||
+      values.confirmPass === ""
+    ) {
       toast.error("Password is required");
-    } else{
-    try {
-      const res1 = await axios.post('http://localhost:8080/resetPass', values)
-      if (res1.data.message === "Password reset successfully.") {
-        setCurrentStep((prev) => (prev < 4 ? prev + 1 : prev));
-        setValues({
-          email: '',
-          otp: '',
-          newPass: '',
-          confirmPass: '',
+    } else {
+      try {
+        const res1 = await axios.post(
+          "http://localhost:8080/resetPass",
+          values
+        );
+        if (res1.data.message === "Password reset successfully.") {
+          setCurrentStep((prev) => (prev < 4 ? prev + 1 : prev));
+          setValues({
+            email: "",
+            otp: "",
+            newPass: "",
+            confirmPass: "",
+          });
+        } else {
+          toast.error(res1.data.message, {
+            autoClose: 4000,
+          });
+        }
+      } catch (error) {
+        toast.error("Error: " + error, {
+          autoClose: 4000,
         });
-      } else {
-        toast.error(res1.data.message, {
-          autoClose: 4000
-        })
       }
-    } catch (error) {
-      toast.error("Error: " + error, {
-        autoClose: 4000
-      })
     }
-  }}
+  };
 
   const prevStep = () => {
     setCurrentStep((prev) => (prev > 1 ? prev - 1 : prev));
@@ -105,15 +113,14 @@ function ForgotPassword() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setValues({ ...values, [name]: value })
+    setValues({ ...values, [name]: value });
     toast.dismiss();
-  }
+  };
 
   return (
     <div className={styles.container}>
       <ToastContainer position="top-center" />
       <div className={styles.content_wrapper}>
-
         {/* Step 1 */}
         {currentStep === 1 && (
           <>
@@ -150,7 +157,7 @@ function ForgotPassword() {
                 className={styles.forgot_password_button}
                 onClick={submitEmail}
               >
-                forgot my password
+                forgot password
               </button>
             </div>
           </>
@@ -172,9 +179,7 @@ function ForgotPassword() {
               <p className={styles.step2_subtitle}>
                 A verification code has been sent to
               </p>
-              <p className={styles.step2_subtitle_email}>
-                {values.email}
-              </p>
+              <p className={styles.step2_subtitle_email}>{values.email}</p>
             </div>
 
             <div className={styles.step2_instruction_container}>
@@ -220,9 +225,7 @@ function ForgotPassword() {
             </div>
 
             <div className={styles.step3_subtitle_container}>
-              <p className={styles.step3_subtitle}>
-                enter your new password
-              </p>
+              <p className={styles.step3_subtitle}>enter your new password</p>
             </div>
 
             <div className={styles.step3_input_field_container}>
@@ -279,11 +282,11 @@ function ForgotPassword() {
             </div>
 
             <div className={styles.forgot_password_button_container}>
-
-              <Link to="/registerlogin?form=login" className={styles.go_to_login_button}>
-                <button
-                  className={styles.go_to_login_button}
-                >
+              <Link
+                to="/registerlogin?form=login"
+                className={styles.go_to_login_button}
+              >
+                <button className={styles.go_to_login_button}>
                   Go to Login
                 </button>
               </Link>

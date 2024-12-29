@@ -244,6 +244,7 @@ function Landing() {
                 className={`${styles.login_button} ${styles.modal_button}`}
               >
                 <button
+                  data-testid="signup-button"
                   className={`${styles.signup_button} ${styles.modal_button}`}
                   onClick={() => handleModalButtonClick("signup")}
                 >
@@ -251,6 +252,7 @@ function Landing() {
                 </button>
               </Link>
               <button
+                data-testid="cancel-button"
                 className={`${styles.close_button} ${styles.modal_button}`}
                 onClick={handleCancel}
               >

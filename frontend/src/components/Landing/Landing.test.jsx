@@ -115,10 +115,19 @@ describe("Unit Testing for the Landing Page", () => {
           <Landing />
         </Router>
       );
+
       fireEvent.click(screen.getByText(/join now/i));
+
       fireEvent.click(screen.getByTestId("login-button"));
       expect(window.location.pathname).toBe("/registerlogin");
       expect(window.location.search).toBe("?form=login");
+
+      fireEvent.click(screen.getByTestId("signup-button"));
+      expect(window.location.pathname).toBe("/registerlogin");
+      expect(window.location.search).toBe("?form=form");
+
+      fireEvent.click(screen.getByTestId("cancel-button"));
+      expect(screen.queryByTestId("modal")).not.toBeInTheDocument();
     });
 
     test("Should close the modal when cancel button is clicked", () => {
@@ -181,8 +190,9 @@ describe("Search Bar", () => {
     expect(screen.getByText(/join us/i)).toBeInTheDocument();
   });
 
-  test("Typing animation works correctly", async () => { //NAGLOLOKO 'TONG HAYOP NA 'TO. MINSAN PASSED, MINSAN FAILED.
-    jest.setTimeout(5000); // O 'DI KAYA RITO BAGUHIN MO
+  test("Typing animation works correctly", async () => {
+    //NAGLOLOKO 'TONG HAYOP NA 'TO. MINSAN PASSED, MINSAN FAILED.
+    jest.setTimeout(5000); // O 'DI KAYA RITO BAGUHIN MO O 'DI KAYA I-RUN LANG 'YUNG TEST ULIT
     render(
       <Router>
         <Landing />
