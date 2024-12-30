@@ -2,7 +2,14 @@ const request = require("supertest");
 const express = require("express");
 const session = require("express-session");
 const mysql = require("mysql");
+const cron = require("node-cron");
 const app = express();
+
+jest.mock("mysql", () => ({
+  createConnection: jest.fn().mockReturnValue({
+    query: jest.fn(),
+  }),
+}));
 
 const db = mysql.createConnection({
   host: "localhost",
@@ -40,80 +47,182 @@ app.post("/logout", (req, res) => {
   }
 });
 
-jest.mock("mysql", () => ({
-  createConnection: jest.fn().mockReturnValue({
-    query: jest.fn(),
-  }),
-}));
+const cronJob = () => {
+  const checkUsersSql = `
+      SELECT COUNT(*) as inactiveCount
+      FROM user
+      WHERE Status = 'Active' AND DATEDIFF(NOW(), LastLoginAt) >= 30
+  `;
+
+  db.query(checkUsersSql, (err, countResult) => {
+    if (err) {
+      console.error("Error checking inactive users:", err);
+    } else {
+      const updateSql = `
+          UPDATE user
+          SET Status = 'Inactive'
+          WHERE Status = 'Active' AND DATEDIFF(NOW(), LastLoginAt) >= 30
+      `;
+
+      db.query(updateSql, (err, result) => {
+        if (err) {
+          console.error("Error updating inactive users:", err);
+        }
+      });
+    }
+  });
+};
 
 describe("Unit Testing for Log Out Function", () => {
   let server;
 
   beforeAll(() => {
     server = app.listen(3000);
+    console.error = jest.fn();
   });
 
-  afterAll((done) => {
-    server.close(done);
+  afterAll(() => {
+    server.close();
+    console.error.mockRestore();
   });
 
-  it("Should log out the user successfully", async () => {
-    jest.setTimeout(10000);
+  describe("Log Out Functionality", () => {
+    it("Should log out the user successfully", async () => {
+      jest.setTimeout(10000);
 
-    const mockSession = { email: "user@example.com" };
-    const mockDbResponse = { affectedRows: 1 };
+      const mockDbResponse = { affectedRows: 1 };
 
-    mysql
-      .createConnection()
-      .query.mockImplementationOnce((query, values, callback) => {
-        callback(null, mockDbResponse);
-      });
+      mysql
+        .createConnection()
+        .query.mockImplementationOnce((query, values, callback) => {
+          callback(null, mockDbResponse);
+        });
 
-    const response = await request(server)
-      .post("/logout")
-      .set("Cookie", ["connect.sid=some-session-id"])
-      .send();
+      const response = await request(server)
+        .post("/logout")
+        .set("Cookie", ["connect.sid=some-session-id"])
+        .send();
 
-    expect(response.status).toBe(200);
-    expect(response.body.valid).toBe(false);
-    expect(response.body.message).toBe("Logout successful.");
+      expect(response.status).toBe(200);
+      expect(response.body.valid).toBe(false);
+      expect(response.body.message).toBe("Logout successful.");
+    });
+
+    it("Should return error on server failure", async () => {
+      jest.setTimeout(10000);
+
+      mysql
+        .createConnection()
+        .query.mockImplementationOnce((query, values, callback) => {
+          callback(new Error("DB error"), null);
+        });
+
+      const response = await request(server)
+        .post("/logout")
+        .set("Cookie", ["connect.sid=some-session-id"])
+        .send();
+
+      expect(response.status).toBe(200);
+      expect(response.body.message).toBe("Error in server: Error: DB error");
+    });
+
+    it("Should return error if update query affects no rows", async () => {
+      jest.setTimeout(10000);
+
+      mysql
+        .createConnection()
+        .query.mockImplementationOnce((query, values, callback) => {
+          callback(null, { affectedRows: 0 });
+        });
+
+      const response = await request(server)
+        .post("/logout")
+        .set("Cookie", ["connect.sid=some-session-id"])
+        .send();
+
+      expect(response.status).toBe(200);
+      expect(response.body.valid).toBe(false);
+      expect(response.body.message).toBe("Logout failed.");
+    });
   });
 
-  it("Should return error on server failure", async () => {
-    jest.setTimeout(10000);
+  describe("Scheduled Task to Mark Users as Inactive", () => {
+    it("Should run successfully and update inactive users", async () => {
+      const mockDbResponse = [{ inactiveCount: 5 }];
+      const mockUpdateResponse = { affectedRows: 5 };
 
-    mysql
-      .createConnection()
-      .query.mockImplementationOnce((query, values, callback) => {
-        callback(new Error("DB error"), null);
-      });
+      mysql
+        .createConnection()
+        .query.mockImplementationOnce((query, callback) => {
+          if (query.includes("SELECT COUNT(*)")) {
+            callback(null, mockDbResponse);
+          }
+        });
 
-    const response = await request(server)
-      .post("/logout")
-      .set("Cookie", ["connect.sid=some-session-id"])
-      .send();
+      mysql
+        .createConnection()
+        .query.mockImplementationOnce((query, callback) => {
+          if (query.includes("UPDATE user")) {
+            callback(null, mockUpdateResponse);
+          }
+        });
 
-    expect(response.status).toBe(200);
-    expect(response.body.message).toBe("Error in server: Error: DB error");
-  });
+      await cronJob();
 
-  it("Should return error if update query affects no rows", async () => {
-    jest.setTimeout(10000);
+      expect(mysql.createConnection().query).toHaveBeenCalledWith(
+        expect.stringContaining("SELECT COUNT(*)"),
+        expect.any(Function)
+      );
+      expect(mysql.createConnection().query).toHaveBeenCalledWith(
+        expect.stringContaining("UPDATE user"),
+        expect.any(Function)
+      );
+    });
 
-    mysql
-      .createConnection()
-      .query.mockImplementationOnce((query, values, callback) => {
-        callback(null, { affectedRows: 0 });
-      });
+    it("Should handle error in checking inactive users", async () => {
+      const mockDbError = new Error("DB error");
 
-    const response = await request(server)
-      .post("/logout")
-      .set("Cookie", ["connect.sid=some-session-id"])
-      .send();
+      mysql
+        .createConnection()
+        .query.mockImplementationOnce((query, callback) => {
+          callback(mockDbError, null);
+        });
 
-    expect(response.status).toBe(200);
-    expect(response.body.valid).toBe(false);
-    expect(response.body.message).toBe("Logout failed.");
+      await cronJob();
+
+      expect(mysql.createConnection().query).toHaveBeenCalledWith(
+        expect.stringContaining("SELECT COUNT(*)"),
+        expect.any(Function)
+      );
+    });
+
+    it("Should handle error in updating inactive users", async () => {
+      const mockDbResponse = [{ inactiveCount: 5 }];
+      const mockUpdateError = new Error("Update failed");
+
+      mysql
+        .createConnection()
+        .query.mockImplementationOnce((query, callback) => {
+          if (query.includes("SELECT COUNT(*)")) {
+            callback(null, mockDbResponse);
+          }
+        });
+
+      mysql
+        .createConnection()
+        .query.mockImplementationOnce((query, callback) => {
+          if (query.includes("UPDATE user")) {
+            callback(mockUpdateError, null);
+          }
+        });
+
+      await cronJob();
+
+      expect(mysql.createConnection().query).toHaveBeenCalledWith(
+        expect.stringContaining("UPDATE user"),
+        expect.any(Function)
+      );
+    });
   });
 });
 
