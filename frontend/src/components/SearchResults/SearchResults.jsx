@@ -12,8 +12,93 @@ import logout from "../../assets/logout.jpg";
 import nav_arrow from "../../assets/nav_arrow.png";
 import current_page from "../../assets/current_page.png";
 import next_page from "../../assets/next_page.png";
+import thumbnail1 from "../../assets/thumbnail_1.jpg";
+import thumbnail2 from "../../assets/thumbnail_2.jpg";
+import thumbnail3 from "../../assets/thumbnail_3.jpg";
 
 function SearchResults() {
+  const files = [
+    {
+      id: 1,
+      title: "CP1_ARRAYS",
+      lesson: "ARRAYS",
+      extension: "docx",
+      author: "Jusko Po",
+      thumbnail: thumbnail1,
+    },
+    {
+      id: 2,
+      title: "CP2_ARRAYS",
+      lesson: "ARRAYS",
+      extension: "docx",
+      author: "Wag Mag Paistress",
+      thumbnail: thumbnail2,
+    },
+    {
+      id: 3,
+      title: "CP3_ARRAYS",
+      lesson: "ARRAYS",
+      extension: "pptx",
+      author: "Aw Aw",
+      thumbnail: thumbnail3,
+    },
+    {
+      id: 4,
+      title: "CP2_ARRAYS",
+      lesson: "ARRAYS",
+      extension: "pdf",
+      author: "PDF Author",
+      thumbnail: thumbnail2,
+    },
+    {
+      id: 5,
+      title: "CP1_ARRAYS",
+      lesson: "ARRAYS",
+      extension: "pptx",
+      author: "Jusko Po",
+      thumbnail: thumbnail1,
+    },
+    {
+      id: 6,
+      title: "CP1_ARRAYS",
+      lesson: "ARRAYS",
+      extension: "pdf",
+      author: "Jusko Po",
+      thumbnail: thumbnail1,
+    },
+    {
+      id: 7,
+      title: "CP3_ARRAYS",
+      lesson: "ARRAYS",
+      extension: "docx",
+      author: "Aw Aw",
+      thumbnail: thumbnail3,
+    },
+    {
+      id: 8,
+      title: "CP2_ARRAYS",
+      lesson: "ARRAYS",
+      extension: "pptx",
+      author: "Wag Mag Paistress",
+      thumbnail: thumbnail2,
+    },
+    {
+      id: 9,
+      title: "CP2_ARRAYS",
+      lesson: "ARRAYS",
+      extension: "pdf",
+      author: "PDF Author",
+      thumbnail: thumbnail3,
+    },
+  ];
+
+  // Search result header logic
+  const [activeButton, setActiveButton] = useState("contents");
+
+  const handleButtonClick = (button) => {
+    setActiveButton(button);
+  };
+
   const [activeDropdown, setActiveDropdown] = useState(null);
   const location = useLocation();
 
@@ -43,16 +128,7 @@ function SearchResults() {
     return "#000";
   };
 
-  // Button logic for the search result header
-  const [activeButton, setActiveButton] = useState('all_contents');
-
-  const handleButtonClick = (button) => {
-    setActiveButton(button);
-  };
-
-
   // Pagination logic
-
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 5;
 
@@ -66,16 +142,12 @@ function SearchResults() {
     setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
   };
 
-
-
   return (
     <div className={styles.container}>
       <div className={styles.search_result_header}>
         <img src={logo} alt="Logo" />
 
-        <div
-          className={styles.search_result_headercontent_search_bar_container}
-        >
+        <div className={styles.search_result_headercontent_search_bar_container}>
           <input
             type="text"
             className={styles.content_search_bar}
@@ -185,9 +257,7 @@ function SearchResults() {
         <div className={styles.search_result_sidebar}>
           <div className={styles.search_result_sidebar_filter}>
             <h3>sort by</h3>
-            <div
-              className={styles.search_result_sidebar_filter_options_container}
-            >
+            <div className={styles.search_result_sidebar_filter_options_container}>
               <div className={styles.search_result_sidebar_filter_option}>
                 <input type="checkbox" />
                 <label htmlFor="">Oldest to Newest</label>
@@ -195,7 +265,7 @@ function SearchResults() {
 
               <div className={styles.search_result_sidebar_filter_option}>
                 <input type="checkbox" />
-                <label htmlFor="">Revelance</label>
+                <label htmlFor="">Relevance</label>
               </div>
 
               <div
@@ -245,101 +315,172 @@ function SearchResults() {
 
         {/* Main Content */}
         <div className={styles.search_result_main_content}>
-        <div className={styles.search_result_main_content_header}>
-        <button
-          className={`${styles.search_result_main_content_header_button} ${activeButton === 'all_contents' ? styles.active_button : ''}`}
-          onClick={() => handleButtonClick('all_contents')}
-        >
-          All Contents
-        </button>
-        <button
-          className={`${styles.search_result_main_content_header_button} ${activeButton === 'documents' ? styles.active_button : ''}`}
-          onClick={() => handleButtonClick('documents')}
-        >
-          Documents
-        </button>
-        <button
-          className={`${styles.search_result_main_content_header_button} ${activeButton === 'presentations' ? styles.active_button : ''}`}
-          onClick={() => handleButtonClick('presentations')}
-        >
-          Presentations
-        </button>
-      </div>
+          <div className={styles.search_result_main_content_header}>
+            <button
+              className={`${styles.search_result_main_content_header_button} ${activeButton === 'contents' ? styles.active_button : ''}`}
+              onClick={() => handleButtonClick('contents')}
+            >
+              Contents
+            </button>
+            <button
+              className={`${styles.search_result_main_content_header_button} ${activeButton === 'documents' ? styles.active_button : ''}`}
+              onClick={() => handleButtonClick('documents')}
+            >
+              Documents
+            </button>
+            <button
+              className={`${styles.search_result_main_content_header_button} ${activeButton === 'presentations' ? styles.active_button : ''}`}
+              onClick={() => handleButtonClick('presentations')}
+            >
+              Presentations
+            </button>
+            <button
+              className={`${styles.search_result_main_content_header_button} ${activeButton === 'pdfs' ? styles.active_button : ''}`}
+              onClick={() => handleButtonClick('pdfs')}
+            >
+              PDFs
+            </button>
+          </div>
           <div className={styles.search_result_main_content_body}>
-            <div className={styles.main_content_body_item}>
-              <div className={styles.upper_section}>
-                <h3>arrays</h3>
+            {activeButton === 'contents' && (
+              <>
+                <div className={styles.main_content_body_item}>
+                  <div className={styles.upper_section}>
+                    <h3>arrays</h3>
+                    <p>lele pons</p>
+                  </div>
+                  <div className={styles.lower_section}>
+                    <p>computer programming i</p>
+                    <p className={styles.lower_section_program_cs}>
+                      computer science
+                    </p>
+                  </div>
+                </div>
+                <div className={styles.main_content_body_item}>
+                  <div className={styles.upper_section}>
+                    <h3>arrays</h3>
+                    <p>lele pons</p>
+                  </div>
+                  <div className={styles.lower_section}>
+                    <p>computer programming ii</p>
+                    <p className={styles.lower_section_program_cs}>
+                      computer science
+                    </p>
+                  </div>
+                </div>
+                <div className={styles.main_content_body_item}>
+                  <div className={styles.upper_section}>
+                    <h3>arrays</h3>
+                    <p>lele pons</p>
+                  </div>
+                  <div className={styles.lower_section}>
+                    <p>computer programming ii</p>
+                    <p className={styles.lower_section_program_cs}>
+                      computer science
+                    </p>
+                  </div>
+                </div>
+                <div className={styles.main_content_body_item}>
+                  <div className={styles.upper_section}>
+                    <h3>arrays</h3>
+                    <p>lele pons</p>
+                  </div>
+                  <div className={styles.lower_section}>
+                    <p>computer programming ii</p>
+                    <p className={styles.lower_section_program_cs}>
+                      computer science
+                    </p>
+                  </div>
+                </div>
+                <div className={styles.main_content_body_item}>
+                  <div className={styles.upper_section}>
+                    <h3>arrays</h3>
+                    <p>lele pons</p>
+                  </div>
+                  <div className={styles.lower_section}>
+                    <p>computer programming ii</p>
+                    <p className={styles.lower_section_program_cs}>
+                      computer science
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
 
-                <p>lele pons</p>
-              </div>
+            {activeButton === 'documents' && (
+              <>
+                <div className={styles.document_container}>
+                  {files
+                    .filter((file) => file.extension === "docx")
+                    .map((file) => (
+                      <div key={file.id} className={styles.document}>
+                        <div className={styles.thumbnail_container}>
+                          <img
+                            src={file.thumbnail}
+                            alt={file.title}
+                            className={styles.document_thumbnail}
+                          />
+                          <div className={styles.lesson_text}>{file.lesson}</div>
+                        </div>
+                        <div className={styles.document_details}>
+                          <h3>{file.title}</h3>
+                          <p>{file.author}</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
 
-              <div className={styles.lower_section}>
-                <p>computer programming i</p>
-                <p className={styles.lower_section_program_cs}>
-                  computer science
-                </p>
-              </div>
-            </div>
+            {activeButton === 'presentations' && (
+              <>
+                <div className={styles.presentation_container}>
+                  {files
+                    .filter((file) => file.extension === "pptx")
+                    .map((file) => (
+                      <div key={file.id} className={styles.presentation}>
+                        <div className={styles.thumbnail_container}>
+                          <img
+                            src={file.thumbnail}
+                            alt={file.title}
+                            className={styles.document_thumbnail}
+                          />
+                          <div className={styles.lesson_text}>{file.lesson}</div>
+                        </div>
+                        <div className={styles.presentation_details}>
+                          <h3>{file.title}</h3>
+                          <p>{file.author}</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
 
-            <div className={styles.main_content_body_item}>
-              <div className={styles.upper_section}>
-                <h3>arrays</h3>
-
-                <p>lele pons</p>
-              </div>
-
-              <div className={styles.lower_section}>
-                <p>computer programming ii</p>
-                <p className={styles.lower_section_program_cs}>
-                  computer science
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.main_content_body_item}>
-              <div className={styles.upper_section}>
-                <h3>arrays</h3>
-
-                <p>lele pons</p>
-              </div>
-
-              <div className={styles.lower_section}>
-                <p>computer programming ii</p>
-                <p className={styles.lower_section_program_cs}>
-                  computer science
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.main_content_body_item}>
-              <div className={styles.upper_section}>
-                <h3>arrays</h3>
-
-                <p>lele pons</p>
-              </div>
-
-              <div className={styles.lower_section}>
-                <p>computer programming ii</p>
-                <p className={styles.lower_section_program_cs}>
-                  computer science
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.main_content_body_item}>
-              <div className={styles.upper_section}>
-                <h3>arrays</h3>
-
-                <p>lele pons</p>
-              </div>
-
-              <div className={styles.lower_section}>
-                <p>computer programming ii</p>
-                <p className={styles.lower_section_program_cs}>
-                  computer science
-                </p>
-              </div>
-            </div>
+            {activeButton === 'pdfs' && (
+              <>
+                <div className={styles.pdf_container}>
+                  {files
+                    .filter((file) => file.extension === "pdf")
+                    .map((file) => (
+                      <div key={file.id} className={styles.pdf}>
+                        <div className={styles.thumbnail_container}>
+                          <img
+                            src={file.thumbnail}
+                            alt={file.title}
+                            className={styles.document_thumbnail}
+                          />
+                          <div className={styles.lesson_text}>{file.lesson}</div>
+                        </div>
+                        <div className={styles.pdf_details}>
+                          <h3>{file.title}</h3>
+                          <p>{file.author}</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
 
             {/* Pagination */}
             <div className={styles.search_result_footer}>

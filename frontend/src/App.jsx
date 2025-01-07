@@ -8,6 +8,7 @@ import ForgotPassword from './components/ForgotPassword/ForgotPassword';
 import Profile from './components/Profile/Profile';
 import AccountSettings from './components/AccountSettings/AccountSettings';
 import SearchResults from './components/SearchResults/SearchResults';
+import ViewContent from './components/ViewContent/ViewContent';
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
         <Route path='/profile' element={<Profile />} />
         <Route path='/account-settings' element={<AccountSettings />} />
         <Route path='/search-results' element={<SearchResults />} />
+        <Route path='/view-content' element={<ViewContent />} />
       </Routes>
     </Router>
   )

@@ -360,7 +360,7 @@ option[value="information-technology"] {
   padding: 20px;
   flex-direction: column;
   background-color: white;
-  width: 70%;
+  width: 65%;
 }
 
 .rotated {
@@ -427,4 +427,253 @@ option[value="information-technology"] {
   visibility: visible;
   transform: scaleX(-50%);
   transition: all 0.3s ease-in-out;
+}
+
+/* Document styling */
+
+.document_container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 30px;
+  background-color: white;
+  flex-wrap: wrap;
+  width: 65%;
+  flex: 1;
+
+  img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    opacity: 0.9;
+  }
+}
+
+.document {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 200px;
+  height: 250px;
+  cursor: pointer;
+  border-radius: 15px;
+  transition: all 0.3s;
+  padding: 3px;
+  background-color: #235890;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.document:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.document_details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 2px 10px;
+
+  h3 {
+    font-size: var(--smaller-font-size);
+    color: white;
+  }
+
+  p {
+    font-size: var(--tiny-font-size);
+    color: white;
+  }
+}
+
+.thumbnail_container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.lesson_text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: var(--smaller-font-size);
+  font-weight: bold;
+  font-size: var(--h1-font-size);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  filter: blur(1px);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Presentation Styling */
+
+.presentation_container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 30px;
+  background-color: white;
+  flex-wrap: wrap;
+  width: 65%;
+  flex: 1;
+
+  img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    opacity: 0.9;
+  }
+}
+
+.presentation {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 200px;
+  height: 250px;
+  cursor: pointer;
+  border-radius: 15px;
+  transition: all 0.3s;
+  padding: 3px;
+  background-color: #F1D302;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.presentation:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.presentation_details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 2px 10px;
+
+  h3 {
+    font-size: var(--smaller-font-size);
+    color: black;
+  }
+
+  p {
+    font-size: var(--tiny-font-size);
+    color: black;
+  }
+}
+
+.thumbnail_container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.lesson_text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: var(--smaller-font-size);
+  font-weight: bold;
+  font-size: var(--h1-font-size);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  filter: blur(1px);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* PDF styling */
+
+.pdf_container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 30px;
+  background-color: white;
+  flex-wrap: wrap;
+  width: 65%;
+  flex: 1;
+
+  img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    opacity: 0.9;
+  }
+}
+
+.pdf {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 200px;
+  height: 250px;
+  cursor: pointer;
+  border-radius: 15px;
+  transition: all 0.3s;
+  padding: 3px;
+  background-color: #000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pdf:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.pdf_details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 2px 10px;
+
+  h3 {
+    font-size: var(--smaller-font-size);
+    color: white;
+  }
+
+  p {
+    font-size: var(--tiny-font-size);
+    color: white;
+  }
+}
+
+.thumbnail_container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.lesson_text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: var(--smaller-font-size);
+  font-weight: bold;
+  font-size: var(--h1-font-size);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  filter: blur(1px);
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
