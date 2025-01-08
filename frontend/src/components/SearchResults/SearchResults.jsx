@@ -93,7 +93,7 @@ function SearchResults() {
   ];
 
   // Search result header logic
-  const [activeButton, setActiveButton] = useState("contents");
+  const [activeButton, setActiveButton] = useState("all");
 
   const handleButtonClick = (button) => {
     setActiveButton(button);

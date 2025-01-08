@@ -10,6 +10,7 @@ import AccountSettings from './components/AccountSettings/AccountSettings';
 import SearchResults from './components/SearchResults/SearchResults';
 import ViewContent from './components/ViewContent/ViewContent';
 import SearchHistory from './components/SearchHistory/SearchHistory';
+import ContentManagement from './components/ContentManagement/ContentManagement';
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
         <Route path='/search-results' element={<SearchResults />} />
         <Route path='/view-content' element={<ViewContent />} />
         <Route path='/search-history' element={<SearchHistory />} />
+        <Route path='/content-management' element={<ContentManagement />} />
       </Routes>
     </Router>
   )
