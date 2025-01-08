@@ -23,9 +23,9 @@ function App() {
         <Route path='/forgotpassword' element={<ForgotPassword />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/account-settings' element={<AccountSettings />} />
-        <Route path='/search-results' element={<SearchResults />} />
         <Route path='/view-content' element={<ViewContent />} />
         <Route path='/search-history' element={<SearchHistory />} />
+        <Route path='/search-results/:search' element={<SearchResults />} />
       </Routes>
     </Router>
   )

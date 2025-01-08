@@ -6,9 +6,12 @@ import search_icon from '../../assets/search-icon.png'
 import download_icon from '../../assets/download_icon.png'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Home() {
   const [userEmail, setUserEmail] = useState("");
+  const [ searchValue, setSearchValue ] = useState('');
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -29,8 +32,36 @@ function Home() {
   }, []);
   //Reuse in other pages that requires logging in
 
+  // api to pass searchValue to backend and to search results
+  const handleSearch = async () => {
+    if(!searchValue.trim() || searchValue === ""){
+      toast.error("Please enter a search term to continue.", {
+        autoClose: 2000
+      });
+      return;
+    }
+
+    try {
+      const res = await axios.post("http://localhost:8080/saveToSearchHistory", { searchValue });
+        if(res.data.message === "Success"){
+          navigate(`/search-results/${searchValue}`);
+          toast.dismiss();
+        } else {
+          toast.error(res.data.message, {
+            autoClose: 2000
+          });
+        }
+    } catch (error) {
+      console.error("Error searching", error);
+      toast.error("An error occurred. Please try again later.", {
+        autoClose: 2000
+      });
+    }
+  };
+
   return (
     <div className={styles.container}>
+      <ToastContainer position='top-center' />
       <div className={styles.header_container}>
         <Header />
       </div>
@@ -40,11 +71,14 @@ function Home() {
           <img src={home_logo} className={styles.logo} alt="This is the logo" />
         </div>
         <div className={styles.content_search_bar_container}>
-            <input type="text"
+            <input
+              type="text"
               className={styles.content_search_bar}
-              placeholder='Search'            
+              placeholder="Search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
             />
-            <button className={styles.search_button}>
+            <button className={styles.search_button} onClick={handleSearch}>
               <img src={search_icon} className={styles.search_icon} alt="This is a search icon" />
             </button>
         </div>  
