@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styles from "./SearchResults.module.css";
 import logo from "../../assets/logo.png";
 import search_icon from "../../assets/search-icon.png";
@@ -15,6 +15,11 @@ import next_page from "../../assets/next_page.png";
 import thumbnail1 from "../../assets/thumbnail_1.jpg";
 import thumbnail2 from "../../assets/thumbnail_2.jpg";
 import thumbnail3 from "../../assets/thumbnail_3.jpg";
+import axios from 'axios';
+import { useParams } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import logoutFunction from '../logoutFunction.jsx';
 
 function SearchResults() {
   const files = [
@@ -92,6 +97,95 @@ function SearchResults() {
     },
   ];
 
+  const [userEmail, setUserEmail] = useState("");
+  const [uploadedPFP, setUploadedPFP] = useState(null);
+  const [ searchValue, setSearchValue ] = useState('');
+
+  const handleSearch = async () => {
+    if(!searchValue.trim() || searchValue === ""){
+      toast.error("Please enter a search term to continue.", {
+        autoClose: 2000
+      });
+      return;
+    }
+
+    try {
+      const res = await axios.post("http://localhost:8080/saveToSearchHistory", { searchValue });
+        if(res.data.message === "Success"){
+          navigate(`/search-results/${searchValue}`);
+          toast.dismiss();
+        } else {
+          toast.error(res.data.message, {
+            autoClose: 2000
+          });
+        }
+    } catch (error) {
+      console.error("Error searching", error);
+      toast.error("An error occurred. Please try again later.", {
+        autoClose: 2000
+      });
+    }
+  };
+
+
+  //Reuse in other pages that requires logging in
+  const navigate = useNavigate();
+  axios.defaults.withCredentials = true;
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080")
+      .then((res) => {
+        if (res.data.valid) {
+          setUserEmail(res.data.email);
+        } else {
+          navigate("/registerlogin");
+        }
+      })
+      .catch((err) => {
+        console.error("Error validating user session:", err);
+      });
+  }, []);
+  //Reuse in other pages that requires logging in
+
+  useEffect(() => {
+    axios.get('http://localhost:8080/getProfile')
+      .then((res) => {
+        const { message, pfp } = res.data;
+        if (message === "User profile fetched successfully") {
+          setUploadedPFP(pfp);
+        } else {
+          toast.error(message, {
+            autoClose: 5000
+          })
+        }
+      })
+      .catch((err) => {
+        toast.error("Error: " + err, {
+          autoClose: 5000
+        })
+      })
+  }, []);
+
+  //get search value from home page
+  const { search } = useParams();
+  const [searchRes, setSearchRes] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8080/searchResults/${search}`);
+        setSearchRes(res.data.results);
+        toast.dismiss();
+      } catch (error) {
+        console.error("Error occurred: " + error);
+        toast.error('Error getting search results', {
+          autoClose: 2000
+        });
+      }
+    };
+    fetchData();
+  }, [search]);
+
   // Search result header logic
   const [activeButton, setActiveButton] = useState("all");
 
@@ -108,7 +202,7 @@ function SearchResults() {
   };
 
   const handleLogout = () => {
-    // Implement logout functionality here
+    logoutFunction(navigate);
   };
 
   // Dropdown select handler logic
@@ -129,21 +223,33 @@ function SearchResults() {
   };
 
   // Pagination logic
+  const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 5;
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    if (searchRes.length > 0) {
+      setTotalPages(Math.ceil(searchRes.length / itemsPerPage));
+    }
+  }, [searchRes]);
 
   const handleNextPage = () => {
-    setCurrentPage((prevPage) =>
-      prevPage < totalPages ? prevPage + 1 : prevPage
-    );
+    setCurrentPage((prevPage) => (prevPage < totalPages ? prevPage + 1 : prevPage));
   };
 
   const handlePreviousPage = () => {
     setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
   };
 
+  const currentItems = searchRes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className={styles.container}>
+      <ToastContainer position='top-center' />
+
       <div className={styles.search_result_header}>
         <img src={logo} alt="Logo" />
 
@@ -152,8 +258,10 @@ function SearchResults() {
             type="text"
             className={styles.content_search_bar}
             placeholder="Search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
-          <button className={styles.search_button}>
+          <button className={styles.search_button} onClick={handleSearch}>
             <img
               src={search_icon}
               className={styles.search_icon}
@@ -164,9 +272,8 @@ function SearchResults() {
 
         {/* Profile Menu */}
         <button
-          className={`${styles.profile_menu} ${
-            activeDropdown === "profile" ? styles.active : ""
-          }`}
+          className={`${styles.profile_menu} ${activeDropdown === "profile" ? styles.active : ""
+            }`}
           onClick={() => toggleDropdown("profile")}
         >
           <img
@@ -342,68 +449,26 @@ function SearchResults() {
             </button>
           </div>
           <div className={styles.search_result_main_content_body}>
+
+
             {activeButton === 'contents' && (
               <>
-                <div className={styles.main_content_body_item}>
-                  <div className={styles.upper_section}>
-                    <h3>arrays</h3>
-                    <p>lele pons</p>
+                {currentItems.map((row, index) => (
+                  <div key={index} className={styles.main_content_body_item}>
+                    <div className={styles.upper_section}>
+                      <h3>{row.Title}</h3>
+                      <p>{row.Firstname} {row.Lastname}</p>
+                    </div>
+                    <div className={styles.lower_section}>
+                      <p>{row.CourseTitle}</p>
+                      {row.Program === 1 ? (
+                        <p className={styles.lower_section_program_cs}>computer science</p>
+                      ) : (
+                        <p className={styles.lower_section_program_it}>information technology</p>
+                      )}
+                    </div>
                   </div>
-                  <div className={styles.lower_section}>
-                    <p>computer programming i</p>
-                    <p className={styles.lower_section_program_cs}>
-                      computer science
-                    </p>
-                  </div>
-                </div>
-                <div className={styles.main_content_body_item}>
-                  <div className={styles.upper_section}>
-                    <h3>arrays</h3>
-                    <p>lele pons</p>
-                  </div>
-                  <div className={styles.lower_section}>
-                    <p>computer programming ii</p>
-                    <p className={styles.lower_section_program_cs}>
-                      computer science
-                    </p>
-                  </div>
-                </div>
-                <div className={styles.main_content_body_item}>
-                  <div className={styles.upper_section}>
-                    <h3>arrays</h3>
-                    <p>lele pons</p>
-                  </div>
-                  <div className={styles.lower_section}>
-                    <p>computer programming ii</p>
-                    <p className={styles.lower_section_program_cs}>
-                      computer science
-                    </p>
-                  </div>
-                </div>
-                <div className={styles.main_content_body_item}>
-                  <div className={styles.upper_section}>
-                    <h3>arrays</h3>
-                    <p>lele pons</p>
-                  </div>
-                  <div className={styles.lower_section}>
-                    <p>computer programming ii</p>
-                    <p className={styles.lower_section_program_cs}>
-                      computer science
-                    </p>
-                  </div>
-                </div>
-                <div className={styles.main_content_body_item}>
-                  <div className={styles.upper_section}>
-                    <h3>arrays</h3>
-                    <p>lele pons</p>
-                  </div>
-                  <div className={styles.lower_section}>
-                    <p>computer programming ii</p>
-                    <p className={styles.lower_section_program_cs}>
-                      computer science
-                    </p>
-                  </div>
-                </div>
+                ))}
               </>
             )}
 
@@ -490,6 +555,7 @@ function SearchResults() {
                   className={styles.search_result_footer_nav_button}
                   alt="previous arrow"
                   onClick={handlePreviousPage}
+                  style={currentPage === 1 && {opacity: '30%'}}
                 />
 
                 <div className={styles.search_result_footer_nav_page}>
@@ -497,10 +563,9 @@ function SearchResults() {
                     <img
                       key={index}
                       src={index + 1 === currentPage ? current_page : next_page}
-                      className={`${styles.page} ${
-                        index + 1 === currentPage ? styles.current_page : ""
-                      }`}
-                      alt={`page ${index + 1}`}
+                      className={`${styles.page} ${index + 1 === currentPage ? styles.current_page : ""}`}
+                      alt={`Page ${index + 1}`}
+                      onClick={() => setCurrentPage(index + 1)}
                     />
                   ))}
                 </div>
@@ -510,6 +575,7 @@ function SearchResults() {
                   className={`${styles.search_result_footer_nav_button} ${styles.rotated}`}
                   alt="next arrow"
                   onClick={handleNextPage}
+                  style={currentPage === totalPages && {opacity: '30%'}}
                 />
               </div>
 
