@@ -1,0 +1,417 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0 100px;
+  gap: 50px;
+}
+
+
+/* Header styling */
+.search_history_header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  padding-left: 5px;
+  padding-top: 30px;
+  gap: 100px;
+}
+
+.profile_menu_container {
+  position: relative; /* Anchor point for dropdown */
+  width: 100%;
+  padding: 10px 0;
+  display: flex;
+  justify-content: flex-end;
+  background-color: transparent;
+  gap: 60px;
+}
+
+.profile_menu {
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 60px;
+  height: 60px;
+  position: relative;
+  box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.2);
+  background-color: none;
+  margin-left: auto;
+}
+
+.profile_menu .default_profile {
+  width: inherit;
+  border-radius: 50%;
+  position: relative;
+
+}
+
+.profile_menu:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown_menu {
+  position: absolute;
+  top: 100%; /* Para palaging sa taas ng header nag-a-appear */
+  right: 0; /* Align to the right side */
+  background-color: #DDDDDD;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  z-index: 1000; /* Para ma-ensure na clickable */
+  width: 100%;
+  width: 325px; /* Adjust width as needed */
+  border-radius: 1.65rem;
+  padding: 10px 2px;
+}
+
+
+.dropdown_menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin: 10px;
+  border-radius: 1rem;
+}
+
+.dropdown_menu li {
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 50px;
+  background-color: white;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  padding: 5px 0;
+  width: 100%;
+  font-size: var(--small-font-size);
+}
+
+.dropdown_menu li:first-child {
+  margin-top: 0;
+}
+
+.dropdown_menu li:hover {
+  background-color: #F5F5F5 ;
+}
+
+.dropdown_menu_logo {
+  height: 25px !important;
+  width: 25px !important;
+  border-radius: 50% !important;
+  margin-right: 15px !important;
+  object-fit: cover !important; 
+}
+
+.dropdown_menu a {
+  display: flex; 
+  align-items: center; 
+  color: #333; 
+  padding: 0 10px; 
+  height: 25px;
+}
+
+
+.notification_menu {
+  margin-top: auto;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  background-color: transparent;
+}
+
+.notification_icon {
+  width: inherit;
+  background-color: none;
+}
+
+.notification_dropdown_menu li {
+  height: 60px;
+  padding: 0 10px;
+}
+
+.search_history_logo {
+  width: 200px;
+  margin: 0 auto;
+}
+
+.search_history_container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 300px;
+  gap: 20px;
+}
+
+.search_history_content_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  img {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+  }
+}
+
+.search_history_action_buttons {
+  display: flex;
+  gap: 20px;
+
+  button:first-child {
+    background-color: var(--blue-color);
+    color: white;
+    font-size: var(--normal-font-size);
+    text-transform: capitalize;
+    height: 30px;
+    padding: 0 20px;
+    border-radius: 50px;
+  }
+
+  button:last-child {
+    background-color: white;
+    color: black;
+    font-size: var(--normal-font-size);
+    text-transform: capitalize;
+    height: 30px;
+    width: 100px;
+    border-radius: 50px;
+    padding: 0 20px;
+    border: 1px solid var(--blue-color);
+
+  }
+}
+
+.search_history_content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.search_history_item {
+
+  h1 {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    text-transform: capitalize;
+    font-weight: 100;
+
+    span {
+      color: black;
+    }
+  }
+
+  hr {
+    margin: 10px 0;
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+
+    li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 100px;
+      height: 35px;
+      
+      p {
+        color: black;
+        flex: 1;
+        flex-wrap: wrap;
+      }
+  
+      img {
+        width: 10px;
+        height: 10px;
+        object-fit: cover;
+      }
+    }
+
+    li:hover p  {
+      text-decoration: underline;
+    }
+  }
+
+  
+}
+
+.calendar_container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.calendar_icon {
+  cursor: pointer;
+  width: 0.5rem; /* Adjust size */
+  height: 0.5rem; /* Adjust size */
+}
+
+.calendar_input {
+  position: absolute;
+  opacity: 0; /* Hidden but functional */
+  pointer-events: none; /* Prevent direct interaction */
+  width: 0; /* Ensure it's not visible */
+  height: 0;
+  bottom: 100%; /* Position it above the icon */
+  right: -100%; /* Position it above the icon */
+}
+
+
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal_content {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 450px;
+  gap: 15px;
+  width: 100%;
+
+    .confirm_delete_button {
+      width: 300px;
+      border-radius: 50px;
+      background-color: #235890;
+      text-transform: uppercase;
+      font-weight: var(--font-semi-bold);
+      margin: 0 auto;
+      height: 40px;
+      margin-bottom: 15px;
+    
+  }
+
+  .delete_search {
+    width: 15px;
+    margin-left: auto;
+  }
+
+  img {
+    width: 15px;
+    margin-left: auto;
+  }
+
+
+  p {
+    color: black;
+    width: 300px;
+    margin: 0 auto;
+    font-size: var(--small-font-size);
+    margin-bottom: 25px;
+  }
+
+}
+
+.modal_title {
+  margin-bottom: 25px;
+
+  .trash_icon {
+    width: 30px;
+    margin: 0 auto;
+  }
+
+  h2 {
+    text-transform: uppercase;
+    font-size: var(--h2-font-size);
+    letter-spacing: 1.5px;
+    word-spacing: 5px;
+  }
+
+  
+}
+
+.modal_content h2 {
+  margin-top: 0;
+}
+
+.modal_content button {
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal_content button:first-of-type {
+  background-color: #ccc;
+}
+
+.modal_content button:last-of-type {
+  background-color: #235890;
+  color: white;
+  height: 40px;
+  width: 300px;
+  border-radius: 50px;
+  margin: 0 auto;
+}
+
+.modal_choose_date {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Space between Start Date and End Date */
+  width: 100%; /* Adjust to modal width */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.calendarContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0; /* Light gray background */
+  border-radius: 20px; /* Rounded corners */
+  padding: 10px 20px; /* Spacing inside the container */
+  width: 300px; /* Adjust as needed */
+  height: 40px;
+
+    img {
+      margin-left: auto;
+    }
+
+}
+
+.label {
+  font-size: 16px;
+  color: hsl(0, 0%, 40%); /* Dark gray text color */
+  flex: 1; 
+}
+
+.calendarIcon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.dateInput {
+  position: absolute;
+  opacity: 0; /* Hide the input field but keep it functional */
+  pointer-events: none; /* Prevent direct interaction */
+}
+

@@ -9,6 +9,7 @@ import Profile from './components/Profile/Profile';
 import AccountSettings from './components/AccountSettings/AccountSettings';
 import SearchResults from './components/SearchResults/SearchResults';
 import ViewContent from './components/ViewContent/ViewContent';
+import SearchHistory from './components/SearchHistory/SearchHistory';
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
         <Route path='/account-settings' element={<AccountSettings />} />
         <Route path='/search-results' element={<SearchResults />} />
         <Route path='/view-content' element={<ViewContent />} />
+        <Route path='/search-history' element={<SearchHistory />} />
       </Routes>
     </Router>
   )

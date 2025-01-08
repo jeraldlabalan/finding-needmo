@@ -77,7 +77,7 @@ function Header() {
         }`}
         onClick={() => toggleDropdown("notification")}
       >
-        <img
+        <img  
           src={notification}
           className={styles.notification_icon}
           alt="Notification Icon"

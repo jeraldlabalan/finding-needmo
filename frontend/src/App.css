@@ -16,6 +16,9 @@
     --text-color: hsl(var(--hue), var(--sat), 46%);
     --body-color: hsl(var(--hue), var(--sat), 98%);
     --container-color: #fff;
+    --blue-color: #235890;
+    --yellow-color: #F1D302;
+    --grey-color: #ddd;
   
     /* Font and typography */
 
