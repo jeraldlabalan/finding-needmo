@@ -26,6 +26,8 @@ function App() {
         <Route path='/account-settings' element={<AccountSettings />} />
         <Route path='/view-content' element={<ViewContent />} />
         <Route path='/search-history' element={<SearchHistory />} />
+        <Route path='/search-results/:search' element={<SearchResults />} />
+        <Route path='/manage-content' element={<ContentManagement />} />
       </Routes>
     </Router>
   )

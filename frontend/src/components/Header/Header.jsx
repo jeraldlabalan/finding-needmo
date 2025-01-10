@@ -19,6 +19,7 @@ function Header() {
   const [activeDropdown, setActiveDropdown] = useState(null); // Manages active dropdown state
   const [userEmail, setUserEmail] = useState("");
   const [uploadedPFP, setUploadedPFP] = useState(null);
+  const [userRole, setUserRole] = useState('');
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ function Header() {
       .then((res) => {
         if (res.data.valid) {
           setUserEmail(res.data.email);
+          setUserRole(res.data.role);
         } else {
           navigate("/registerlogin");
         }
@@ -147,20 +149,25 @@ function Header() {
               </Link>
             </li>
 
-            <li
-              className={
-                location.pathname === "/settings" ? styles.active_link : ""
-              }
-            >
-              <Link to="/settings">
-                <img
-                  src={manage_content}
-                  className={styles.dropdown_menu_logo}
-                  alt="Manage Content"
-                />
-                Manage Content
-              </Link>
-            </li>
+            
+
+              {userRole === "Educator" ? (
+                <li
+                className={
+                  location.pathname === "/settings" ? styles.active_link : ""
+                }
+              >
+                <Link to="/manage-content">
+                  <img
+                    src={manage_content}
+                    className={styles.dropdown_menu_logo}
+                    alt="Manage Content"
+                  />
+                  Manage Content
+                </Link>
+              </li>
+              ) : ("")}
+
             <li>
               <Link onClick={handleLogout}>
                 <img

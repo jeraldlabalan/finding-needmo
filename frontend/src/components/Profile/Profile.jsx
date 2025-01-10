@@ -73,8 +73,7 @@ function Profile() {
       .then(response => {
         if (response.data.uploadedContent) {
           setUploadedContent(response.data.uploadedContent);
-        }
-        console.log(response.data);
+        }        
       })
       .catch(error => console.error("Error fetching content:", error));
   }, [uploadedContent]);
