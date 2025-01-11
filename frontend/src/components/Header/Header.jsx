@@ -139,7 +139,7 @@ function Header() {
                 location.pathname === "/settings" ? styles.active_link : ""
               }
             >
-              <Link to="/settings">
+              <Link to="/account-settings">
                 <img
                   src={account_settings}
                   className={styles.dropdown_menu_logo}

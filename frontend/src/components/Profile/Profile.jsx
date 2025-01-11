@@ -599,7 +599,7 @@ function Profile() {
       <div className={styles.content}>
         <div className={styles.upper_content}>
           <div className={styles.profile_photo_container}>
-            <img src={uploadedPFP} alt="profile photo" />
+            <img src={uploadedPFP} className={styles.display_photo} alt="profile photo" />
           </div>
           <div className={styles.name_and_role_container}>
             <h1 className={styles.name}>{profileColumns.Firstname} {profileColumns.Lastname}</h1>
@@ -760,19 +760,21 @@ function Profile() {
                         className={styles.modal_profile_photo}
                         alt="profile photo"
                       />
-                      <input
-                        type="file"
-                        id="uploadPFP"
-                        name="uploadPFP"
-                        className={styles.edit_profile_photo_button}
-                        accept="image/*"
-                        onChange={handleUploadChange}
-                      />
-                      <img
-                        src={edit_profile_icon}
-                        className={styles.edit_profile_icon}
-                        alt="edit profile photo icon"
-                      />
+                      <div className={styles.add_new_profile_button}>
+                        <input
+                          type="file"
+                          id="uploadPFP"
+                          name="uploadPFP"
+                          className={styles.edit_profile_photo_button}
+                          accept="image/*"
+                          onChange={handleUploadChange}
+                        />
+                        <img
+                          src={edit_profile_icon}
+                          className={styles.edit_profile_icon}
+                          alt="edit profile photo icon"
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -809,7 +811,7 @@ function Profile() {
                         value={profileInfo.position || ''}
                         required
                       >
-                        <option value={null}>Your position</option>
+                        <option value={null} disabled >Your position</option>
                         <option value="Instructor 1">Instructor 1</option>
                         <option value="Instructor 2">Instructor 2</option>
                         <option value="Instructor 3">Instructor 3</option>
@@ -823,7 +825,7 @@ function Profile() {
                         value={profileInfo.program || null}
                         required
                       >
-                        <option value={null}>Select Program</option>
+                        <option value={null} disabled>Select Program</option>
                         <option value="1">Bachelor of Science in Computer Science</option>
                         <option value="2">Bachelor of Science in Information Technology</option>
                       </select>
@@ -902,7 +904,7 @@ function Profile() {
                       value={contentDetails.program}
                       onChange={handleAddContentChange}
                     >
-                      <option value={null}>Program</option>
+                      <option value={null} disabled>Program</option>
                       <option value="1">Computer Science</option>
                       <option value="2">
                         Information Technology
@@ -963,19 +965,23 @@ function Profile() {
                       ))}
 
                       <div className={`${styles.file} ${styles.add_file}`}>
-                        <input
-                          name='contentInput'
-                          value={contentDetails.contentInput}
-                          type="file"
-                          multiple
-                          onChange={handleContentFileChange}
-                        />
-                        <img
-                          src={add_file_icon}
-                          className={styles.file_icon}
-                          alt="add file icon"
-                        />
-                        <p className={styles.button_name}>add files</p>
+                        
+                        <button className={styles.add_file_button_container}>
+                          <input
+                            name='contentInput'
+                            value={contentDetails.contentInput}
+                            type="file"
+                            multiple
+                            onChange={handleContentFileChange}
+                          />
+                          <img
+                            src={add_file_icon}
+                            className={styles.file_icon}
+                            alt="add file icon"
+                          />
+                         add files
+                        </button>
+                        
                       </div>
                     </div>
                   </div>
@@ -1089,11 +1095,18 @@ function Profile() {
                     <div className={styles.modal_file_container}>
                       {editContent.files && editContent.files.map((file, index) => (
                         <div key={index} className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}>
+
+
+
+
                           <img
                             src={file_icon_white} // Use appropriate file icon
                             className={styles.file_icon}
                             alt="file icon"
                           />
+
+
+                          
                           <p className={styles.file_name}>{file.originalName}</p> {/* Display file name */}
                           <img
                             src={delete_file_icon_white} // Use appropriate delete icon
@@ -1104,17 +1117,22 @@ function Profile() {
                         </div>
                       ))}
                       <div className={`${styles.file} ${styles.add_file}`}>
-                        <input
-                          type="file"
-                          multiple
-                          onChange={handleEditContentFiles}
-                        />
-                        <img
-                          src={add_file_icon}
-                          className={styles.file_icon}
-                          alt="add file icon"
-                        />
-                        <p className={styles.button_name}>add files</p>
+                      <button className={styles.add_file_button_container}>
+                          <input
+                            name='contentInput'
+                            value={contentDetails.contentInput}
+                            type="file"
+                            multiple
+                            onChange={handleContentFileChange}
+                          />
+                          <img
+                            src={add_file_icon}
+                            className={styles.file_icon}
+                            alt="add file icon"
+                          />
+                         add files
+                        </button>
+
                       </div>
                     </div>
                     <div className={styles.save_changes_button_container}>

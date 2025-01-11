@@ -37,6 +37,11 @@
 
 }
 
+.display_photo {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+}
 
 .profile_photo_container img {
   border-radius: 50%;
@@ -409,14 +414,21 @@
   border-radius: 50%;
   object-fit: cover; 
   display: block;
+  height: 135px;
+}
+
+.add_new_profile_button {
+  position: absolute;
+  right: 10px;
+  top: 100px;
 }
 
 .profile_container .edit_profile_photo_button {
   border-radius: 50%;
   background-color: transparent !important;
   position: absolute;
-  bottom: 6%;
-  right: 6%;
+  width: 20px;
+  opacity: 0;
 }
 
 .profile_container .edit_profile_icon {
@@ -543,13 +555,12 @@
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   gap: 10px;
-  max-height: 75px;
+  max-height: 80px;
   overflow-y: scroll;
   padding: 3px;
-  border: 1px solid rgba(0, 0, 0, .12);
   border-radius: 16px;
 }
 
@@ -563,6 +574,22 @@
   height: 25px;
   border-radius: 30px;
   cursor: pointer;
+  font-size: var(--tiny-font-size);
+  padding: 0 10px;
+  overflow: hidden;
+
+  img {
+    width: 10%;
+  }
+
+  p {
+    flex: 1;
+    font-size: var(--smaller-font-size);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    
+  }
 }
 
 .modal_file_container .file_icon_white {
@@ -571,6 +598,11 @@
 
 .file_icon_white .file_name {
   color: white;
+  font-size: var(--tiny-font-size);
+}
+
+.file_name {
+  font-size: var(--tiny-font-size);
 }
 
 .modal_file_container .file_icon_black {
@@ -578,8 +610,40 @@
 }
 
 .modal_file_container .add_file {
+  position: relative;
   background-color: #DDDDDD;
   height: 25px;
+  display: flex;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.add_file_button_container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #dddddd;
+  border: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  text-transform: capitalize;
+  color: black;
+
+  input[type="file"]{
+    position: absolute;
+    opacity: 1;
+    cursor: pointer;
+    top: 0; 
+    left: 0;
+    transform: scale(3);
+    opacity: 0;
+  }
+
+  img {
+    cursor: pointer;
+  }
 }
 
 .add_file .button_name {
@@ -650,6 +714,7 @@
 .confirm_archive_and_delete_container .confirm_textbox {
   background-color: #DDDDDD;
   padding: 0 16px;
+  text-align: center;
 }
 
 .confirm_button {

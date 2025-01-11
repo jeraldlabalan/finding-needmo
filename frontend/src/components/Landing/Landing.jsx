@@ -240,7 +240,7 @@ function Landing() {
               </Link>
 
               <Link
-                to="/registerlogin?form=form"
+                to="/registerlogin?form=register"
                 className={`${styles.login_button} ${styles.modal_button}`}
               >
                 <button

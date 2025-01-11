@@ -41,7 +41,9 @@
 }
 
 .profile_menu .default_profile {
-  width: inherit;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 50%;
   position: relative;
 
@@ -221,7 +223,7 @@
   color: black;
   font-weight: var(--font-semi-bold);
   position: relative;
-  padding-bottom: 5px;
+  padding-bottom: 20px;
 }
 
 .search_result_main_content_header_button::before {
@@ -401,39 +403,355 @@
   width: 15px;
 }
 
-.content_cards .card {
+.modal_content .modal_profile_container,
+.modal_content .modal_subheader_container {
+  width: 100%;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.modal_profile_container .profile_container {
+  position: relative;
+}
+
+.profile_container .modal_profile_photo {
+  width: 135px;
+  border: 5px solid #235890;
+  border-radius: 50%;
+  object-fit: cover; 
+  display: block;
+  height: 135px;
+}
+
+.add_new_profile_button {
+  position: absolute;
+  right: 10px;
+  top: 100px;
+}
+
+.profile_container .edit_profile_photo_button {
+  border-radius: 50%;
+  background-color: transparent !important;
+  position: absolute;
+  width: 20px;
+  opacity: 0;
+}
+
+.profile_container .edit_profile_icon {
+  width: 20px;
+}
+
+.modal_content .modal_info_container {
+  width: 100%;
+  padding: 0 30px;
+  height: 35%;
+}
+
+
+
+.modal_content .modal_content_header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.modal_info_container .modal_info_group {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.modal_info_group .name_container {
+  display: flex;
+  width: 100%;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  border: 3px solid rgba(0, 0, 0, 0.12);
-  border-radius: 5px;
-  cursor: pointer; /* Add cursor pointer for selectable cards */
 }
 
-.content_cards .card.selected_card {
-  border-color: var(--blue-color); /* Change border color for selected cards */
+.name_container .name {
+  width: 48%;
+  background-color: #DDDDDD;
+  border: none;
+  border-radius: 50px;
+  height: 40px;
+  padding: 0 16px;
+  color: black;
 }
 
-.search_history_action_buttons button img {
-  width: 20px;
-  height: 20px;
-}
-
-.search_history_content_manipulation img {
-  cursor: pointer;
-}
-
-.multiple_select_header {
-  display: flex;
-  justify-content: space-between;
+.modal_info_group .modal_info_input {
   width: 100%;
+  background-color: #DDDDDD;
+  border: none;
+  border-radius: 50px;
+  height: 40px;
+  padding: 0 16px;
+  color: black;
+}
+
+.modal_content .save_changes_button_container {
+  width: 100%;
+  margin-top: auto;
+}
+
+.save_changes_button_container .save_changes_button {
+  height: 40px;
+  width: 150px;
+  background-color: #235890;
+  color: white;
+  text-transform: uppercase;
+  border-radius: 50px;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+  font-weight: var(--font-semi-bold);
+}
+
+
+.modal_content .modal_subheader_container {
+  width: 100%;
+}
+
+.archive_and_delete_content_container .subheader_container,
+.modal_subheader_container .subheader_container {
+  width: 100%;
+  display: flex;  
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.subheader_container .subheader_icon {
+  width: 30px;
+}
+
+.subheader_container .subheader_description {
+  text-transform: uppercase;
+}
+
+.modal_content .modal_content_info_container {
+  width: 100%;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px 0;
+}
+
+.modal_content_info_container .modal_content_input {
+  background-color: #DDDDDD;
+  border: none;
+  color: black;
+}
+
+.modal_content_info_container .modal_content_select,
+.modal_content_info_container .modal_content_text {
+  height: 40px;
+  border-radius: 50px;
+  padding: 0 16px;
+}
+
+.modal_content_info_container .modal_content_textarea {
+  height: 75px;
+  resize: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+
+}
+
+.modal_content_info_container .modal_file_container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  max-height: 80px;
+  overflow-y: scroll;
+  padding: 3px;
+  border-radius: 16px;
+}
+
+.modal_file_container .file {
+  background-color: #DDDDDD;
+  display: flex;
+  justify-content: center;
+  align-items:center;
+  gap: 0 5px;
+  width: 31%;
+  height: 25px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: var(--tiny-font-size);
+  padding: 0 10px;
+  overflow: hidden;
 
   img {
-    width: 30px;
+    width: 10%;
   }
-    div {
-      display: flex;
-      gap: 30px;
-    }
+
+  p {
+    flex: 1;
+    font-size: var(--smaller-font-size);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    
+  }
+}
+
+.modal_file_container .file_icon_white {
+  background-color: #235890;
+}
+
+.file_icon_white .file_name {
+  color: white;
+  font-size: var(--tiny-font-size);
+}
+
+.file_name {
+  font-size: var(--tiny-font-size);
+}
+
+.modal_file_container .file_icon_black {
+  background-color: #F1D302;
+}
+
+.modal_file_container .add_file {
+  position: relative;
+  background-color: #DDDDDD;
+  height: 25px;
+  display: flex;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.add_file_button_container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #dddddd;
+  border: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  text-transform: capitalize;
+  color: black;
+
+  input[type="file"]{
+    position: absolute;
+    opacity: 1;
+    cursor: pointer;
+    top: 0; 
+    left: 0;
+    transform: scale(3);
+    opacity: 0;
+  }
+
+  img {
+    cursor: pointer;
+  }
+}
+
+.add_file .button_name {
+  color: black;
+}
+
+.file_icon_black .file_name {
+  color: black;
+}
+
+.file .file_icon {
+  width: 15px;
+}
+
+.file .file_name,
+.file .button_name {
+  font-size: var(--smaller-font-size);
+  text-transform: capitalize;
+}
+
+.archive_and_delete_content_header {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.archive_and_delete_content_header .header_close_button {
+  border: none;
+  background-color: white;
+  width: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.archive_and_delete_content_header .header_close_icon {
+  width: 15px;
+}
+
+
+.archive_and_delete_content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px ;
+  padding: 0 1rem;
+}
+
+.archive_and_delete_confirmation {
+  font-size: var(--small-font-size);
+  text-align: center;
+  color: black;
+}
+
+.confirm_archive_and_delete_container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.confirm_archive_and_delete_container .confirm {
+  height: 40px;
+  width: 100%;
+  border-radius: 24px;
+  border: none;
+}
+
+.confirm_archive_and_delete_container .confirm_textbox {
+  background-color: #DDDDDD;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.confirm_button {
+  background-color: #235890;
+  color: white;
+  font-weight: var(--font-semi-bold);
+  text-transform: uppercase;
+}
+
+.step2_archive_and_delete_content {
+  width: 100%;
+  height: 100%;
+}
+
+.view_archived_contents_button {
+  width: 100%;
+  background-color: #235890;
+  color: white;
+  font-weight: var(--font-semi-bold);
+  text-transform: uppercase;
+  height: 40px;
+  width: 100%;
+  border-radius: 24px;
+  border: none;
+}
+
+.view_button_container {
+  width: 100%;
+  margin-top: auto;
+  padding: 0 1rem;
+
 }

@@ -12,7 +12,6 @@
 
 .search_result_header {
   display: flex;
-
   align-items: center;
   justify-content: flex-start;
   position: relative;
@@ -26,17 +25,6 @@
 }
 
 
-/* Profile menu styling */
-.profile_menu_container {
-  position: relative; /* Anchor point for dropdown */
-  width: 100%;
-  padding: 10px 0;
-  display: flex;
-  justify-content: flex-end;
-  background-color: transparent;
-  gap: 60px;
-}
-
 .profile_menu {
   border: none;
   border-radius: 50%;
@@ -48,14 +36,16 @@
   box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.2);
   background-color: none;
   margin-left: auto;
+
+  .default_profile {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
 }
 
-.profile_menu .default_profile {
-  width: inherit;
-  border-radius: 50%;
-  position: relative;
 
-}
 
 .profile_menu:hover {
   background-color: #f0f0f0;

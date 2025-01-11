@@ -99,11 +99,10 @@ function SearchResults() {
 
   const [userEmail, setUserEmail] = useState("");
   const [uploadedPFP, setUploadedPFP] = useState(null);
-  const [searchValue, setSearchValue] = useState('');
-  const [userRole, setUserRole] = useState('');
+  const [ searchValue, setSearchValue ] = useState('');
 
   const handleSearch = async () => {
-    if (!searchValue.trim() || searchValue === "") {
+    if(!searchValue.trim() || searchValue === ""){
       toast.error("Please enter a search term to continue.", {
         autoClose: 2000
       });
@@ -112,14 +111,14 @@ function SearchResults() {
 
     try {
       const res = await axios.post("http://localhost:8080/saveToSearchHistory", { searchValue });
-      if (res.data.message === "Success") {
-        navigate(`/search-results/${searchValue}`);
-        toast.dismiss();
-      } else {
-        toast.error(res.data.message, {
-          autoClose: 2000
-        });
-      }
+        if(res.data.message === "Success"){
+          navigate(`/search-results/${searchValue}`);
+          toast.dismiss();
+        } else {
+          toast.error(res.data.message, {
+            autoClose: 2000
+          });
+        }
     } catch (error) {
       console.error("Error searching", error);
       toast.error("An error occurred. Please try again later.", {
@@ -138,7 +137,6 @@ function SearchResults() {
       .then((res) => {
         if (res.data.valid) {
           setUserEmail(res.data.email);
-          setUserRole(res.data.role);
         } else {
           navigate("/registerlogin");
         }
@@ -149,7 +147,6 @@ function SearchResults() {
   }, []);
   //Reuse in other pages that requires logging in
 
-  //get user pfp
   useEffect(() => {
     axios.get('http://localhost:8080/getProfile')
       .then((res) => {
@@ -178,8 +175,9 @@ function SearchResults() {
       try {
         const res = await axios.get(`http://localhost:8080/searchResults/${search}`);
         setSearchRes(res.data.results);
+        toast.dismiss();
       } catch (error) {
-        console.error("Error occurred:", error);
+        console.error("Error occurred: " + error);
         toast.error('Error getting search results', {
           autoClose: 2000
         });
@@ -188,9 +186,8 @@ function SearchResults() {
     fetchData();
   }, [search]);
 
-
   // Search result header logic
-  const [activeButton, setActiveButton] = useState("contents");
+  const [activeButton, setActiveButton] = useState("all");
 
   const handleButtonClick = (button) => {
     setActiveButton(button);
@@ -244,33 +241,6 @@ function SearchResults() {
     setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
   };
 
-
-
-  const [programFilter, setProgramFilter] = useState("");
-  const [subjectFilter, setSubjectFilter] = useState("");
-
-  // Filter by program and subject
-  const filteredResults = searchRes.filter((item) => {
-    const matchesProgram = programFilter
-      ? item.Program === parseInt(programFilter, 10)
-      : true;
-    const matchesSubject = subjectFilter
-      ? (item.CourseTitle || '').toLowerCase().includes(subjectFilter.toLowerCase())
-      : true;
-    return matchesProgram && matchesSubject;
-  });
-  
-  // Handler for program filter change
-  const handleProgramFilterChange = (e) => {
-    setProgramFilter(e.target.value);
-  };
-  
-  // Handler for subject filter change
-  const handleSubjectFilterChange = (e) => {
-    setSubjectFilter(e.target.value);
-  };
-
-
   const currentItems = searchRes.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -305,13 +275,16 @@ function SearchResults() {
           className={`${styles.profile_menu} ${activeDropdown === "profile" ? styles.active : ""
             }`}
           onClick={() => toggleDropdown("profile")}
-        >
-          <img
-            src={uploadedPFP}
-            className={styles.default_profile}
-            alt="Profile Icon"
-          />
+        > <img
+                  src={uploadedPFP}
+                  className={styles.default_profile}
+                  alt="Profile Icon"
+                />
+
+          
+
         </button>
+
         {activeDropdown === "profile" && (
           <div className={styles.dropdown_menu}>
             <ul>
@@ -350,7 +323,7 @@ function SearchResults() {
                   location.pathname === "/settings" ? styles.active_link : ""
                 }
               >
-                <Link to="/settings">
+                <Link to="/account-settings">
                   <img
                     src={account_settings}
                     className={styles.dropdown_menu_logo}
@@ -360,24 +333,20 @@ function SearchResults() {
                 </Link>
               </li>
 
-              {userRole === "Educator" ? (
-                              <li
-                              className={
-                                location.pathname === "/settings" ? styles.active_link : ""
-                              }
-                            >
-                              <Link to="/manage-content">
-                                <img
-                                  src={manage_content}
-                                  className={styles.dropdown_menu_logo}
-                                  alt="Manage Content"
-                                />
-                                Manage Content
-                              </Link>
-                            </li>
-                            ) : ("")}
-
-
+              <li
+                className={
+                  location.pathname === "/account-settings" ? styles.active_link : ""
+                }
+              >
+                <Link to="/settings">
+                  <img
+                    src={manage_content}
+                    className={styles.dropdown_menu_logo}
+                    alt="Manage Content"
+                  />
+                  Manage Content
+                </Link>
+              </li>
               <li>
                 <Link onClick={handleLogout}>
                   <img
@@ -416,13 +385,15 @@ function SearchResults() {
                 <label>
                   Program
                   <select
-                    value={programFilter}
-                    onChange={handleProgramFilterChange}
-                    style={{ color: getColor(programFilter) }}
+                    value={selectedValue}
+                    onChange={handleSelect}
+                    style={{ color: getColor(selectedValue) }}
                   >
                     <option value="">All</option>
-                    <option value="1">Computer Science</option>
-                    <option value="2">Information Technology</option>
+                    <option value="computer-science">Computer Science</option>
+                    <option value="information-technology">
+                      Information Technology
+                    </option>
                   </select>
                 </label>
               </div>
@@ -485,28 +456,22 @@ function SearchResults() {
 
             {activeButton === 'contents' && (
               <>
-                {filteredResults.map((row, index) => (
-            <div key={index} className={styles.main_content_body_item}>
-              <div className={styles.upper_section}>
-                <h3>{row.Title}</h3>
-                <p>
-                  {row.Firstname} {row.Lastname}
-                </p>
-              </div>
-              <div className={styles.lower_section}>
-                <p>{row.CourseTitle}</p>
-                {row.Program === 1 ? (
-                  <p className={styles.lower_section_program_cs}>
-                    computer science
-                  </p>
-                ) : (
-                  <p className={styles.lower_section_program_it}>
-                    information technology
-                  </p>
-                )}
-              </div>
-            </div>
-          ))}
+                {currentItems.map((row, index) => (
+                  <div key={index} className={styles.main_content_body_item}>
+                    <div className={styles.upper_section}>
+                      <h3>{row.Title}</h3>
+                      <p>{row.Firstname} {row.Lastname}</p>
+                    </div>
+                    <div className={styles.lower_section}>
+                      <p>{row.CourseTitle}</p>
+                      {row.Program === 1 ? (
+                        <p className={styles.lower_section_program_cs}>computer science</p>
+                      ) : (
+                        <p className={styles.lower_section_program_it}>information technology</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </>
             )}
 
@@ -593,7 +558,7 @@ function SearchResults() {
                   className={styles.search_result_footer_nav_button}
                   alt="previous arrow"
                   onClick={handlePreviousPage}
-                  style={currentPage === 1 && { opacity: '30%' }}
+                  style={currentPage === 1 && {opacity: '30%'}}
                 />
 
                 <div className={styles.search_result_footer_nav_page}>
@@ -613,7 +578,7 @@ function SearchResults() {
                   className={`${styles.search_result_footer_nav_button} ${styles.rotated}`}
                   alt="next arrow"
                   onClick={handleNextPage}
-                  style={currentPage === totalPages && { opacity: '30%' }}
+                  style={currentPage === totalPages && {opacity: '30%'}}
                 />
               </div>
 

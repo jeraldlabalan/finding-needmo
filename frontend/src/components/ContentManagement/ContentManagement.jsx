@@ -24,14 +24,14 @@ import add from "../../assets/add.png";
 import multiple_select_icon from "../../assets/multiple-select.png";
 import close from "../../assets/close-icon-modal.png";
 import trash_icon from "../../assets/trash-icon-blue.png";
-import unarchive_icon from "../../assets/unarchive-icon.png"
-import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import logoutFunction from '../logoutFunction.jsx';
+import unarchive_icon from "../../assets/unarchive-icon.png";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import logoutFunction from "../logoutFunction.jsx";
 
 function ContentManagement() {
-  const [activeDropdown, setActiveDropdown] = useState(null);  
+  const [activeDropdown, setActiveDropdown] = useState(null);
 
   const toggleDropdown = (menu) => {
     setActiveDropdown((prev) => (prev === menu ? null : menu));
@@ -79,7 +79,7 @@ function ContentManagement() {
     setActiveButton(button);
   };
 
-  const [userRole, setUserRole] = useState('');
+  const [userRole, setUserRole] = useState("");
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -101,7 +101,6 @@ function ContentManagement() {
       });
   }, []);
   //Reuse in other pages that requires logging in
-
 
   // Function to open the modals
 
@@ -143,53 +142,54 @@ function ContentManagement() {
 
   //get user pfp
   useEffect(() => {
-    axios.get('http://localhost:8080/getProfile')
+    axios
+      .get("http://localhost:8080/getProfile")
       .then((res) => {
         const { message, pfp } = res.data;
         if (message === "User profile fetched successfully") {
           setUploadedPFP(pfp);
         } else {
           toast.error(message, {
-            autoClose: 5000
-          })
+            autoClose: 5000,
+          });
         }
       })
       .catch((err) => {
         toast.error("Error: " + err, {
-          autoClose: 5000
-        })
-      })
+          autoClose: 5000,
+        });
+      });
   }, []);
-
 
   //get uploaded content
   const [uploadedContent, setUploadedContent] = useState([]);
 
   useEffect(() => {
     // Fetch the uploaded content data
-    axios.get('http://localhost:8080/getUploadedContent')
-      .then(response => {
+    axios
+      .get("http://localhost:8080/getUploadedContent")
+      .then((response) => {
         if (response.data.uploadedContent) {
           setUploadedContent(response.data.uploadedContent);
-        }        
+        }
       })
-      .catch(error => console.error("Error fetching content:", error));
+      .catch((error) => console.error("Error fetching content:", error));
   }, [uploadedContent]);
 
   const [courses, setCourses] = useState([]);
   const [contentFiles, setContentFiles] = useState([]);
-    const [contentDetails, setContentDetails] = useState({
-      title: '',
-      description: '',
-      subject: '',
-      program: '',
-      course: '',
-      keyword: '',
-      contentInput: '',
-    });
+  const [contentDetails, setContentDetails] = useState({
+    title: "",
+    description: "",
+    subject: "",
+    program: "",
+    course: "",
+    keyword: "",
+    contentInput: "",
+  });
 
-    const [filteredSubjects, setFilteredSubjects] = useState([]);
-      const [selectedRequest, setSelectedRequest] = useState([]);
+  const [filteredSubjects, setFilteredSubjects] = useState([]);
+  const [selectedRequest, setSelectedRequest] = useState([]);
 
   const handleContentFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files); // Convert FileList to array
@@ -219,373 +219,389 @@ function ContentManagement() {
   };
 
   const [programs, setPrograms] = useState([]);
-    const [subjects, setSubjects] = useState([]);
-    const [editContent, setEditContent] = useState({
-      contentID: selectedRequest.ContentID,
-      title: selectedRequest.Title,
-      description: selectedRequest.Description,
-      subject: selectedRequest.Course,
-      program: selectedRequest.Program,
-      course: selectedRequest.Course,
-      courseTitle: selectedRequest.CourseTitle, // Add courseTitle
-      keyword: selectedRequest.Tags,
-      files: selectedRequest.Files, // Initialize files
+  const [subjects, setSubjects] = useState([]);
+  const [editContent, setEditContent] = useState({
+    contentID: selectedRequest.ContentID,
+    title: selectedRequest.Title,
+    description: selectedRequest.Description,
+    subject: selectedRequest.Course,
+    program: selectedRequest.Program,
+    course: selectedRequest.Course,
+    courseTitle: selectedRequest.CourseTitle, // Add courseTitle
+    keyword: selectedRequest.Tags,
+    files: selectedRequest.Files, // Initialize files
+  });
+
+  const [editContentFiles, setEditContentFiles] = useState(
+    selectedRequest.Files || []
+  ); // Files for editing content
+
+  const handleEditContentFiles = (e) => {
+    const selectedFiles = Array.from(e.target.files); // Convert FileList to array
+    const newFiles = selectedFiles.map((file) => ({
+      originalName: file.name,
+      file: file, // Store the actual file object
+      mimeType: file.type,
+      size: file.size,
+    }));
+
+    console.log("New Files:", newFiles);
+
+    setEditContentFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    setEditContent((prevContent) => ({
+      ...prevContent,
+      files: [...prevContent.files, ...newFiles],
+    }));
+  };
+
+  const handleEditContentFileRemove = (index) => {
+    console.log("Removing file at index:", index);
+
+    setEditContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setEditContent((prevContent) => ({
+      ...prevContent,
+      files: prevContent.files.filter((_, i) => i !== index),
+    }));
+  };
+
+  useEffect(() => {
+    if (selectedRequest) {
+      console.log("Selected Request:", selectedRequest.Course);
+      setEditContent({
+        contentID: selectedRequest.ContentID,
+        title: selectedRequest.Title,
+        description: selectedRequest.Description,
+        subject: selectedRequest.Course, // Ensure this is correctly set
+        program: selectedRequest.Program,
+        courseID: selectedRequest.Course,
+        courseTitle: selectedRequest.CourseTitle, // Add courseTitle
+        keyword: selectedRequest.Tags,
+        files: Array.isArray(selectedRequest.Files)
+          ? selectedRequest.Files
+          : [], // Ensure files is an array
+      });
+
+      setEditContentFiles(
+        Array.isArray(selectedRequest.Files) ? selectedRequest.Files : []
+      ); // Ensure files is an array
+    }
+  }, [selectedRequest]);
+
+  const handleEditContentChange = (e) => {
+    const { name, value } = e.target;
+    setEditContent((prevRequest) => ({
+      ...prevRequest,
+      [name]: value,
+    }));
+  };
+
+  const handleAddContent = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    contentFiles.forEach((contentFile) =>
+      formData.append("contentFiles", contentFile)
+    );
+    formData.append("title", contentDetails.title);
+    formData.append("description", contentDetails.description);
+    formData.append("subject", contentDetails.subject);
+    formData.append("program", contentDetails.program);
+    formData.append("keyword", contentDetails.keyword);
+
+    axios
+      .post("http://localhost:8080/uploadContent", formData)
+      .then((res) => {
+        console.log("Upload success:", res.data);
+        toast.success("Upload success", {
+          autoClose: 2000,
+        });
+
+        setContentFiles([]);
+
+        setContentDetails({
+          title: "",
+          description: "",
+          subject: "",
+          program: "",
+          course: "",
+          keyword: "",
+          contentInput: "",
+        });
+
+        setIsAddContentModalOpen(false);
+      })
+      .catch((err) => {
+        console.error("Upload error:", err);
+      });
+  };
+
+  const handleEditContent = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    editContentFiles.forEach((editContentFile) => {
+      if (editContentFile.file) {
+        formData.append("editContentFiles", editContentFile.file); // Append the actual file object
+      } else {
+        formData.append("existingFiles", JSON.stringify(editContentFile)); // Append existing file metadata
+      }
     });
-  
-    const [editContentFiles, setEditContentFiles] = useState(selectedRequest.Files || []); // Files for editing content
+    formData.append("contentID", editContent.contentID);
+    formData.append("title", editContent.title);
+    formData.append("description", editContent.description);
+    formData.append("subject", editContent.subject); // Ensure this is a valid CourseID
+    formData.append("program", editContent.program);
+    formData.append("keyword", editContent.keyword);
 
-    const handleEditContentFiles = (e) => {
-      const selectedFiles = Array.from(e.target.files); // Convert FileList to array
-      const newFiles = selectedFiles.map(file => ({
-        originalName: file.name,
-        file: file, // Store the actual file object
-        mimeType: file.type,
-        size: file.size
-      }));
-  
-      console.log("New Files:", newFiles);
-  
-      setEditContentFiles((prevFiles) => [...prevFiles, ...newFiles]);
-      setEditContent((prevContent) => ({
-        ...prevContent,
-        files: [...prevContent.files, ...newFiles]
-      }));
-    };
+    console.log("Form Data:", {
+      contentID: editContent.contentID,
+      title: editContent.title,
+      description: editContent.description,
+      subject: editContent.subject,
+      program: editContent.program,
+      keyword: editContent.keyword,
+      files: editContentFiles,
+    });
 
-    const handleEditContentFileRemove = (index) => {
-      console.log("Removing file at index:", index);
-  
-      setEditContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-      setEditContent((prevContent) => ({
-        ...prevContent,
-        files: prevContent.files.filter((_, i) => i !== index)
-      }));
-    };
-
-    useEffect(() => {
-        if (selectedRequest) {
-          console.log("Selected Request:", selectedRequest.Course);
-          setEditContent({
-            contentID: selectedRequest.ContentID,
-            title: selectedRequest.Title,
-            description: selectedRequest.Description,
-            subject: selectedRequest.Course, // Ensure this is correctly set
-            program: selectedRequest.Program,
-            courseID: selectedRequest.Course,
-            courseTitle: selectedRequest.CourseTitle, // Add courseTitle
-            keyword: selectedRequest.Tags,
-            files: Array.isArray(selectedRequest.Files) ? selectedRequest.Files : [], // Ensure files is an array
-          });
-    
-          setEditContentFiles(Array.isArray(selectedRequest.Files) ? selectedRequest.Files : []); // Ensure files is an array
-        }
-      }, [selectedRequest]);
-
-      const handleEditContentChange = (e) => {
-        const { name, value } = e.target;
-        setEditContent((prevRequest) => ({
-          ...prevRequest,
-          [name]: value,
-        }));
-      };
-
-
-      const handleAddContent = (e) => {
-        e.preventDefault();
-    
-        const formData = new FormData();
-        contentFiles.forEach((contentFile) => formData.append("contentFiles", contentFile));
-        formData.append("title", contentDetails.title);
-        formData.append("description", contentDetails.description);
-        formData.append("subject", contentDetails.subject);
-        formData.append("program", contentDetails.program);
-        formData.append("keyword", contentDetails.keyword);
-    
-        axios
-          .post("http://localhost:8080/uploadContent", formData)
-          .then((res) => {
-            console.log("Upload success:", res.data);
-            toast.success("Upload success", {
-              autoClose: 2000
-            });
-    
-            setContentFiles([]);
-    
-            setContentDetails({
-              title: '',
-              description: '',
-              subject: '',
-              program: '',
-              course: '',
-              keyword: '',
-              contentInput: '',
-            });
-    
-            setIsAddContentModalOpen(false);
-          })
-          .catch((err) => {
-            console.error("Upload error:", err);
-          });
-    
-      };
-
-      const handleEditContent = (e) => {
-        e.preventDefault();
-    
-        const formData = new FormData();
-        editContentFiles.forEach((editContentFile) => {
-          if (editContentFile.file) {
-            formData.append("editContentFiles", editContentFile.file); // Append the actual file object
-          } else {
-            formData.append("existingFiles", JSON.stringify(editContentFile)); // Append existing file metadata
-          }
+    axios
+      .post("http://localhost:8080/editUploadedContent", formData)
+      .then((res) => {
+        console.log("Edit success:", res.data);
+        toast.success("Edit success", {
+          autoClose: 2000,
         });
-        formData.append("contentID", editContent.contentID);
-        formData.append("title", editContent.title);
-        formData.append("description", editContent.description);
-        formData.append("subject", editContent.subject); // Ensure this is a valid CourseID
-        formData.append("program", editContent.program);
-        formData.append("keyword", editContent.keyword);
-    
-        console.log("Form Data:", {
-          contentID: editContent.contentID,
-          title: editContent.title,
-          description: editContent.description,
-          subject: editContent.subject,
-          program: editContent.program,
-          keyword: editContent.keyword,
-          files: editContentFiles
-        });
-    
-        axios
-          .post("http://localhost:8080/editUploadedContent", formData)
-          .then((res) => {
-            console.log("Edit success:", res.data);
-            toast.success("Edit success", {
-              autoClose: 2000
-            });
-    
-            setTimeout(() => {
-              window.location.reload();
-            }, 2000);
-          })
-          .catch((err) => {
-            console.error("Edit error:", err);
-          });
-      };
 
-      useEffect(() => {
-        axios.get("http://localhost:8080/getContentPrograms")
-          .then((res) => {
-            console.log(res.data);
-            setPrograms(res.data);
-          })
-          .catch((err) => {
-            toast.error("Error: " + err, {
-              autoClose: 4000
-            })
-          })
-      }, []);
-    
-      useEffect(() => {
-        if (editContent.program) {
-          axios.get(`http://localhost:8080/getContentSubjects?program=${editContent.program}`)
-            .then((res) => {
-              console.log(res.data);
-              setSubjects(res.data);
-            })
-            .catch((err) => {
-              toast.error("Error: " + err, {
-                autoClose: 4000
-              })
-            })
-        }
-      }, [editContent.program]);
-    
-      useEffect(() => {
-    
-        // If program is selected, filter the courses accordingly
-        if (contentDetails.program) {
-          const filtered = courses.filter(
-            (course) => course.Program === parseInt(contentDetails.program)
-          );
-          console.log("Filtered Subjects:", filtered);
-          setFilteredSubjects(filtered);
-        } else {
-          console.log("Program not selected, clearing subjects...");
-          setFilteredSubjects([]); // Clear subjects when no program is selected
-        }
-      }, [contentDetails.program, courses]); // Run when program or courses change
-    
-    
-      //get courses
-      useEffect(() => {
-        axios.get("http://localhost:8080/getCourses")
-          .then((res) => {
-            console.log(res.data);
-            setCourses(res.data);
-          })
-          .catch((err) => {
-            toast.error("Error: " + err, {
-              autoClose: 4000
-            })
-          })
-      }, []);
-
-      const [archiveContent, setArchiveContent] = useState({
-        contentID: '',
-        archive: '',
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Edit error:", err);
       });
-      const [isArchiveSuccess, setIsArchiveSuccess] = useState(false);
-    
-      const handleArchiveContentChange = (e) => {
-        const { name, value } = e.target;
-        setArchiveContent((prevContent) => ({
-          ...prevContent,
-          [name]: value
-        }));
-      };
-    
-      const handleArchiveContent = () => {
-        if (archiveContent.archive !== selectedRequest.Title || !archiveContent.archive) {
-          toast.error("Title does not match", {
-            autoClose: 2000
-          });
-          return;
-        }
-    
-        const data = {
-          contentID: selectedRequest.ContentID,
-          title: archiveContent.archive
-        };
-    
-        axios.post("http://localhost:8080/archiveUploadedContent", data)
-          .then((res) => {
-            console.log("Archive success:", res.data);
-            toast.success("Archive success", {
-              autoClose: 2000
-            });
-    
-            setCurrentStepArchive((prev) => (prev < 2 ? prev + 1 : prev));
-            setIsArchiveSuccess(true);
-          })
-          .catch((err) => {
-            console.error("Archive error:", err);
-            setIsArchiveSuccess(false);
-          });
-      }
-      const [deleteContent, setDeleteContent] = useState({
-        contentID: '',
-        delete: '',
+  };
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/getContentPrograms")
+      .then((res) => {
+        console.log(res.data);
+        setPrograms(res.data);
+      })
+      .catch((err) => {
+        toast.error("Error: " + err, {
+          autoClose: 4000,
+        });
       });
-      const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
-    
-      const handleDeleteContentChange = (e) => {
-        const { name, value } = e.target;
-        setDeleteContent((prevContent) => ({
-          ...prevContent,
-          [name]: value
-        }));
-      };
-    
-      const handleDeleteContent = () => {
-        if (deleteContent.delete !== selectedRequest.Title || !deleteContent.delete) {
-          toast.error("Title does not match", {
-            autoClose: 2000
-          });
-          return;
-        }
-    
-        const data = {
-          contentID: selectedRequest.ContentID,
-          title: deleteContent.delete
-        };
-    
-        axios.post("http://localhost:8080/deleteUploadedContent", data)
-          .then((res) => {
-            console.log("Delete success:", res.data);
-            toast.success("Delete success", {
-              autoClose: 2000
-            });
-    
-            setCurrentStepDelete((prev) => (prev < 2 ? prev + 1 : prev));
-            setIsDeleteSuccess(true);
-          })
-          .catch((err) => {
-            console.error("Archive error:", err);
-            setIsDeleteSuccess(false);
-          });
-      }
-    
+  }, []);
 
-    
-      const handleEditRow = (details) => {
-        setSelectedRequest({
-          ...details,
-          files: details.Files
-        });
-        setIsEditContentModalOpen(true);
-      };
-    
-      const handleArchiveRow = (details) => {
-        setSelectedRequest({
-          ...details,
-          files: details.Files
-        });
-        setIsArchiveContentModalOpen(true);
-        toast.dismiss();
-      };
-    
-      const handleDeleteRow = (details) => {
-        setSelectedRequest({
-          ...details,
-          files: details.Files
-        });
-        setIsDeleteContentModalOpen(true);
-      }
-
-
-      //get all archived contents
-      const [archivedContent, setArchivedContent] = useState ([]);
-      useEffect(() => {
-        // Fetch the uploaded content data
-        axios.get('http://localhost:8080/getArchivedContents')
-          .then(response => {
-            if (response.data.archivedRes) {
-              setArchivedContent(response.data.archivedRes);
-            }        
-          })
-          .catch(error => console.error("Error fetching content:", error));
-      }, [archivedContent]);
-
-      //handle unarchive a content
-      const handleUnarchiveContent = (details) => {
-        console.log(details.ContentID);
-
-        axios.post('http://localhost:8080/unarchiveContent', {
-          contentID: details.ContentID,
-          title: details.Title
-        })
+  useEffect(() => {
+    if (editContent.program) {
+      axios
+        .get(
+          `http://localhost:8080/getContentSubjects?program=${editContent.program}`
+        )
         .then((res) => {
-          if(res.data.message === "Success"){
-            toast.success(`Successfully unarchived content: '${details.Title}'`, {
-              autoClose: 1000
-            })
-            setTimeout(() => {
-              window.location.reload();
-          }, 1000);            
-          } else{
-            toast.error(`Failed to unarchive content: '${details.Title}'`, {
-              autoClose: 2000
-            })
-          }
+          console.log(res.data);
+          setSubjects(res.data);
         })
         .catch((err) => {
-          toast.error(`An error occurred. Please try again.`+err, {
-            autoClose: 2000
-          })
-        })
-      }
+          toast.error("Error: " + err, {
+            autoClose: 4000,
+          });
+        });
+    }
+  }, [editContent.program]);
+
+  useEffect(() => {
+    // If program is selected, filter the courses accordingly
+    if (contentDetails.program) {
+      const filtered = courses.filter(
+        (course) => course.Program === parseInt(contentDetails.program)
+      );
+      console.log("Filtered Subjects:", filtered);
+      setFilteredSubjects(filtered);
+    } else {
+      console.log("Program not selected, clearing subjects...");
+      setFilteredSubjects([]); // Clear subjects when no program is selected
+    }
+  }, [contentDetails.program, courses]); // Run when program or courses change
+
+  //get courses
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/getCourses")
+      .then((res) => {
+        console.log(res.data);
+        setCourses(res.data);
+      })
+      .catch((err) => {
+        toast.error("Error: " + err, {
+          autoClose: 4000,
+        });
+      });
+  }, []);
+
+  const [archiveContent, setArchiveContent] = useState({
+    contentID: "",
+    archive: "",
+  });
+  const [isArchiveSuccess, setIsArchiveSuccess] = useState(false);
+
+  const handleArchiveContentChange = (e) => {
+    const { name, value } = e.target;
+    setArchiveContent((prevContent) => ({
+      ...prevContent,
+      [name]: value,
+    }));
+  };
+
+  const handleArchiveContent = () => {
+    if (
+      archiveContent.archive !== selectedRequest.Title ||
+      !archiveContent.archive
+    ) {
+      toast.error("Title does not match", {
+        autoClose: 2000,
+      });
+      return;
+    }
+
+    const data = {
+      contentID: selectedRequest.ContentID,
+      title: archiveContent.archive,
+    };
+
+    axios
+      .post("http://localhost:8080/archiveUploadedContent", data)
+      .then((res) => {
+        console.log("Archive success:", res.data);
+        toast.success("Archive success", {
+          autoClose: 2000,
+        });
+
+        setCurrentStepArchive((prev) => (prev < 2 ? prev + 1 : prev));
+        setIsArchiveSuccess(true);
+      })
+      .catch((err) => {
+        console.error("Archive error:", err);
+        setIsArchiveSuccess(false);
+      });
+  };
+  const [deleteContent, setDeleteContent] = useState({
+    contentID: "",
+    delete: "",
+  });
+  const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
+
+  const handleDeleteContentChange = (e) => {
+    const { name, value } = e.target;
+    setDeleteContent((prevContent) => ({
+      ...prevContent,
+      [name]: value,
+    }));
+  };
+
+  const handleDeleteContent = () => {
+    if (
+      deleteContent.delete !== selectedRequest.Title ||
+      !deleteContent.delete
+    ) {
+      toast.error("Title does not match", {
+        autoClose: 2000,
+      });
+      return;
+    }
+
+    const data = {
+      contentID: selectedRequest.ContentID,
+      title: deleteContent.delete,
+    };
+
+    axios
+      .post("http://localhost:8080/deleteUploadedContent", data)
+      .then((res) => {
+        console.log("Delete success:", res.data);
+        toast.success("Delete success", {
+          autoClose: 2000,
+        });
+
+        setCurrentStepDelete((prev) => (prev < 2 ? prev + 1 : prev));
+        setIsDeleteSuccess(true);
+      })
+      .catch((err) => {
+        console.error("Archive error:", err);
+        setIsDeleteSuccess(false);
+      });
+  };
+
+  const handleEditRow = (details) => {
+    setSelectedRequest({
+      ...details,
+      files: details.Files,
+    });
+    setIsEditContentModalOpen(true);
+  };
+
+  const handleArchiveRow = (details) => {
+    setSelectedRequest({
+      ...details,
+      files: details.Files,
+    });
+    setIsArchiveContentModalOpen(true);
+    toast.dismiss();
+  };
+
+  const handleDeleteRow = (details) => {
+    setSelectedRequest({
+      ...details,
+      files: details.Files,
+    });
+    setIsDeleteContentModalOpen(true);
+  };
+
+  //get all archived contents
+  const [archivedContent, setArchivedContent] = useState([]);
+  useEffect(() => {
+    // Fetch the uploaded content data
+    axios
+      .get("http://localhost:8080/getArchivedContents")
+      .then((response) => {
+        if (response.data.archivedRes) {
+          setArchivedContent(response.data.archivedRes);
+        }
+      })
+      .catch((error) => console.error("Error fetching content:", error));
+  }, [archivedContent]);
+
+  //handle unarchive a content
+  const handleUnarchiveContent = (details) => {
+    console.log(details.ContentID);
+
+    axios
+      .post("http://localhost:8080/unarchiveContent", {
+        contentID: details.ContentID,
+        title: details.Title,
+      })
+      .then((res) => {
+        if (res.data.message === "Success") {
+          toast.success(`Successfully unarchived content: '${details.Title}'`, {
+            autoClose: 1000,
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else {
+          toast.error(`Failed to unarchive content: '${details.Title}'`, {
+            autoClose: 2000,
+          });
+        }
+      })
+      .catch((err) => {
+        toast.error(`An error occurred. Please try again.` + err, {
+          autoClose: 2000,
+        });
+      });
+  };
 
   return (
     <div className={styles.container}>
@@ -666,7 +682,6 @@ function ContentManagement() {
                   Manage Content
                 </Link>
               </li>
-
 
               <li>
                 <Link onClick={handleLogout}>
@@ -847,7 +862,6 @@ function ContentManagement() {
             </>
           )}
 
-
           {activeButton === "archive" && (
             <>
               <div className={styles.content_cards}>
@@ -917,7 +931,6 @@ function ContentManagement() {
           )}
         </div>
       </div>
-      
 
       {/* ADD Content Modal */}
       {isAddContentModalOpen && (
@@ -1039,19 +1052,21 @@ function ContentManagement() {
                   </div>
                 ))}
                 <div className={`${styles.file} ${styles.add_file}`}>
-                  <input
-                    name="contentInput"
-                    value={contentDetails.contentInput}
-                    type="file"
-                    multiple
-                    onChange={handleContentFileChange}
-                  />
-                  <img
-                    src={add_file_icon}
-                    className={styles.file_icon}
-                    alt="add file icon"
-                  />
-                  <p className={styles.button_name}>add files</p>
+                  <button className={styles.add_file_button_container}>
+                    <input
+                      name="contentInput"
+                      value={contentDetails.contentInput}
+                      type="file"
+                      multiple
+                      onChange={handleContentFileChange}
+                    />
+                    <img
+                      src={add_file_icon}
+                      className={styles.file_icon}
+                      alt="add file icon"
+                    />
+                    add files
+                  </button>
                 </div>
               </div>
             </div>

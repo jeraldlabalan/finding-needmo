@@ -70,12 +70,11 @@ function ViewContent() {
             activeDropdown === "profile" ? styles.active : ""
           }`}
           onClick={() => toggleDropdown("profile")}
-        >
-          <img
-            src={uploadedPFP}
-            className={styles.default_profile}
-            alt="Profile Icon"
-          />
+        > <img
+                          src={uploadedPFP}
+                          className={styles.default_profile}
+                          alt="Profile Icon"
+                        />
         </button>
         {activeDropdown === "profile" && (
           <div className={styles.dropdown_menu}>
@@ -115,7 +114,7 @@ function ViewContent() {
                   location.pathname === "/settings" ? styles.active_link : ""
                 }
               >
-                <Link to="/settings">
+                <Link to="/account-settings">
                   <img
                     src={account_settings}
                     className={styles.dropdown_menu_logo}
@@ -130,7 +129,7 @@ function ViewContent() {
                   location.pathname === "/settings" ? styles.active_link : ""
                 }
               >
-                <Link to="/settings">
+                <Link to="/manage-content">
                   <img
                     src={manage_content}
                     className={styles.dropdown_menu_logo}
