@@ -123,7 +123,7 @@ router.get('/getProfile', (req, res) => {
                     
                     return res.send({
                         message: "User profile fetched successfully",
-                        pfp: pfp,
+                        pfp: profileRes[0].Picture,
                         userData: userRes[0],
                         profileData: profileRes[0]
                     })

@@ -23,7 +23,7 @@ function App() {
         <Route path='/home' element={<Home />} />
         <Route path='/forgotpassword' element={<ForgotPassword />} />
         <Route path='/profile' element={<Profile />} />
-        <Route path='/settings' element={<AccountSettings />} />
+        <Route path='/account-settings' element={<AccountSettings />} />
         <Route path='/view-content' element={<ViewContent />} />
         <Route path='/search-history' element={<SearchHistory />} />
         <Route path='/search-results/:search' element={<SearchResults />} />

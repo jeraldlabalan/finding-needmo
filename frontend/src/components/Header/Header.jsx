@@ -46,7 +46,7 @@ function Header() {
     .then((res) => {
       const {message, pfp} = res.data;
       if(message === "User profile fetched successfully"){
-        setUploadedPFP(pfp);
+        setUploadedPFP(`http://localhost:8080/${pfp}`);
       } else {
         toast.error(message, {
           autoClose: 5000

@@ -40,6 +40,7 @@ function Profile() {
   const [userColumns, setUserColumns] = useState([]);
   const [profileColumns, setProfileColumns] = useState([]);
   const [uploadedPFP, setUploadedPFP] = useState(null);
+  const [initialPFP, setInitialPFP] = useState(null);  
 
   const [profileInfo, setProfileInfo] = useState({
     uploadPFP: null,
@@ -66,6 +67,7 @@ function Profile() {
   const [selectedRequest, setSelectedRequest] = useState([]);
 
   const [uploadedContent, setUploadedContent] = useState([]);
+  
 
   useEffect(() => {
     // Fetch the uploaded content data
@@ -197,6 +199,7 @@ function Profile() {
   };
 
   const handleAddContent = (e) => {
+    
     e.preventDefault();
 
     const formData = new FormData();
@@ -210,6 +213,7 @@ function Profile() {
     axios
       .post("http://localhost:8080/uploadContent", formData)
       .then((res) => {
+        
         console.log("Upload success:", res.data);
         toast.success("Upload success", {
           autoClose: 2000
@@ -230,12 +234,13 @@ function Profile() {
         setIsAddContentModalOpen(false);
       })
       .catch((err) => {
-        console.error("Upload error:", err);
+        console.error("Upload error:", err);        
       });
 
   };
 
   const handleEditContent = (e) => {
+    
     e.preventDefault();
 
     const formData = new FormData();
@@ -265,7 +270,7 @@ function Profile() {
 
     axios
       .post("http://localhost:8080/editUploadedContent", formData)
-      .then((res) => {
+      .then((res) => {        
         console.log("Edit success:", res.data);
         toast.success("Edit success", {
           autoClose: 2000
@@ -275,7 +280,7 @@ function Profile() {
           window.location.reload();
         }, 2000);
       })
-      .catch((err) => {
+      .catch((err) => {    
         console.error("Edit error:", err);
       });
   };
@@ -356,7 +361,8 @@ function Profile() {
         if (message === "User profile fetched successfully") {
           setUserColumns(userData);
           setProfileColumns(profileData);
-          setUploadedPFP(pfp);
+          setUploadedPFP(`http://localhost:8080/${pfp}`);
+          setInitialPFP(`http://localhost:8080/${pfp}`);
 
           setProfileInfo({
             uploadPFP: pfp || null,
@@ -379,8 +385,10 @@ function Profile() {
       })
   }, []);
 
-  const saveProfileChanges = () => {
-    const data = new FormData();
+  const saveProfileChanges = () => {    
+
+    const data = new FormData();    
+
     if (profileInfo.uploadPFP) {
       data.append("uploadPFP", profileInfo.uploadPFP);
     }
@@ -395,9 +403,9 @@ function Profile() {
       headers: { "Content-Type": "multipart/form-data", },
     })
       .then((res) => {
-        if (res.data.message === "Changes saved") {
+        if (res.data.message === "Changes saved") {          
           console.log("Changes saved:", res.data);
-          setUploadedPFP(`http://localhost:8080/${res.data.pfpURL}`);
+          setUploadedPFP(`http://localhost:8080/${res.data.pfpURL}`);          
 
           setTimeout(() => {
             window.location.reload();
@@ -407,7 +415,7 @@ function Profile() {
       .catch((err) => {
         toast.error("Error: " + err, {
           autoClose: 5000
-        })
+        })        
       })
   }
 
@@ -431,7 +439,8 @@ function Profile() {
 
   // Function to close the modals
   const closeEditProfileModal = () => {
-    setIsEditProfileModalOpen(false);
+    setIsEditProfileModalOpen(false);    
+    setUploadedPFP(initialPFP);
   };
 
   const closeEditContentModal = () => {
@@ -466,6 +475,8 @@ function Profile() {
         uploadPFP: file,   // Store the file itself
         pfpURL: url,       // Store the image URL for previewing
       }));
+
+      setUploadedPFP(url);
     }
   };
 
@@ -483,7 +494,7 @@ function Profile() {
     }));
   };
 
-  const handleArchiveContent = () => {
+  const handleArchiveContent = () => {    
     if (archiveContent.archive !== selectedRequest.Title || !archiveContent.archive) {
       toast.error("Title does not match", {
         autoClose: 2000
@@ -495,9 +506,10 @@ function Profile() {
       contentID: selectedRequest.ContentID,
       title: archiveContent.archive
     };
+    
 
     axios.post("http://localhost:8080/archiveUploadedContent", data)
-      .then((res) => {
+      .then((res) => {        
         console.log("Archive success:", res.data);
         toast.success("Archive success", {
           autoClose: 2000
@@ -506,7 +518,7 @@ function Profile() {
         setCurrentStepArchive((prev) => (prev < 2 ? prev + 1 : prev));
         setIsArchiveSuccess(true);
       })
-      .catch((err) => {
+      .catch((err) => {        
         console.error("Archive error:", err);
         setIsArchiveSuccess(false);
       });
@@ -538,10 +550,10 @@ function Profile() {
     const data = {
       contentID: selectedRequest.ContentID,
       title: deleteContent.delete
-    };
+    };    
 
     axios.post("http://localhost:8080/deleteUploadedContent", data)
-      .then((res) => {
+      .then((res) => {        
         console.log("Delete success:", res.data);
         toast.success("Delete success", {
           autoClose: 2000
@@ -550,7 +562,7 @@ function Profile() {
         setCurrentStepDelete((prev) => (prev < 2 ? prev + 1 : prev));
         setIsDeleteSuccess(true);
       })
-      .catch((err) => {
+      .catch((err) => {        
         console.error("Archive error:", err);
         setIsDeleteSuccess(false);
       });
@@ -756,7 +768,7 @@ function Profile() {
                   <div className={styles.modal_profile_container}>
                     <div className={styles.profile_container}>
                       <img
-                        src={profileInfo.uploadPFP ? profileInfo.pfpURL : uploadedPFP}
+                        src={uploadedPFP}
                         className={styles.modal_profile_photo}
                         alt="profile photo"
                       />

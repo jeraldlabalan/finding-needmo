@@ -12,6 +12,7 @@ import path from 'path';
 import EducatorProfile from './routes/EducatorProfile.js';
 import handleContent from './routes/handleContent.js';
 import Search from './routes/Search.js';
+import AccountSettings from './routes/AccountSettings.js';
 
 const app = express();
 app.use(express.json());
@@ -65,6 +66,7 @@ app.use("/uploads", express.static("uploads"));
 app.use('/', EducatorProfile);
 app.use('/', handleContent);
 app.use('/', Search);
+app.use('/', AccountSettings);
 
 
 // Scheduled task to mark users as inactive without triggering anything in frontend

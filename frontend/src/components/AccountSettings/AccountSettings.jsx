@@ -7,11 +7,16 @@ import verify_icon_black from "../../assets/verify-icon-black.png";
 import email_icon_white from "../../assets/email-icon-white.png";
 import email_icon from '../../assets/email.png'
 import verify_icon from '../../assets/verified_icon.png'
+import axios from 'axios';
 
 function AccountSettings() {
   const [selectedForm, setSelectedForm] = useState(null);
   const [currentChangeEmailStep, setCurrentChangeEmailStep] = useState(1);
   const [currentChangePasswordStep, setCurrentChangePasswordStep] = useState(1);
+  const [emailData, setEmailData] = useState({
+    password: '',
+
+  });
 
   const nextStep = () => {
     setCurrentChangePasswordStep((prev) => (prev < 3 ? prev + 1 : prev));
@@ -33,6 +38,31 @@ function AccountSettings() {
     setCurrentChangeEmailStep(1); 
     setCurrentChangePasswordStep(1); 
   };
+
+  const handleEmailChange = (e) => {
+    const { name, value } = e.target;
+  setEmailData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+  }
+
+  const handleVerifyPassword = () => {
+    console.log(emailData);
+
+    axios.post('http://localhost:8080/verifyPassword/accSettings', {password: emailData.password})
+    .then((res) => {
+      if(res.data.message === "Correct"){
+        setCurrentChangeEmailStep((prev) => (prev < 3 ? prev + 1 : prev));
+      } else {
+        alert(res.data.message);
+      }
+    })
+    .catch((err) => {
+      alert("An error occurred. Please try again.");
+      console.log("Error: " + err);
+    })
+  }
   
 
   return (
@@ -108,6 +138,9 @@ function AccountSettings() {
               <div className={styles.password_field_container}>
                 <input
                   type="password"
+                  value={emailData.password}
+                  name='password'
+                  onChange={handleEmailChange}
                   className={styles.password_field}
                   placeholder="Password"
                 />
@@ -115,7 +148,7 @@ function AccountSettings() {
               <div className={styles.nav_buttons_container}>
                 <button
                   className={`${styles.button_next} ${styles.button}`}
-                  onClick={nextStep}
+                  onClick={handleVerifyPassword}
                 >
                   next
                 </button>
