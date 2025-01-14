@@ -10,9 +10,18 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function RegisterLogin() {
-  const location = useLocation(); // Get current location object
+  const location = useLocation();
+  const [isSignUp, setIsSignUp] = useState(); 
 
-  const [isSignUp, setIsSignUp] = useState(true); // Default form is Sign Up
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const formType = queryParams.get("form");
+    if (formType === "login") {
+      setIsSignUp(false);
+    } else if (formType === "register") {
+      setIsSignUp(true);
+    }
+  }, [location.search]);
 
   const [signUpValues, setSignUpValues] = useState({
     accRole: "",
@@ -50,22 +59,22 @@ function RegisterLogin() {
 
   axios.defaults.withCredentials = true;
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:8080")
-      .then((res) => {
-        if (res.data.valid) {
-          if (res.data.role === "Student") {
-            navigate("/home");
-          } else if (res.data.role === "Educator") {
-            navigate("/home");
-          }
-        } else {
-          navigate("/registerlogin?form=login");
-        }
-      })
-      .catch((err) => toast.error("Error" + err, { autoClose: 4000 }));
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:8080")
+  //     .then((res) => {
+  //       if (res.data.valid) {
+  //         if (res.data.role === "Student") {
+  //           navigate("/home");
+  //         } else if (res.data.role === "Educator") {
+  //           navigate("/home");
+  //         }
+  //       } else {
+  //         navigate("/registerlogin?form=login");
+  //       }
+  //     })
+  //     .catch((err) => toast.error("Error" + err, { autoClose: 4000 }));
+  // }, []);
 
   const submitLogin = (e) => {
     e.preventDefault();
@@ -266,14 +275,6 @@ function RegisterLogin() {
     toast.dismiss();
   };
 
-  // Logic para ma-direct sa sign up or log in form kapag galing sa landing page
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const formType = queryParams.get("form"); // 'login' or 'register'
-    if (formType === "login") setIsSignUp(false);
-    if (formType === "register") setIsSignUp(true);
-  }, [location]);
-
   // Switching from sign up form to login form vice versa
   const toggleForm = () => {
     setIsSignUp((prev) => !prev);
@@ -283,8 +284,10 @@ function RegisterLogin() {
     <div className={styles.container}>
       <ToastContainer position="top-center" />
       <div className={styles.content}>
+        <Link to="/" className={styles.logo}>
+        
         <img src={logo} alt="This is our logo" className={styles.logo} />
-
+        </Link>
         {/* Sign-Up Form */}
         {isSignUp && (
           <div className={styles.signup_content} id="signup">

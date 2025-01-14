@@ -1,0 +1,141 @@
+.create_document_container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  gap: 40px;
+}
+
+.create_document_header_container {
+  height: 100px;
+  padding: 0 100px;
+
+}
+
+.logo_container {
+  width: 100%;
+  padding-left: 5%;
+
+  .logo {
+    width: 300px;
+  }
+  
+}
+
+.create_document_main_content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  margin: 0 auto;
+  gap: 50px;
+
+  .main_content_header {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+
+    .main_content_header_button {
+      font-weight: var(--font-semi-bold);
+      text-transform: capitalize;
+      padding-bottom: 5px;
+      position: relative;
+      background-color: white;
+    }
+    
+  }
+
+  .main_content_content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 50px;
+  }
+}
+
+.active_button {
+  color: #235890;
+}
+
+.active_button::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  border-radius: 50px;
+  height: 3px;
+  bottom: 0;
+  left: 0%; 
+  background-color: #235890; /* Change this to your desired color */
+  visibility: visible;
+  transform: scaleX(-50%);
+  transition: all 0.3s ease-in-out;
+}
+
+.file_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100px;
+  height: 150px;
+
+    .file_icon {
+      width: 100px;
+    }
+
+    .delete_icon {
+      width: 20px;
+    }
+
+    p {
+      font-size: var(--smaller-font-size);
+      max-width: 9ch;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+}
+
+
+.add_file_button {
+  display: flex;
+  flex-direction: column;
+  height: 150px;
+  width: 125px;
+  border-radius: 12px;
+  background-color: #ddd;
+  padding: 20px 0;  
+  gap: 20px;
+  cursor: pointer;
+  overflow: hidden;
+
+    div {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-direction: column;
+      overflow: hidden;
+      
+      img {
+        width: 30px;
+        height: 30px;
+      }
+
+      input[type="file"] {
+        cursor: pointer;
+        display: none;
+      }
+    }
+
+    p {
+      font-size: var(--smaller-font-size);
+      font-weight: bold;
+      text-align: center;
+      text-transform: capitalize;
+      color: black;
+      user-select: none;
+    }
+
+}

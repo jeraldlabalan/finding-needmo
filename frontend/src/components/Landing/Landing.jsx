@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "/src/components/Landing/Landing.module.css";
 import logo from "/src/assets/logo.png";
 import landing_photo from "/src/assets/landing-photo.png";
@@ -10,6 +10,17 @@ import information_technology from "/src/assets/information-technology.png";
 function Landing() {
   // Modal logic
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  
+  const handleLoginClick = () => {
+    closeModal();
+    navigate('/registerlogin?form=login');
+  };
+
+  const handleRegisterClick = () => {
+    closeModal();
+    navigate('/registerlogin?form=register');
+  };
 
   // Function to open the modal
   const openModal = () => {
@@ -226,31 +237,27 @@ function Landing() {
             </p>
 
             <div className={styles.modal_buttons_container}>
-              <Link
-                to="/registerlogin?form=login"
-                className={`${styles.login_button} ${styles.modal_button}`}
-              >
+            
                 <button
                   data-testid="login-button"
                   className={`${styles.login_button} ${styles.modal_button}`}
-                  onClick={() => handleModalButtonClick("login")}
+                  onClick={handleLoginClick}
                 >
                   log in
                 </button>
-              </Link>
+        
 
-              <Link
-                to="/registerlogin?form=register"
-                className={`${styles.login_button} ${styles.modal_button}`}
-              >
+         
+              
+            
                 <button
                   data-testid="signup-button"
                   className={`${styles.signup_button} ${styles.modal_button}`}
-                  onClick={() => handleModalButtonClick("signup")}
+                  onClick={handleRegisterClick}
                 >
                   sign up
                 </button>
-              </Link>
+         
               <button
                 data-testid="cancel-button"
                 className={`${styles.close_button} ${styles.modal_button}`}

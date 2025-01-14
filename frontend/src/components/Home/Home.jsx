@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css'
 import Header from '../Header/Header'
 import home_logo from '../../assets/logo2.svg'
 import search_icon from '../../assets/search-icon.png'
 import download_icon from '../../assets/download_icon.png'
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -59,6 +59,14 @@ function Home() {
     }
   };
 
+  const handleCreateDocument = () => {
+    navigate('/create-document?section=document');
+  };
+
+  const handleCreatePresentation = () => {
+    navigate('/create-document?section=presentation');
+  };
+
   return (
     <div className={styles.container}>
       <ToastContainer position='top-center' />
@@ -83,13 +91,13 @@ function Home() {
             </button>
         </div>  
         <div className={styles.action_buttons_container}>
-          <button className={styles.action_button}>
+          <button onClick={handleCreateDocument} className={styles.action_button}>
             create document
           </button>
-          <button className={styles.action_button}>
+          <button onClick={handleCreatePresentation} className={styles.action_button}>
             create presentation
           </button>
-          <button className={styles.action_button}>
+          <button  className={styles.action_button}>
             upload content
           </button>
         </div>

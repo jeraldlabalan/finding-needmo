@@ -92,35 +92,8 @@ function SearchResults() {
 
   const [userEmail, setUserEmail] = useState("");
   const [uploadedPFP, setUploadedPFP] = useState(null);
-  const [ searchValue, setSearchValue ] = useState('');
 
-  const handleSearch = async () => {
-    if(!searchValue.trim() || searchValue === ""){
-      toast.error("Please enter a search term to continue.", {
-        autoClose: 2000
-      });
-      return;
-    }
-
-    try {
-      const res = await axios.post("http://localhost:8080/saveToSearchHistory", { searchValue });
-        if(res.data.message === "Success"){
-          navigate(`/search-results/${searchValue}`);
-          toast.dismiss();
-        } else {
-          toast.error(res.data.message, {
-            autoClose: 2000
-          });
-        }
-    } catch (error) {
-      console.error("Error searching", error);
-      toast.error("An error occurred. Please try again later.", {
-        autoClose: 2000
-      });
-    }
-  };
-
-
+  
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
   axios.defaults.withCredentials = true;
