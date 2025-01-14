@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import SecondHeader from '../SecondHeader/SecondHeader';
 
 function Profile() {
   // Modal logic

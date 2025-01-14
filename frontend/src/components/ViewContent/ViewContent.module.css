@@ -9,19 +9,12 @@
 
 /* Header styling */
 
-.search_result_header {
+.view_content_header {
   display: flex;
-
   align-items: center;
   justify-content: flex-start;
   position: relative;
-  padding-left: 5px;
-  padding-top: 30px;
-  gap: 100px;
-}
-
-.search_result_header img {
-  width: 257px;
+  height: 100px;
 }
 
 

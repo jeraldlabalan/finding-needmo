@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from "./ViewContent.module.css";
 import logo from "../../assets/logo.png";
 import search_icon from "../../assets/search-icon.png";
@@ -14,6 +14,7 @@ import greater_icon from "../../assets/greater_icon.png";
 import docs_thumbnail from "../../assets/file-icon-blue.png";
 import pdf_thumbnail from "../../assets/file-icon-black.png";
 import pptx_thumbnail from "../../assets/file-icon-yellow.png";
+import SecondHeader from "../SecondHeader/SecondHeader";
 
 function ViewContent() {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -44,113 +45,8 @@ function ViewContent() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.search_result_header}>
-        <img src={logo} alt="Logo" />
-
-        <div
-          className={styles.search_result_headercontent_search_bar_container}
-        >
-          <input
-            type="text"
-            className={styles.content_search_bar}
-            placeholder="Search"
-          />
-          <button className={styles.search_button}>
-            <img
-              src={search_icon}
-              className={styles.search_icon}
-              alt="This is a search icon"
-            />
-          </button>
-        </div>
-
-        {/* Profile Menu */}
-        <button
-          className={`${styles.profile_menu} ${
-            activeDropdown === "profile" ? styles.active : ""
-          }`}
-          onClick={() => toggleDropdown("profile")}
-        > <img
-                          src={uploadedPFP}
-                          className={styles.default_profile}
-                          alt="Profile Icon"
-                        />
-        </button>
-        {activeDropdown === "profile" && (
-          <div className={styles.dropdown_menu}>
-            <ul>
-              <li
-                className={
-                  location.pathname === "/profile" ? styles.active_link : ""
-                }
-              >
-                <Link to="/profile">
-                  <img
-                    src={profile}
-                    className={styles.dropdown_menu_logo}
-                    alt="Profile"
-                  />
-                  Profile
-                </Link>
-              </li>
-              <li
-                className={
-                  location.pathname === "/search-history"
-                    ? styles.active_link
-                    : ""
-                }
-              >
-                <Link to="/search-history">
-                  <img
-                    src={search_history}
-                    className={styles.dropdown_menu_logo}
-                    alt="Search History"
-                  />
-                  Search History
-                </Link>
-              </li>
-              <li
-                className={
-                  location.pathname === "/settings" ? styles.active_link : ""
-                }
-              >
-                <Link to="/account-settings">
-                  <img
-                    src={account_settings}
-                    className={styles.dropdown_menu_logo}
-                    alt="Account Settings"
-                  />
-                  Account Settings
-                </Link>
-              </li>
-
-              <li
-                className={
-                  location.pathname === "/settings" ? styles.active_link : ""
-                }
-              >
-                <Link to="/manage-content">
-                  <img
-                    src={manage_content}
-                    className={styles.dropdown_menu_logo}
-                    alt="Manage Content"
-                  />
-                  Manage Content
-                </Link>
-              </li>
-              <li>
-                <Link onClick={handleLogout}>
-                  <img
-                    src={logout}
-                    className={styles.dropdown_menu_logo}
-                    alt="Logout"
-                  />
-                  Logout
-                </Link>
-              </li>
-            </ul>
-          </div>
-        )}
+      <div className={styles.view_content_header}>
+        <SecondHeader />
       </div>
 
       <div className={styles.content_container}>

@@ -11,6 +11,7 @@ import SearchResults from './components/SearchResults/SearchResults';
 import ViewContent from './components/ViewContent/ViewContent';
 import SearchHistory from './components/SearchHistory/SearchHistory';
 import ContentManagement from './components/ContentManagement/ContentManagement';
+import SecondHeader from './components/SecondHeader/SecondHeader';
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
         <Route path='/search-history' element={<SearchHistory />} />
         <Route path='/search-results/:search' element={<SearchResults />} />
         <Route path='/manage-content' element={<ContentManagement />} />
+        <Route path='/second-header' element={<SecondHeader />} />
       </Routes>
     </Router>
   )

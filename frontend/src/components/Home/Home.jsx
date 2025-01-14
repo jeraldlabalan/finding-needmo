@@ -62,7 +62,7 @@ function Home() {
   return (
     <div className={styles.container}>
       <ToastContainer position='top-center' />
-      <div className={styles.header_container}>
+      <div className={styles.home_header_container}>
         <Header />
       </div>
       <div className={styles.content}>

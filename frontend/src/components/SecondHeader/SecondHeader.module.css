@@ -1,13 +1,17 @@
-.header_container {
-  position: relative; /* Anchor point for dropdown */
-  width: 100%;
+.second_header_container {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  height: 100px;
-  background-color: transparent;
-  gap: 60px;
+  position: relative;
+  padding-left: 5px;
+  gap: 100px;
+  width: 100%;
 }
+
+.logo {
+  width: 200px;
+}
+
+
 
 .profile_menu_container {
   position: relative; /* Anchor point for dropdown */
@@ -29,6 +33,7 @@
   position: relative;
   box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.2);
   background-color: none;
+  margin-left: auto;
 }
 
 .profile_menu .default_profile {
@@ -123,4 +128,35 @@ li .dropdown_menu_logo {
 .notification_dropdown_menu li {
   height: 60px;
   padding: 0 10px;
+}
+
+/* Search bar styling */
+.search_result_headercontent_search_bar_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.search_result_headercontent_search_bar_container .content_search_bar {
+  width: 650px;
+  height: 45px;
+  border: none;
+  padding: 20px;
+  border-radius: 50px;
+  font-size: var(--normal-font-size);
+  position: relative;
+  background-color: #DDDDDD;
+}
+
+.search_result_headercontent_search_bar_container .search_button {
+  position: relative;
+  top: 50%;
+  right: 40px;
+}
+
+.search_button .search_icon {
+  position: absolute;
+  transform: translateY(-50%);
+  width: 30px;
 }

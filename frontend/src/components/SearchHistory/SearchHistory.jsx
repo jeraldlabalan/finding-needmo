@@ -1,20 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link, useLocation } from "react-router-dom";
 import styles from "./SearchHistory.module.css";
-import uploadedPFP from "../../assets/default-profile-photo.jpg";
-import profile from "../../assets/profile.jpg";
-import search_history from "../../assets/search-history.jpg";
-import account_settings from "../../assets/account-settings.jpg";
-import manage_content from "../../assets/manage-content.jpg";
-import logout from "../../assets/logout.jpg";
 import logo from "../../assets/logo.png";
 import calendar_icon from "../../assets/calendar-icon.png";
 import delete_search from "../../assets/close-icon-modal.png";
 import trash_icon from "../../assets/delete-content-icon.png";
+import SecondHeader from "../SecondHeader/SecondHeader";
+import Header from "../Header/Header";
 
 function SearchHistory() {
-  const [activeDropdown, setActiveDropdown] = useState(null);
   const navigate = useNavigate();
   const calendarInputRef = useRef(null);
   const [isClearSearchModalOpen, setIsClearSearchModalOpen] = useState(false);
@@ -28,14 +22,6 @@ function SearchHistory() {
     }
   };
 
-  const toggleDropdown = (menu) => {
-    setActiveDropdown((prev) => (prev === menu ? null : menu));
-  };
-
-  const handleLogout = () => {
-    // Implement logout functionality here
-    logoutFunction(navigate);
-  };
 
   const openClearSearchModal = () => {
     setIsClearSearchModalOpen(true);
@@ -87,94 +73,7 @@ function SearchHistory() {
   return (
     <div className={styles.container}>
       <div className={styles.search_history_header}>
-        {/* Profile Menu */}
-        <button
-          className={`${styles.profile_menu} ${
-            activeDropdown === "profile" ? styles.active : ""
-          }`}
-          onClick={() => toggleDropdown("profile")}
-        >
-          <img
-            src={uploadedPFP}
-            className={styles.default_profile}
-            alt="Profile Icon"
-          />
-        </button>
-        {activeDropdown === "profile" && (
-          <div className={styles.dropdown_menu}>
-            <ul>
-              <li
-                className={
-                  location.pathname === "/profile" ? styles.active_link : ""
-                }
-              >
-                <Link to="/profile">
-                  <img
-                    src={profile}
-                    className={styles.dropdown_menu_logo}
-                    alt="Profile"
-                  />
-                  Profile
-                </Link>
-              </li>
-              <li
-                className={
-                  location.pathname === "/search-history"
-                    ? styles.active_link
-                    : ""
-                }
-              >
-                <Link to="/search-history">
-                  <img
-                    src={search_history}
-                    className={styles.dropdown_menu_logo}
-                    alt="Search History"
-                  />
-                  Search History
-                </Link>
-              </li>
-              <li
-                className={
-                  location.pathname === "/settings" ? styles.active_link : ""
-                }
-              >
-                <Link to="/settings">
-                  <img
-                    src={account_settings}
-                    className={styles.dropdown_menu_logo}
-                    alt="Account Settings"
-                  />
-                  Account Settings
-                </Link>
-              </li>
-
-              <li
-                className={
-                  location.pathname === "/settings" ? styles.active_link : ""
-                }
-              >
-                <Link to="/settings">
-                  <img
-                    src={manage_content}
-                    className={styles.dropdown_menu_logo}
-                    alt="Manage Content"
-                  />
-                  Manage Content
-                </Link>
-              </li>
-              <li>
-                <Link onClick={handleLogout}>
-                  <img
-                    src={logout}
-                    className={styles.dropdown_menu_logo}
-                    alt="Logout"
-                  />
-                  Logout
-                </Link>
-              </li>
-            </ul>
-          </div>
-        )}
+        <Header />
       </div>
 
       <img src={logo} className={styles.search_history_logo} alt="logo" />

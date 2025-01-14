@@ -1,29 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from "react-router-dom";
-import styles from "./Header.module.css";
-import notification from "../../assets/notification_icon.png";
-import default_profile from "../../assets/default-profile-photo.jpg";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import styles from "./SecondHeader.module.css";
+import logo from "../../assets/logo.png";
+import search_icon from "../../assets/search-icon.png";
 import profile from "../../assets/profile.jpg";
 import account_settings from "../../assets/account-settings.jpg";
 import logout from "../../assets/logout.jpg";
 import search_history from "../../assets/search-history.jpg";
 import manage_content from "../../assets/manage-content.jpg";
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logoutFunction from '../logoutFunction.jsx';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
-function Header() {
-  const location = useLocation(); // For detecting active path
-  const [activeDropdown, setActiveDropdown] = useState(null); // Manages active dropdown state
+function SecondHeader() {
   const [userEmail, setUserEmail] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   const [uploadedPFP, setUploadedPFP] = useState(null);
   const [userRole, setUserRole] = useState('');
-
-  //Reuse in other pages that requires logging in
+  const location = useLocation(); // For detecting active path
+  const [activeDropdown, setActiveDropdown] = useState(null);
   const navigate = useNavigate();
   axios.defaults.withCredentials = true;
+
   useEffect(() => {
     axios
       .get("http://localhost:8080")
@@ -68,12 +65,57 @@ function Header() {
     logoutFunction(navigate);
 };
 
+  const handleSearch = async () => {
+    if (!searchValue.trim() || searchValue === "") {
+      toast.error("Please enter a search term to continue.", {
+        autoClose: 2000,
+      });
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/saveToSearchHistory",
+        { searchValue }
+      );
+      if (res.data.message === "Success") {
+        navigate(`/search-results/${searchValue}`);
+        toast.dismiss();
+      } else {
+        toast.error(res.data.message, {
+          autoClose: 2000,
+        });
+      }
+    } catch (error) {
+      console.error("Error searching", error);
+      toast.error("An error occurred. Please try again later.", {
+        autoClose: 2000,
+      });
+    }
+  };
+
   return (
-    <div className={styles.header_container}>
-      <ToastContainer position='top-center' />
-      {/* Notification Menu */}
-      <div className={styles.profile_menu_container}>
-      {/* Profile Menu */}
+    <div className={styles.second_header_container}>
+      <img className={styles.logo} src={logo} alt="Logo" />
+
+      <div className={styles.search_result_headercontent_search_bar_container}>
+        <input
+          type="text"
+          className={styles.content_search_bar}
+          placeholder="Search"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+        />
+
+        <button className={styles.search_button} onClick={handleSearch}>
+          <img
+            src={search_icon}
+            className={styles.search_icon}
+            alt="This is a search icon"
+          />
+        </button>
+      </div>
+
       <button
         className={`${styles.profile_menu} ${
           activeDropdown === "profile" ? styles.active : ""
@@ -91,15 +133,25 @@ function Header() {
       {activeDropdown === "profile" && (
         <div className={styles.dropdown_menu}>
           <ul>
-            <li className={location.pathname === "/profile" ? styles.active_link : ""}>
+            <li
+              className={
+                location.pathname === "/profile" ? styles.active_link : ""
+              }
+            >
               <Link to="/profile">
-                <img src={profile} className={styles.dropdown_menu_logo} alt="Profile" />
+                <img
+                  src={profile}
+                  className={styles.dropdown_menu_logo}
+                  alt="Profile"
+                />
                 Profile
               </Link>
             </li>
             <li
               className={
-                location.pathname === "/search-history" ? styles.active_link : ""
+                location.pathname === "/search-history"
+                  ? styles.active_link
+                  : ""
               }
             >
               <Link to="/search-history">
@@ -126,10 +178,8 @@ function Header() {
               </Link>
             </li>
 
-            
-
-              {userRole === "Educator" ? (
-                <li
+            {userRole === "Educator" ? (
+              <li
                 className={
                   location.pathname === "/settings" ? styles.active_link : ""
                 }
@@ -143,7 +193,9 @@ function Header() {
                   Manage Content
                 </Link>
               </li>
-              ) : ("")}
+            ) : (
+              ""
+            )}
 
             <li>
               <Link onClick={handleLogout}>
@@ -158,9 +210,8 @@ function Header() {
           </ul>
         </div>
       )}
-      </div>
     </div>
   );
 }
 
-export default Header;
+export default SecondHeader;

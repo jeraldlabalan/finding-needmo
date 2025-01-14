@@ -3,6 +3,10 @@
   flex-direction: column;
   justify-content: center;
   min-height: 100vh;
+  padding: 0 100px;
+}
+
+.home_header_container {
 }
 .content {
   padding: 100px;

@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./SearchResults.module.css";
-import logo from "../../assets/logo.png";
-import search_icon from "../../assets/search-icon.png";
-import uploadedPFP from "../../assets/default-profile-photo.jpg";
-import profile from "../../assets/profile.jpg";
-import search_history from "../../assets/search-history.jpg";
-import account_settings from "../../assets/account-settings.jpg";
-import manage_content from "../../assets/manage-content.jpg";
-import logout from "../../assets/logout.jpg";
 import nav_arrow from "../../assets/nav_arrow.png";
 import current_page from "../../assets/current_page.png";
 import next_page from "../../assets/next_page.png";
@@ -20,6 +12,7 @@ import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import logoutFunction from '../logoutFunction.jsx';
+import SecondHeader from "../SecondHeader/SecondHeader.jsx";
 
 function SearchResults() {
   const files = [
@@ -251,115 +244,7 @@ function SearchResults() {
       <ToastContainer position='top-center' />
 
       <div className={styles.search_result_header}>
-        <img src={logo} alt="Logo" />
-
-        <div className={styles.search_result_headercontent_search_bar_container}>
-          <input
-            type="text"
-            className={styles.content_search_bar}
-            placeholder="Search"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-          <button className={styles.search_button} onClick={handleSearch}>
-            <img
-              src={search_icon}
-              className={styles.search_icon}
-              alt="This is a search icon"
-            />
-          </button>
-        </div>
-
-        {/* Profile Menu */}
-        <button
-          className={`${styles.profile_menu} ${activeDropdown === "profile" ? styles.active : ""
-            }`}
-          onClick={() => toggleDropdown("profile")}
-        > <img
-                  src={uploadedPFP}
-                  className={styles.default_profile}
-                  alt="Profile Icon"
-                />
-
-          
-
-        </button>
-
-        {activeDropdown === "profile" && (
-          <div className={styles.dropdown_menu}>
-            <ul>
-              <li
-                className={
-                  location.pathname === "/profile" ? styles.active_link : ""
-                }
-              >
-                <Link to="/profile">
-                  <img
-                    src={profile}
-                    className={styles.dropdown_menu_logo}
-                    alt="Profile"
-                  />
-                  Profile
-                </Link>
-              </li>
-              <li
-                className={
-                  location.pathname === "/search-history"
-                    ? styles.active_link
-                    : ""
-                }
-              >
-                <Link to="/search-history">
-                  <img
-                    src={search_history}
-                    className={styles.dropdown_menu_logo}
-                    alt="Search History"
-                  />
-                  Search History
-                </Link>
-              </li>
-              <li
-                className={
-                  location.pathname === "/settings" ? styles.active_link : ""
-                }
-              >
-                <Link to="/account-settings">
-                  <img
-                    src={account_settings}
-                    className={styles.dropdown_menu_logo}
-                    alt="Account Settings"
-                  />
-                  Account Settings
-                </Link>
-              </li>
-
-              <li
-                className={
-                  location.pathname === "/account-settings" ? styles.active_link : ""
-                }
-              >
-                <Link to="/settings">
-                  <img
-                    src={manage_content}
-                    className={styles.dropdown_menu_logo}
-                    alt="Manage Content"
-                  />
-                  Manage Content
-                </Link>
-              </li>
-              <li>
-                <Link onClick={handleLogout}>
-                  <img
-                    src={logout}
-                    className={styles.dropdown_menu_logo}
-                    alt="Logout"
-                  />
-                  Logout
-                </Link>
-              </li>
-            </ul>
-          </div>
-        )}
+        <SecondHeader />
       </div>
 
       <div className={styles.search_result_content}>
