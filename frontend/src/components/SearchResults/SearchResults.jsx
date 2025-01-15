@@ -92,8 +92,12 @@ function SearchResults() {
 
   const [userEmail, setUserEmail] = useState("");
   const [uploadedPFP, setUploadedPFP] = useState(null);
+  const [searchValue, setSearchValue] = useState('');
+  const [userRole, setUserRole] = useState('');
+  const [docx, setDocx] = useState([]);
+  const [ppts, setPPTs] = useState([]);
+  const [pdfs, setPDFs] = useState([]);
 
-  
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
   axios.defaults.withCredentials = true;
@@ -103,6 +107,7 @@ function SearchResults() {
       .then((res) => {
         if (res.data.valid) {
           setUserEmail(res.data.email);
+          setUserRole(res.data.role);
         } else {
           navigate("/registerlogin");
         }
@@ -113,6 +118,7 @@ function SearchResults() {
   }, []);
   //Reuse in other pages that requires logging in
 
+  //get user pfp
   useEffect(() => {
     axios.get('http://localhost:8080/getProfile')
       .then((res) => {
@@ -141,9 +147,12 @@ function SearchResults() {
       try {
         const res = await axios.get(`http://localhost:8080/searchResults/${search}`);
         setSearchRes(res.data.results);
-        toast.dismiss();
+        setDocx(res.data.docxFiles);
+        setPPTs(res.data.pptFiles);
+        setPDFs(res.data.pdfFiles);
+
       } catch (error) {
-        console.error("Error occurred: " + error);
+        console.error("Error occurred:", error);
         toast.error('Error getting search results', {
           autoClose: 2000
         });
@@ -153,7 +162,7 @@ function SearchResults() {
   }, [search]);
 
   // Search result header logic
-  const [activeButton, setActiveButton] = useState("all");
+  const [activeButton, setActiveButton] = useState("contents");
 
   const handleButtonClick = (button) => {
     setActiveButton(button);
@@ -207,6 +216,31 @@ function SearchResults() {
     setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
   };
 
+  const [programFilter, setProgramFilter] = useState("");
+  const [subjectFilter, setSubjectFilter] = useState("");
+
+  // Filter by program and subject
+  const filteredResults = searchRes.filter((item) => {
+    const matchesProgram = programFilter
+      ? item.Program === parseInt(programFilter, 10)
+      : true;
+    const matchesSubject = subjectFilter
+      ? (item.CourseTitle || '').toLowerCase().includes(subjectFilter.toLowerCase())
+      : true;
+    return matchesProgram && matchesSubject;
+  });
+
+  // Handler for program filter change
+  const handleProgramFilterChange = (e) => {
+    setProgramFilter(e.target.value);
+  };
+
+  // Handler for subject filter change
+  const handleSubjectFilterChange = (e) => {
+    setSubjectFilter(e.target.value);
+  };
+
+
   const currentItems = searchRes.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -243,15 +277,13 @@ function SearchResults() {
                 <label>
                   Program
                   <select
-                    value={selectedValue}
-                    onChange={handleSelect}
-                    style={{ color: getColor(selectedValue) }}
+                    value={programFilter}
+                    onChange={handleProgramFilterChange}
+                    style={{ color: getColor(programFilter) }}
                   >
                     <option value="">All</option>
-                    <option value="computer-science">Computer Science</option>
-                    <option value="information-technology">
-                      Information Technology
-                    </option>
+                    <option value="1">Computer Science</option>
+                    <option value="2">Information Technology</option>
                   </select>
                 </label>
               </div>
@@ -314,7 +346,7 @@ function SearchResults() {
 
             {activeButton === 'contents' && (
               <>
-                {currentItems.map((row, index) => (
+                {filteredResults.map((row, index) => (
                   <div key={index} className={styles.main_content_body_item}>
                     <div className={styles.upper_section}>
                       <h3>{row.Title}</h3>
@@ -336,24 +368,36 @@ function SearchResults() {
             {activeButton === 'documents' && (
               <>
                 <div className={styles.document_container}>
-                  {files
-                    .filter((file) => file.extension === "docx")
-                    .map((file) => (
-                      <div key={file.id} className={styles.document}>
-                        <div className={styles.thumbnail_container}>
-                          <img
-                            src={file.thumbnail}
-                            alt={file.title}
-                            className={styles.document_thumbnail}
-                          />
-                          <div className={styles.lesson_text}>{file.lesson}</div>
+                  {docx.length > 0 ? (
+                    docx.map((item, index) => {
+                      const docxFiles = item.docxFiles;  // Access the pdfFiles from the item directly
+
+                      // If there are no pdfFiles for this item, skip rendering
+                      if (docxFiles.length === 0) {
+                        return null;
+                      }
+
+                      // Render all the pdf files
+                      return docxFiles.map((file, fileIndex) => (
+                        <div key={`${index}-${fileIndex}`} className={styles.document}>
+                          <div className={styles.thumbnail_container}>
+                            <img
+                              src={thumbnail1}
+                              alt={file.originalName}
+                              className={styles.document_thumbnail}
+                            />
+                            <div className={styles.lesson_text}>{item.Title}</div>
+                          </div>
+                          <div className={styles.document_details}>
+                            <h3>{file.originalName}</h3>
+                            <p>{item.Firstname} {item.Lastname}</p>
+                          </div>
                         </div>
-                        <div className={styles.document_details}>
-                          <h3>{file.title}</h3>
-                          <p>{file.author}</p>
-                        </div>
-                      </div>
-                    ))}
+                      ));
+                    })
+                  ) : (
+                    <p>No PPT files available</p>
+                  )}
                 </div>
               </>
             )}
@@ -361,24 +405,36 @@ function SearchResults() {
             {activeButton === 'presentations' && (
               <>
                 <div className={styles.presentation_container}>
-                  {files
-                    .filter((file) => file.extension === "pptx")
-                    .map((file) => (
-                      <div key={file.id} className={styles.presentation}>
-                        <div className={styles.thumbnail_container}>
-                          <img
-                            src={file.thumbnail}
-                            alt={file.title}
-                            className={styles.document_thumbnail}
-                          />
-                          <div className={styles.lesson_text}>{file.lesson}</div>
+                  {ppts.length > 0 ? (
+                    ppts.map((item, index) => {
+                      const pptFiles = item.pptFiles;  // Access the pdfFiles from the item directly
+
+                      // If there are no pdfFiles for this item, skip rendering
+                      if (pptFiles.length === 0) {
+                        return null;
+                      }
+
+                      // Render all the pdf files
+                      return pptFiles.map((file, fileIndex) => (
+                        <div key={`${index}-${fileIndex}`} className={styles.document}>
+                          <div className={styles.thumbnail_container}>
+                            <img
+                              src={thumbnail2}
+                              alt={file.originalName}
+                              className={styles.document_thumbnail}
+                            />
+                            <div className={styles.lesson_text}>{item.Title}</div>
+                          </div>
+                          <div className={styles.document_details}>
+                            <h3>{file.originalName}</h3>
+                            <p>{item.Firstname} {item.Lastname}</p>
+                          </div>
                         </div>
-                        <div className={styles.presentation_details}>
-                          <h3>{file.title}</h3>
-                          <p>{file.author}</p>
-                        </div>
-                      </div>
-                    ))}
+                      ));
+                    })
+                  ) : (
+                    <p>No PPT files available</p>
+                  )}
                 </div>
               </>
             )}
@@ -386,27 +442,42 @@ function SearchResults() {
             {activeButton === 'pdfs' && (
               <>
                 <div className={styles.pdf_container}>
-                  {files
-                    .filter((file) => file.extension === "pdf")
-                    .map((file) => (
-                      <div key={file.id} className={styles.pdf}>
-                        <div className={styles.thumbnail_container}>
-                          <img
-                            src={file.thumbnail}
-                            alt={file.title}
-                            className={styles.document_thumbnail}
-                          />
-                          <div className={styles.lesson_text}>{file.lesson}</div>
+                  {pdfs.length > 0 ? (
+                    pdfs.map((item, index) => {
+                      const pdfFiles = item.pdfFiles;  // Access the pdfFiles from the item directly
+
+                      // If there are no pdfFiles for this item, skip rendering
+                      if (pdfFiles.length === 0) {
+                        return null;
+                      }
+
+                      // Render all the pdf files
+                      return pdfFiles.map((file, fileIndex) => (
+                        <div key={`${index}-${fileIndex}`} className={styles.document}>
+                          <div className={styles.thumbnail_container}>
+                            <img
+                              src={thumbnail3}
+                              alt={file.originalName}
+                              className={styles.document_thumbnail}
+                            />
+                            <div className={styles.lesson_text}>{item.Title}</div>
+                          </div>
+                          <div className={styles.document_details}>
+                            <h3>{file.originalName}</h3>
+                            <p>{item.Firstname} {item.Lastname}</p>
+                          </div>
                         </div>
-                        <div className={styles.pdf_details}>
-                          <h3>{file.title}</h3>
-                          <p>{file.author}</p>
-                        </div>
-                      </div>
-                    ))}
+                      ));
+                    })
+                  ) : (
+                    <p>No PDF files available</p>
+                  )}
                 </div>
               </>
             )}
+
+
+
 
             {/* Pagination */}
             <div className={styles.search_result_footer}>
@@ -416,7 +487,7 @@ function SearchResults() {
                   className={styles.search_result_footer_nav_button}
                   alt="previous arrow"
                   onClick={handlePreviousPage}
-                  style={currentPage === 1 && {opacity: '30%'}}
+                  style={currentPage === 1 && { opacity: '30%' }}
                 />
 
                 <div className={styles.search_result_footer_nav_page}>
@@ -436,7 +507,7 @@ function SearchResults() {
                   className={`${styles.search_result_footer_nav_button} ${styles.rotated}`}
                   alt="next arrow"
                   onClick={handleNextPage}
-                  style={currentPage === totalPages && {opacity: '30%'}}
+                  style={currentPage === totalPages && { opacity: '30%' }}
                 />
               </div>
 

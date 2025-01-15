@@ -13,6 +13,7 @@ import EducatorProfile from './routes/EducatorProfile.js';
 import handleContent from './routes/handleContent.js';
 import Search from './routes/Search.js';
 import AccountSettings from './routes/AccountSettings.js';
+import FileCreation from './routes/FileCreation.js';
 
 const app = express();
 app.use(express.json());
@@ -67,7 +68,7 @@ app.use('/', EducatorProfile);
 app.use('/', handleContent);
 app.use('/', Search);
 app.use('/', AccountSettings);
-
+app.use('/', FileCreation);
 
 // Scheduled task to mark users as inactive without triggering anything in frontend
 cron.schedule("0 0 * * *", () => {

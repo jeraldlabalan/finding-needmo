@@ -151,15 +151,17 @@ function Profile() {
       mimeType: file.type,
       size: file.size
     }));
-
+  
     console.log("New Files:", newFiles);
-
+  
+    // Append the new files to the existing files
     setEditContentFiles((prevFiles) => [...prevFiles, ...newFiles]);
     setEditContent((prevContent) => ({
       ...prevContent,
-      files: [...prevContent.files, ...newFiles]
+      files: [...prevContent.files, ...newFiles] // Add new files to the files array
     }));
   };
+  
 
   const handleEditContentFileRemove = (index) => {
     console.log("Removing file at index:", index);
@@ -1136,7 +1138,7 @@ function Profile() {
                             value={contentDetails.contentInput}
                             type="file"
                             multiple
-                            onChange={handleContentFileChange}
+                            onChange={handleEditContentFiles}
                           />
                           <img
                             src={add_file_icon}

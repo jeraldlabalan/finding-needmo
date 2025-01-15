@@ -59,22 +59,22 @@ function RegisterLogin() {
 
   axios.defaults.withCredentials = true;
 
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:8080")
-  //     .then((res) => {
-  //       if (res.data.valid) {
-  //         if (res.data.role === "Student") {
-  //           navigate("/home");
-  //         } else if (res.data.role === "Educator") {
-  //           navigate("/home");
-  //         }
-  //       } else {
-  //         navigate("/registerlogin?form=login");
-  //       }
-  //     })
-  //     .catch((err) => toast.error("Error" + err, { autoClose: 4000 }));
-  // }, []);
+   useEffect(() => {
+     axios
+       .get("http://localhost:8080")
+       .then((res) => {
+         if (res.data.valid) {
+           if (res.data.role === "Student") {
+             navigate("/home");
+           } else if (res.data.role === "Educator") {
+             navigate("/home");
+           }
+         } else{
+           navigate("/registerlogin");
+         }
+       })
+       .catch((err) => toast.error("Error" + err, { autoClose: 4000 }));
+   }, []);
 
   const submitLogin = (e) => {
     e.preventDefault();

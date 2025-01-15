@@ -273,6 +273,57 @@ router.post('/editUploadedContent', upload.array("editContentFiles"), (req, res)
     }
 });
 
+router.get('/getUploadedContent/manageContent', (req, res) => {
+    const sql = `
+        SELECT * 
+        FROM content 
+        WHERE CreatedBy = ? AND IsArchived = ? AND IsDeleted = ? 
+        ORDER BY UploadedAt DESC
+    `;
+    
+    // Query for the content
+    db.query(sql, [req.session.userID, 0, 0], (err, result) => {
+        if (err) {
+            return res.json({ message: "Error in server: " + err });
+        } else if (result.length > 0) {
+            // Get the course IDs from the content result
+            const courseIds = result.map(item => item.Course);
+
+            // Create placeholders for the course IDs
+            const placeholders = courseIds.map(() => '?').join(', ');
+            const getCourseTitle = `SELECT * FROM course WHERE CourseID IN (${placeholders})`;
+
+            // Query for the courses
+            db.query(getCourseTitle, courseIds, (err, courseRes) => {
+                if (err) {
+                    return res.json({ message: "Error in server: " + err });
+                } else if (courseRes.length > 0) {
+                    // Add the course titles to the result
+                    result.forEach(content => {
+                        const course = courseRes.find(c => c.CourseID === content.Course);
+                        if (course) {
+                            content.CourseTitle = course.Title; // Add course title to the content object
+                        }
+                    });
+
+                    // Parse the Files JSON data before sending to frontend
+                    result.forEach(item => {
+                        item.Files = item.Files ? JSON.parse(item.Files) : [];  // Ensure Files is in a proper object format
+                      });
+
+                    // Send back the data including course titles
+                    
+                    return res.json({ uploadedContent: result });
+                } else {
+                    return res.json({ message: "No course titles found." });
+                }
+            });
+        } else {
+            return res.json({ message: "No uploaded content found." });
+        }
+    });
+});
+
 router.get('/getUploadedContent', (req, res) => {
     const sql = `
         SELECT * 

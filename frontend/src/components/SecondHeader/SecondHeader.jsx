@@ -10,14 +10,16 @@ import search_history from "../../assets/search-history.jpg";
 import manage_content from "../../assets/manage-content.jpg";
 import axios from 'axios';
 import logoutFunction from '../logoutFunction.jsx';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function SecondHeader() {
   const [userEmail, setUserEmail] = useState("");
-  const [searchValue, setSearchValue] = useState("");
   const [uploadedPFP, setUploadedPFP] = useState(null);
   const [userRole, setUserRole] = useState('');
   const location = useLocation(); // For detecting active path
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [ searchValue, setSearchValue ] = useState('');
   const navigate = useNavigate();
   axios.defaults.withCredentials = true;
 
@@ -65,47 +67,45 @@ function SecondHeader() {
     logoutFunction(navigate);
 };
 
-  const handleSearch = async () => {
-    if (!searchValue.trim() || searchValue === "") {
-      toast.error("Please enter a search term to continue.", {
-        autoClose: 2000,
-      });
-      return;
-    }
+const handleSearch = async () => {
+  if(!searchValue.trim() || searchValue === ""){
+    toast.error("Please enter a search term to continue.", {
+      autoClose: 2000
+    });
+    return;
+  }
 
-    try {
-      const res = await axios.post(
-        "http://localhost:8080/saveToSearchHistory",
-        { searchValue }
-      );
-      if (res.data.message === "Success") {
+  try {
+    const res = await axios.post("http://localhost:8080/saveToSearchHistory", { searchValue });
+      if(res.data.message === "Success"){
         navigate(`/search-results/${searchValue}`);
         toast.dismiss();
       } else {
         toast.error(res.data.message, {
-          autoClose: 2000,
+          autoClose: 2000
         });
       }
-    } catch (error) {
-      console.error("Error searching", error);
-      toast.error("An error occurred. Please try again later.", {
-        autoClose: 2000,
-      });
-    }
-  };
+  } catch (error) {
+    console.error("Error searching", error);
+    toast.error("An error occurred. Please try again later.", {
+      autoClose: 2000
+    });
+  }
+};
 
   return (
     <div className={styles.second_header_container}>
+      <ToastContainer position='top-center' />
       <img className={styles.logo} src={logo} alt="Logo" />
 
       <div className={styles.search_result_headercontent_search_bar_container}>
-        <input
-          type="text"
-          className={styles.content_search_bar}
-          placeholder="Search"
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
+      <input
+              type="text"
+              className={styles.content_search_bar}
+              placeholder="Search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
 
         <button className={styles.search_button} onClick={handleSearch}>
           <img
