@@ -20,6 +20,65 @@ db.connect((err) => {
     }
 });
 
+router.post('/deleteAllSearch', (req, res) => {
+    const getID = `SELECT * FROM user WHERE Email = ?`;
+    db.query(getID, req.session.email, (err, idRes) => {
+        if(err){
+            return res.json({message: "Error in server: " + err});
+        } else {
+            const deleteSearch = `DELETE FROM searchhistory WHERE SearchedBy = ?`;
+            db.query(deleteSearch, idRes[0].UserID, (err, deleteRes) => {
+                if(err){
+                    return res.json({message: "Error in server: " + err});
+                } else if(deleteRes.affectedRows > 0){
+                    return res.json({message: "Success"});
+                } else{
+                    return res.json({message: "Failed"});
+                }
+            })
+        }
+    })
+})
+
+router.post('/deleteASearch', (req, res) => {
+    const { historyID } = req.body;
+    const getID = `SELECT * FROM user WHERE Email = ?`;
+    db.query(getID, req.session.email, (err, idRes) => {
+        if(err){
+            return res.json({message: "Error in server: " + err});
+        } else {
+            const deleteSearch = `DELETE FROM searchhistory WHERE HistoryID = ? AND SearchedBy = ?`;
+            db.query(deleteSearch, [historyID, idRes[0].UserID], (err, deleteRes) => {
+                if(err){
+                    return res.json({message: "Error in server: " + err});
+                } else if(deleteRes.affectedRows > 0){
+                    return res.json({message: "Success"});
+                } else{
+                    return res.json({message: "Failed"});
+                }
+            })
+        }
+    })
+})
+
+router.get('/getSearchHistory', (req,res) => {
+    const getID = `SELECT * FROM user WHERE Email = ?`;
+    db.query(getID, req.session.email, (err, idRes) => {
+        if(err){
+            return res.json({message: "Error in server: " + err});
+        } else {
+            const getSearch = `SELECT * FROM searchhistory WHERE SearchedBy = ?`;
+            db.query(getSearch, idRes[0].UserID, (err, searchRes) => {
+                if(err){
+                    return res.json({message: "Error in server: " + err});
+                } else {
+                    return res.json({message: "Success", searches: searchRes});
+                }
+            })
+        }
+    })
+})
+
 router.post('/saveToSearchHistory', (req, res) => {
     const { searchValue } = req.body;
 

@@ -370,30 +370,42 @@ function SearchResults() {
                 <div className={styles.document_container}>
                   {docx.length > 0 ? (
                     docx.map((item, index) => {
-                      const docxFiles = item.docxFiles;  // Access the pdfFiles from the item directly
+                      const docxFiles = item.docxFiles;
 
-                      // If there are no pdfFiles for this item, skip rendering
                       if (docxFiles.length === 0) {
                         return null;
                       }
 
-                      // Render all the pdf files
-                      return docxFiles.map((file, fileIndex) => (
-                        <div key={`${index}-${fileIndex}`} className={styles.document}>
-                          <div className={styles.thumbnail_container}>
-                            <img
-                              src={thumbnail1}
-                              alt={file.originalName}
-                              className={styles.document_thumbnail}
-                            />
-                            <div className={styles.lesson_text}>{item.Title}</div>
+                      return docxFiles.map((file, fileIndex) => {
+                        const fileUrl = `http://localhost:8080/${file.path.replace(/\\/g, '/')}`; // Replace backslashes with forward slashes
+                        return (
+                          <div key={`${index}-${fileIndex}`}>
+                            <a 
+                              href={fileUrl} // Use the dynamically generated file URL
+                              download={file.originalName} // Set the file name for download
+                              target="_blank"
+                              className={styles.document}
+                            >
+                              <div className={styles.thumbnail_container}>
+                              <img
+                                src={thumbnail3}
+                                alt={file.originalName}
+                                className={styles.document_thumbnail}
+                              />
+                              <div className={styles.lesson_text}>{item.Title}</div>
+                            </div>
+                      
+                            <div className={styles.document_details}>                      
+                                <h3>{file.originalName}</h3>
+                                <p>{item.Firstname} {item.Lastname}</p>                              
+                            </div>
+                            </a>
+                      
+                            
+                            
                           </div>
-                          <div className={styles.document_details}>
-                            <h3>{file.originalName}</h3>
-                            <p>{item.Firstname} {item.Lastname}</p>
-                          </div>
-                        </div>
-                      ));
+                        );
+                      });
                     })
                   ) : (
                     <p>No PPT files available</p>
@@ -407,30 +419,44 @@ function SearchResults() {
                 <div className={styles.presentation_container}>
                   {ppts.length > 0 ? (
                     ppts.map((item, index) => {
-                      const pptFiles = item.pptFiles;  // Access the pdfFiles from the item directly
+                      const pptFiles = item.pptFiles;
 
-                      // If there are no pdfFiles for this item, skip rendering
                       if (pptFiles.length === 0) {
                         return null;
                       }
 
-                      // Render all the pdf files
-                      return pptFiles.map((file, fileIndex) => (
-                        <div key={`${index}-${fileIndex}`} className={styles.document}>
-                          <div className={styles.thumbnail_container}>
-                            <img
-                              src={thumbnail2}
-                              alt={file.originalName}
-                              className={styles.document_thumbnail}
-                            />
-                            <div className={styles.lesson_text}>{item.Title}</div>
+                      return pptFiles.map((file, fileIndex) => {
+                        const fileUrl = `http://localhost:8080/${file.path.replace(/\\/g, '/')}`; // Replace backslashes with forward slashes
+                        return (
+                          <div key={`${index}-${fileIndex}`}>
+                            <a 
+                              href={fileUrl} // Use the dynamically generated file URL
+                              download={file.originalName} // Set the file name for download
+                              target="_blank"
+                              className={styles.document}
+                            >
+                              <div className={styles.thumbnail_container}>
+                              <img
+                                src={thumbnail3}
+                                alt={file.originalName}
+                                className={styles.document_thumbnail}
+                              />
+                              <div className={styles.lesson_text}>{item.Title}</div>
+                            </div>
+                      
+                            <div className={styles.document_details}>
+                      
+                                <h3>{file.originalName}</h3>
+                                <p>{item.Firstname} {item.Lastname}</p>
+                              
+                            </div>
+                            </a>
+                      
+                            
+                            
                           </div>
-                          <div className={styles.document_details}>
-                            <h3>{file.originalName}</h3>
-                            <p>{item.Firstname} {item.Lastname}</p>
-                          </div>
-                        </div>
-                      ));
+                        );
+                      });
                     })
                   ) : (
                     <p>No PPT files available</p>
@@ -444,30 +470,46 @@ function SearchResults() {
                 <div className={styles.pdf_container}>
                   {pdfs.length > 0 ? (
                     pdfs.map((item, index) => {
-                      const pdfFiles = item.pdfFiles;  // Access the pdfFiles from the item directly
-
-                      // If there are no pdfFiles for this item, skip rendering
+                      const pdfFiles = item.pdfFiles; 
+                      
                       if (pdfFiles.length === 0) {
                         return null;
                       }
 
-                      // Render all the pdf files
-                      return pdfFiles.map((file, fileIndex) => (
-                        <div key={`${index}-${fileIndex}`} className={styles.document}>
-                          <div className={styles.thumbnail_container}>
-                            <img
-                              src={thumbnail3}
-                              alt={file.originalName}
-                              className={styles.document_thumbnail}
-                            />
-                            <div className={styles.lesson_text}>{item.Title}</div>
-                          </div>
-                          <div className={styles.document_details}>
-                            <h3>{file.originalName}</h3>
-                            <p>{item.Firstname} {item.Lastname}</p>
-                          </div>
-                        </div>
-                      ));
+                      // Render all the PDF files
+return pdfFiles.map((file, fileIndex) => {
+  const fileUrl = `http://localhost:8080/${file.path.replace(/\\/g, '/')}`; // Replace backslashes with forward slashes
+  return (
+    <div key={`${index}-${fileIndex}`}>
+      <a 
+        href={fileUrl} // Use the dynamically generated file URL
+        download={file.originalName} // Set the file name for download
+        target="_blank"
+        className={styles.document}
+      >
+        <div className={styles.thumbnail_container}>
+        <img
+          src={thumbnail3}
+          alt={file.originalName}
+          className={styles.document_thumbnail}
+        />
+        <div className={styles.lesson_text}>{item.Title}</div>
+      </div>
+
+      <div className={styles.document_details}>
+
+          <h3>{file.originalName}</h3>
+          <p>{item.Firstname} {item.Lastname}</p>
+        
+      </div>
+      </a>
+
+      
+      
+    </div>
+  );
+});
+
                     })
                   ) : (
                     <p>No PDF files available</p>

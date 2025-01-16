@@ -7,6 +7,9 @@ import delete_search from "../../assets/close-icon-modal.png";
 import trash_icon from "../../assets/delete-content-icon.png";
 import SecondHeader from "../SecondHeader/SecondHeader";
 import Header from "../Header/Header";
+import axios from 'axios';
+import { useParams } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
 
 function SearchHistory() {
   const navigate = useNavigate();
@@ -15,10 +18,103 @@ function SearchHistory() {
   const [isAllModalOpen, setIsAllModalOpen] = useState(false);
   const [isClearSearchStepTwo, setIsClearSearchStepTwo] = useState(false);
   const [isAllStepTwo, setIsAllStepTwo] = useState(false);
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [filteredHistory, setFilteredHistory] = useState([]);
+
+  useEffect(() => {
+    // Fetch search history from the backend
+    const fetchSearchHistory = async () => {
+      try {
+        const res = await axios.get("http://localhost:8080/getSearchHistory");
+        if (res.data.message === "Success") {
+          const sortedHistory = res.data.searches.sort(
+            (a, b) => new Date(b.SearchedAt) - new Date(a.SearchedAt)
+          );
+          setSearchHistory(sortedHistory);
+          setFilteredHistory(sortedHistory);
+        } else {
+          console.error(res.data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching search history:", error);
+      }
+    };
+
+    fetchSearchHistory();
+  }, []);
 
   const handleCalendarClick = () => {
     if (calendarInputRef.current) {
       calendarInputRef.current.showPicker(); // Modern approach to trigger date picker
+    }
+  };
+
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    if (selectedDate) {
+      // Filter the history based on the selected date
+      const filtered = searchHistory.filter((entry) => {
+        const entryDate = new Date(entry.SearchedAt).toISOString().split("T")[0]; // Extract date part from SearchedAt
+        return entryDate === selectedDate;
+      });
+      setFilteredHistory(filtered);
+    } else {
+      setFilteredHistory(searchHistory); // Show all history if no date is selected
+    }
+  };
+
+  //Group search history by date
+  const groupedHistory = filteredHistory.reduce((acc, entry) => {
+    const searchedDate = new Date(entry.SearchedAt);
+    const today = new Date().toDateString();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayString = yesterday.toDateString();
+  
+    let groupKey;
+    if (searchedDate.toDateString() === today) {
+      groupKey = "Today";
+    } else if (searchedDate.toDateString() === yesterdayString) {
+      groupKey = "Yesterday";
+    } else {
+      groupKey = searchedDate.toLocaleDateString("default", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+    }
+  
+    if (!acc[groupKey]) {
+      acc[groupKey] = [];
+    }
+    acc[groupKey].push(entry); // Store the entire entry object instead of just entry.Entry
+    return acc;
+  }, {});
+  
+
+  //delete one search
+  const handleDeleteSearch = async(row) => {
+    console.log("Deleting search with ID:", row.HistoryID);
+
+    try {
+      const res = await axios.post('http://localhost:8080/deleteASearch', {historyID: row.HistoryID});
+      if(res.data.message === "Success"){
+        setSearchHistory((prevHistory) => prevHistory.filter((entry) => entry.HistoryID !== row.HistoryID));
+        setFilteredHistory((prevFiltered) => prevFiltered.filter((entry) => entry.HistoryID !== row.HistoryID));
+
+        toast.success(`'${row.Entry}' deleted successfully`, {
+          autoClose: 2000
+        });
+      } else{
+        toast.error(`Failed to delete '${row.Entry}'. Please try again`, {
+          autoClose: 2000
+        })
+      }
+    } catch (error) {
+      console.log("Error", error);
+      toast.error(`An error occurred. Please try again`, {
+        autoClose: 2000
+      })
     }
   };
 
@@ -48,9 +144,29 @@ function SearchHistory() {
     setIsClearSearchStepTwo(true);
   };
 
-  const handleAllConfirm = () => {
-    // Add functionality to display all search history here
-    setIsAllStepTwo(true);
+
+  //delete all searches
+  const handleAllConfirm = async() => {
+    
+    try {
+      const res = await axios.post('http://localhost:8080/deleteAllSearch');
+      if(res.data.message === "Success"){
+        setSearchHistory([]);
+        setFilteredHistory([]);
+        
+        setIsAllStepTwo(true);
+        toast.dismiss();
+      } else{
+        toast.error(`Failed to delete Searches. Please try again`, {
+          autoClose: 2000
+        })
+      }
+    } catch (error) {
+      console.log("Error", error);
+      toast.error(`An error occurred. Please try again`, {
+        autoClose: 2000
+      })
+    }
   };
 
   const startDateInputRef = useRef(null);
@@ -65,13 +181,9 @@ function SearchHistory() {
   const [startDate, setStartDate] = useState("Start Date");
   const [endDate, setEndDate] = useState("End Date");
 
-  const handleDateChange = (event, setDate) => {
-    const selectedDate = event.target.value;
-    setDate(new Date(selectedDate).toLocaleDateString()); // Format the date (MM/DD/YYYY)
-  };
-
   return (
     <div className={styles.container}>
+      <ToastContainer position='top-center' />
       <div className={styles.search_history_header}>
         <Header />
       </div>
@@ -79,91 +191,57 @@ function SearchHistory() {
       <img src={logo} className={styles.search_history_logo} alt="logo" />
 
       <div className={styles.search_history_container}>
-        <div className={styles.search_history_content_header}>
-          <div className={styles.calendar_container}>
-            <img
-              src={calendar_icon}
-              className={styles.calendar_icon}
-              alt="Calendar Icon"
-              onClick={handleCalendarClick}
-            />
-            <input
-              type="date"
-              id="calendar-input"
-              className={styles.calendar_input}
-              ref={calendarInputRef}
-            />
-          </div>
-
-          <div className={styles.search_history_action_buttons}>
-            <button onClick={openClearSearchModal}>clear search</button>
-            <button onClick={openAllModal}>all </button>
-          </div>
+      <div className={styles.search_history_content_header}>
+        <div className={styles.calendar_container}>
+          <img
+            src={calendar_icon}
+            className={styles.calendar_icon}
+            alt="Calendar Icon"
+            onClick={handleCalendarClick} // Focus the calendar input on icon click
+          />
+          <input
+            type="date"
+            id="calendar-input"
+            className={styles.calendar_input}
+            ref={calendarInputRef}
+            onChange={handleDateChange} // Filter history when date changes
+          />
         </div>
 
-        <div className={styles.search_history_content}>
-          <div className={styles.search_history_item}>
-            <h1>today</h1>
-            <hr />
-            <ul>
-              <li>
-                <p>search query</p>
-                <img src={delete_search} alt="delete" />
-              </li>
-              <li>
-                <p>search query</p>
-                <img src={delete_search} alt="delete" />
-              </li>
-              <li>
-                <p>search query</p>
-                <img src={delete_search} alt="delete" />
-              </li>
-            </ul>
-          </div>
-
-          <div className={styles.search_history_item}>
-            <h1>yesterday</h1>
-            <hr />
-            <ul>
-              <li>
-                <p>search query</p>
-                <img src={delete_search} alt="delete" />
-              </li>
-              <li>
-                <p>search query</p>
-                <img src={delete_search} alt="delete" />
-              </li>
-              <li>
-                <p>search query</p>
-                <img src={delete_search} alt="delete" />
-              </li>
-            </ul>
-          </div>
-
-          <div className={styles.search_history_item}>
-            <h1>
-              <span>january</span>
-              <span>12,</span>
-              <span>2021</span>
-            </h1>
-            <hr />
-            <ul>
-              <li>
-                <p>search query</p>
-                <img src={delete_search} alt="delete" />
-              </li>
-              <li>
-                <p>search query</p>
-                <img src={delete_search} alt="delete" />
-              </li>
-              <li>
-                <p>search query</p>
-                <img src={delete_search} alt="delete" />
-              </li>
-            </ul>
-          </div>
+        <div className={styles.search_history_action_buttons}>
+          <button onClick={openClearSearchModal}>Clear Search</button>
+          <button onClick={openAllModal}>All</button>
         </div>
       </div>
+
+      <div className={styles.search_history_content}>
+      {Object.entries(groupedHistory).map(([dateGroup, entries]) => (
+  <div className={styles.search_history_item} key={dateGroup}>
+    <h1>
+      {dateGroup === "Today" || dateGroup === "Yesterday" ? (
+        dateGroup
+      ) : (
+        <>
+          {dateGroup.split(",")[0]} {/* Month and Day */}
+          <span>,</span>
+          <span>{dateGroup.split(",")[1]}</span> {/* Year */}
+        </>
+      )}
+    </h1>
+    <hr />
+    <ul>
+      {entries.map((entry, index) => (
+        <li key={index}>
+          <p>{entry.Entry}</p> {/* Assuming entry.Entry contains the search query */}          
+          <button onClick={() => handleDeleteSearch(entry)} style={{background: 'transparent'}}><img src={delete_search} alt="delete" /></button>
+        </li>
+      ))}
+    </ul>
+  </div>
+))}
+
+      </div>
+    </div>
 
       {/* Clear Search Modal */}
       {isClearSearchModalOpen && (
