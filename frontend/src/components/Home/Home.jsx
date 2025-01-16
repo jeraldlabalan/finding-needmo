@@ -11,7 +11,8 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function Home() {
   const [userEmail, setUserEmail] = useState("");
-  const [ searchValue, setSearchValue ] = useState('');
+  const [userRole, setUserRole] = useState('');
+  const [ searchValue, setSearchValue ] = useState('');  
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ function Home() {
       .then((res) => {
         if (res.data.valid) {
           setUserEmail(res.data.email);
+          setUserRole(res.data.role);
         } else {
           navigate("/registerlogin");
         }
@@ -90,7 +92,8 @@ function Home() {
               <img src={search_icon} className={styles.search_icon} alt="This is a search icon" />
             </button>
         </div>  
-        <div className={styles.action_buttons_container}>
+        {userRole === "Educator" ? (
+          <div className={styles.action_buttons_container}>
           <button onClick={handleCreateDocument} className={styles.action_button}>
             create document
           </button>
@@ -101,6 +104,7 @@ function Home() {
             upload content
           </button>
         </div>
+        ) : ('')}        
         </div>
       </div>
       <div className={styles.downloaded_contents_button_container}>

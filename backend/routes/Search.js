@@ -20,25 +20,37 @@ db.connect((err) => {
     }
 });
 
-router.post('/deleteAllSearch', (req, res) => {
+router.post('/deleteSearchByDate', (req, res) => {
+    const { startDate, endDate } = req.body;
+  
     const getID = `SELECT * FROM user WHERE Email = ?`;
     db.query(getID, req.session.email, (err, idRes) => {
         if(err){
             return res.json({message: "Error in server: " + err});
         } else {
-            const deleteSearch = `DELETE FROM searchhistory WHERE SearchedBy = ?`;
-            db.query(deleteSearch, idRes[0].UserID, (err, deleteRes) => {
+            const id = idRes[0].UserID;
+
+            // Convert startDate and endDate to 'YYYY-MM-DD' format (ignoring time)
+            const formattedStartDate = new Date(startDate).toISOString().split('T')[0]; 
+            const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
+        
+            const query = `
+            DELETE FROM searchhistory
+            WHERE DATE(SearchedAt) >= ? AND DATE(SearchedAt) <= ?
+            AND SearchedBy = ?`;
+
+            db.query(query, [formattedStartDate, formattedEndDate, id], (err, deleteRes) => {
                 if(err){
                     return res.json({message: "Error in server: " + err});
                 } else if(deleteRes.affectedRows > 0){
                     return res.json({message: "Success"});
-                } else{
+                } else {
                     return res.json({message: "Failed"});
                 }
             })
         }
     })
-})
+});
 
 router.post('/deleteASearch', (req, res) => {
     const { historyID } = req.body;
