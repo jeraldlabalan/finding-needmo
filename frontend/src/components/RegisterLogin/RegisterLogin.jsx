@@ -79,6 +79,12 @@ function RegisterLogin() {
   const submitLogin = (e) => {
     e.preventDefault();
 
+    // Validate if both email and password are filled
+    if (!loginValues.loginEmail || !loginValues.loginPass) {
+      toast.error("All fields are required", { autoClose: 3000 });
+      return; // Prevent form submission if fields are empty
+    }
+
     axios
       .post("http://localhost:8080/login", loginValues)
       .then((res) => {
@@ -186,6 +192,17 @@ function RegisterLogin() {
   };
 
   const submitEmailPass = () => {
+    // Check if any of the sign-up fields are empty
+    if (
+      !signUpValues.email ||
+      !signUpValues.password ||
+      !signUpValues.confirmPass ||
+      !signUpValues.accRole
+    ) {
+      toast.error("All fields are required", { autoClose: 3000 });
+      return; // Prevent form submission if any field is empty
+    }
+
     if (signUpValues.password !== signUpValues.confirmPass) {
       toast.error("Passwords don't match");
     } else if (
@@ -508,7 +525,7 @@ function RegisterLogin() {
                     className={styles.back_to_login}
                     onClick={handleGoToLogin}
                   >
-                    Go To Login
+                    Go To Log in
                   </button>
                 </div>
               )}

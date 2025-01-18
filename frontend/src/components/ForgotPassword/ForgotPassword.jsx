@@ -71,6 +71,18 @@ function ForgotPassword() {
 
   //SAVE NEW PASSWORD
   const handleNewPass = async () => {
+    // Check if both passwords are provided
+    if (!values.newPass || values.newPass === "") {
+      return toast.error("Please enter a new password", {
+        autoClose: 3000,
+      });
+    }
+    if (!values.confirmPass || values.confirmPass === "") {
+      return toast.error("Please confirm your new password", {
+        autoClose: 3000,
+      });
+    }
+
     if (values.newPass !== values.confirmPass) {
       toast.error("Passwords don't match");
     } else if (
@@ -287,7 +299,7 @@ function ForgotPassword() {
                 className={styles.go_to_login_button}
               >
                 <button className={styles.go_to_login_button}>
-                  Go to Login
+                  Go to Log in
                 </button>
               </Link>
             </div>
