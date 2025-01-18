@@ -7,6 +7,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 describe("Unit Testing for RegisterLogin Component", () => {
   describe("Sign Up", () => {
     test("Renders the logo image, Sign Up text, and three input types with correct placeholders.", () => {
+      window.history.pushState({}, "", "?form=register");
       render(
         <Router>
           <RegisterLogin />
@@ -31,7 +32,24 @@ describe("Unit Testing for RegisterLogin Component", () => {
       ).toBeInTheDocument();
     });
 
+    test("Clicking the logo link redirects to the homepage", () => {
+      window.history.pushState({}, "", "?form=register");
+      render(
+        <Router>
+          <RegisterLogin />
+        </Router>
+      );
+
+      const logoImage = screen.getByAltText(/This is our logo/i);
+      expect(logoImage).toBeInTheDocument();
+
+      fireEvent.click(logoImage);
+
+      expect(window.location.pathname).toBe("/");
+    });
+
     test("Renders the Sign Up as text and two radio buttons", () => {
+      window.history.pushState({}, "", "?form=register");
       render(
         <Router>
           <RegisterLogin />
@@ -39,12 +57,12 @@ describe("Unit Testing for RegisterLogin Component", () => {
       );
 
       expect(screen.getByText(/Sign Up as/i)).toBeInTheDocument();
-
       expect(screen.getByLabelText(/student/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/educator/i)).toBeInTheDocument();
     });
 
     test("Handles radio button selection for account role", () => {
+      window.history.pushState({}, "", "?form=register");
       render(
         <Router>
           <RegisterLogin />
@@ -69,6 +87,7 @@ describe("Unit Testing for RegisterLogin Component", () => {
     });
 
     test("Renders the SIGN UP button", () => {
+      window.history.pushState({}, "", "?form=register");
       render(
         <Router>
           <RegisterLogin />
@@ -80,6 +99,7 @@ describe("Unit Testing for RegisterLogin Component", () => {
     });
 
     test('Renders the correct text for "Already have an account? Log In."', () => {
+      window.history.pushState({}, "", "?form=register");
       render(
         <Router>
           <RegisterLogin />
@@ -91,6 +111,7 @@ describe("Unit Testing for RegisterLogin Component", () => {
     });
 
     test("Handles the toggling of the form from 'Sign Up' to 'Log In' when Log In is clicked", () => {
+      window.history.pushState({}, "", "?form=register");
       render(
         <Router>
           <RegisterLogin />
@@ -107,6 +128,7 @@ describe("Unit Testing for RegisterLogin Component", () => {
     });
 
     test("Handles input change for email, password, and confirm password.", () => {
+      window.history.pushState({}, "", "?form=register");
       render(
         <Router>
           <RegisterLogin />
@@ -156,6 +178,22 @@ describe("Unit Testing for RegisterLogin Component", () => {
 
       const passwordInput = screen.getByPlaceholderText(/Enter password/i);
       expect(passwordInput).toBeInTheDocument();
+    });
+
+    test("Clicking the logo link redirects to the homepage", () => {
+      window.history.pushState({}, "", "?form=login");
+      render(
+        <Router>
+          <RegisterLogin />
+        </Router>
+      );
+
+      const logoImage = screen.getByAltText(/This is our logo/i);
+      expect(logoImage).toBeInTheDocument();
+
+      fireEvent.click(logoImage);
+
+      expect(window.location.pathname).toBe("/");
     });
 
     test("Renders the LOG IN button", () => {

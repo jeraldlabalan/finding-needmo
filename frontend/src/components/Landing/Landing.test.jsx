@@ -115,7 +115,7 @@ describe("Unit Testing for the Landing Page", () => {
       });
     });
 
-    test("Modal buttons navigate correctly", () => {
+    test("Log In button navigates correctly", () => {
       render(
         <Router>
           <Landing />
@@ -127,13 +127,20 @@ describe("Unit Testing for the Landing Page", () => {
       fireEvent.click(screen.getByTestId("login-button"));
       expect(window.location.pathname).toBe("/registerlogin");
       expect(window.location.search).toBe("?form=login");
+    });
+
+    test("Sign Up button navigates correctly", () => {
+      render(
+        <Router>
+          <Landing />
+        </Router>
+      );
+
+      fireEvent.click(screen.getByText(/join now/i));
 
       fireEvent.click(screen.getByTestId("signup-button"));
       expect(window.location.pathname).toBe("/registerlogin");
-      expect(window.location.search).toBe("?form=form");
-
-      fireEvent.click(screen.getByTestId("cancel-button"));
-      expect(screen.queryByTestId("modal")).not.toBeInTheDocument();
+      expect(window.location.search).toBe("?form=register");
     });
 
     test("Should close the modal when cancel button is clicked", () => {
@@ -197,8 +204,9 @@ describe("Search Bar", () => {
   });
 
   test("Typing animation works correctly", async () => {
-    //NAGLOLOKO 'TONG HAYOP NA 'TO. MINSAN PASSED, MINSAN FAILED.
-    jest.setTimeout(5000); // O 'DI KAYA RITO BAGUHIN MO O 'DI KAYA I-RUN LANG 'YUNG TEST ULIT
+    //NAGLOLOKO 'TO. MINSAN PASSED, MINSAN FAILED.
+    // I-RUN LANG 'YUNG TEST ULIT PARA MAGING PASSED.
+    jest.setTimeout(5000);
     render(
       <Router>
         <Landing />
@@ -211,7 +219,7 @@ describe("Search Bar", () => {
       () => {
         expect(inputElement.placeholder).toBe("Start Searching...");
       },
-      { timeout: 5000 } //ADJUST MO HERE KAPAG NAG-FAIL 'TO
+      { timeout: 5000 }
     );
   });
 

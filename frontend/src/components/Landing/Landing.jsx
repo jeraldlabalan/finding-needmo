@@ -11,15 +11,15 @@ function Landing() {
   // Modal logic
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
-  
+
   const handleLoginClick = () => {
     closeModal();
-    navigate('/registerlogin?form=login');
+    navigate("/registerlogin?form=login");
   };
 
   const handleRegisterClick = () => {
     closeModal();
-    navigate('/registerlogin?form=register');
+    navigate("/registerlogin?form=register");
   };
 
   // Function to open the modal
@@ -237,27 +237,22 @@ function Landing() {
             </p>
 
             <div className={styles.modal_buttons_container}>
-            
-                <button
-                  data-testid="login-button"
-                  className={`${styles.login_button} ${styles.modal_button}`}
-                  onClick={handleLoginClick}
-                >
-                  log in
-                </button>
-        
+              <button
+                data-testid="login-button"
+                className={`${styles.login_button} ${styles.modal_button}`}
+                onClick={handleLoginClick}
+              >
+                log in
+              </button>
 
-         
-              
-            
-                <button
-                  data-testid="signup-button"
-                  className={`${styles.signup_button} ${styles.modal_button}`}
-                  onClick={handleRegisterClick}
-                >
-                  sign up
-                </button>
-         
+              <button
+                data-testid="signup-button"
+                className={`${styles.signup_button} ${styles.modal_button}`}
+                onClick={handleRegisterClick}
+              >
+                sign up
+              </button>
+
               <button
                 data-testid="cancel-button"
                 className={`${styles.close_button} ${styles.modal_button}`}

@@ -1,4 +1,3 @@
-// PINAGHIWALAY KO I-TEST REGISTER AND LOG IN FUNCTION PARA MAS MADALI SA AKIN
 const request = require("supertest");
 const express = require("express");
 const nodemailer = require("nodemailer");
@@ -29,7 +28,7 @@ app.post("/sendPIN", (req, res) => {
       return res.json({ message: "Error in server: " + err });
     } else if (result.length > 0) {
       return res.json({ message: "Email exists" });
-    } else if (result.length === 0) {
+    } else {
       const randomPin = Math.floor(100000 + Math.random() * 900000);
       verificationPins[email] = { pin: randomPin, createdAt: Date.now() };
 

@@ -11,7 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 function RegisterLogin() {
   const location = useLocation();
-  const [isSignUp, setIsSignUp] = useState(); 
+  const [isSignUp, setIsSignUp] = useState();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -59,22 +59,22 @@ function RegisterLogin() {
 
   axios.defaults.withCredentials = true;
 
-   useEffect(() => {
-     axios
-       .get("http://localhost:8080")
-       .then((res) => {
-         if (res.data.valid) {
-           if (res.data.role === "Student") {
-             navigate("/home");
-           } else if (res.data.role === "Educator") {
-             navigate("/home");
-           }
-         } else{
-           navigate("/registerlogin");
-         }
-       })
-       .catch((err) => toast.error("Error" + err, { autoClose: 4000 }));
-   }, []);
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080")
+      .then((res) => {
+        if (res.data.valid) {
+          if (res.data.role === "Student") {
+            navigate("/home");
+          } else if (res.data.role === "Educator") {
+            navigate("/home");
+          }
+        } else {
+          navigate("/registerlogin");
+        }
+      })
+      .catch((err) => toast.error("Error" + err, { autoClose: 4000 }));
+  }, []);
 
   const submitLogin = (e) => {
     e.preventDefault();
@@ -285,8 +285,7 @@ function RegisterLogin() {
       <ToastContainer position="top-center" />
       <div className={styles.content}>
         <Link to="/" className={styles.logo}>
-        
-        <img src={logo} alt="This is our logo" className={styles.logo} />
+          <img src={logo} alt="This is our logo" className={styles.logo} />
         </Link>
         {/* Sign-Up Form */}
         {isSignUp && (

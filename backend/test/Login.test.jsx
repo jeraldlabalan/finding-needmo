@@ -1,4 +1,3 @@
-// PINAGHIWALAY KO I-TEST REGISTER AND LOG IN FUNCTION PARA MAS MADALI SA AKIN
 const request = require("supertest");
 const express = require("express");
 const mysql = require("mysql");
@@ -22,7 +21,6 @@ app.use(
 app.post("/login", (req, res) => {
   const { loginEmail, loginPass } = req.body;
 
-  // Check for missing email or password
   if (!loginEmail || !loginPass) {
     return res.status(400).json({ message: "Missing email or password" });
   }
@@ -47,57 +45,41 @@ app.post("/login", (req, res) => {
           return res.status(400).json({ message: "Incorrect password" });
         }
 
-        if (user.Status === "Inactive") {
-          connection.query(
-            'UPDATE user SET Status = "Active", LastLoginAt = NOW() WHERE UserID = ?',
-            [user.UserID],
-            (err, updateResult) => {
-              if (err)
-                return res
-                  .status(500)
-                  .json({ message: "Error updating user status" });
+        const updateStatusSql =
+          user.Status === "Inactive"
+            ? 'UPDATE user SET Status = "Active", LastLoginAt = NOW() WHERE UserID = ?'
+            : "SELECT * FROM profile WHERE User = ?";
 
-              connection.query(
-                "SELECT * FROM profile WHERE User = ?",
-                [user.UserID],
-                (err, profileResults) => {
-                  if (err)
-                    return res.status(500).json({ message: "Database error" });
+        connection.query(
+          updateStatusSql,
+          [user.UserID],
+          (err, updateResult) => {
+            if (err)
+              return res
+                .status(500)
+                .json({ message: "Error updating user status" });
 
-                  const profile = profileResults[0];
-                  req.session.userID = user.UserID;
-                  res.status(200).json({
-                    message: "Login successful",
-                    isLoggedIn: true,
-                    userID: user.UserID,
-                    firstname: profile.Firstname,
-                    lastname: profile.Lastname,
-                    status: "Active",
-                  });
-                }
-              );
-            }
-          );
-        } else {
-          connection.query(
-            "SELECT * FROM profile WHERE User = ?",
-            [user.UserID],
-            (err, profileResults) => {
-              if (err)
-                return res.status(500).json({ message: "Database error" });
+            connection.query(
+              "SELECT * FROM profile WHERE User = ?",
+              [user.UserID],
+              (err, profileResults) => {
+                if (err)
+                  return res.status(500).json({ message: "Database error" });
 
-              const profile = profileResults[0];
-              req.session.userID = user.UserID;
-              res.status(200).json({
-                message: "Login successful",
-                isLoggedIn: true,
-                userID: user.UserID,
-                firstname: profile.Firstname,
-                lastname: profile.Lastname,
-              });
-            }
-          );
-        }
+                const profile = profileResults[0];
+                req.session.userID = user.UserID;
+                res.status(200).json({
+                  message: "Login successful",
+                  isLoggedIn: true,
+                  userID: user.UserID,
+                  firstname: profile.Firstname,
+                  lastname: profile.Lastname,
+                  status: user.Status === "Inactive" ? "Active" : user.Status,
+                });
+              }
+            );
+          }
+        );
       });
     }
   );
@@ -192,7 +174,6 @@ describe("Unit Testing for Log In Function", () => {
       Email: "test@example.com",
       Password: "hashedpassword",
       Status: "Active",
-      Role: "Student",
     };
 
     mockQuery.mockImplementation((sql, params, callback) => {
@@ -217,7 +198,7 @@ describe("Unit Testing for Log In Function", () => {
   it("Should return error if the user is not found", async () => {
     mockQuery.mockImplementation((sql, params, callback) => {
       if (sql.includes("SELECT * FROM user")) {
-        callback(null, []); // No user found
+        callback(null, []);
       }
     });
 
@@ -249,16 +230,8 @@ describe("Unit Testing for Log In Function", () => {
   });
 
   it("Should return database error if there's an issue querying user", async () => {
-    const user = {
-      UserID: 1,
-      Email: "test@example.com",
-      Password: "hashedpassword",
-      Status: "Active",
-      Role: "Student",
-    };
-
     mockQuery.mockImplementationOnce((sql, params, callback) => {
-      callback(new Error("Database error"), null); // Simulate DB error
+      callback(new Error("Database error"), null);
     });
 
     const response = await request(app).post("/login").send({
@@ -274,7 +247,7 @@ describe("Unit Testing for Log In Function", () => {
     const user = {
       UserID: 1,
       Email: "test@example.com",
-      Password: "hashedpassword", // Simulate a hashed password
+      Password: "hashedpassword",
       Status: "Active",
       Role: "Student",
     };
