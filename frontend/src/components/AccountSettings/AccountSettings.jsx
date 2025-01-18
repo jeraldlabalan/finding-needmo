@@ -5,30 +5,30 @@ import Header from "../Header/Header";
 import account_setting_icon from "../../assets/account-settings-icon.png";
 import verify_icon_black from "../../assets/verify-icon-black.png";
 import email_icon_white from "../../assets/email-icon-white.png";
-import email_icon from '../../assets/email.png'
-import verify_icon from '../../assets/verified_icon.png'
-import logoutFunction from '../logoutFunction.jsx';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import email_icon from "../../assets/email.png";
+import verify_icon from "../../assets/verified_icon.png";
+import logoutFunction from "../logoutFunction.jsx";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function AccountSettings() {
   const [selectedForm, setSelectedForm] = useState(null);
   const [currentChangeEmailStep, setCurrentChangeEmailStep] = useState(1);
   const [currentChangePasswordStep, setCurrentChangePasswordStep] = useState(1);
   const [emailData, setEmailData] = useState({
-    password: '',
-    email: '',
+    password: "",
+    email: "",
   });
 
   const [passData, setPassData] = useState({
-    password: '',
-    newPass: '',
-    confirmNewPass: '',
-  })
+    password: "",
+    newPass: "",
+    confirmNewPass: "",
+  });
   const [userEmail, setUserEmail] = useState("");
-  const [userRole, setUserRole] = useState('');
+  const [userRole, setUserRole] = useState("");
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -72,14 +72,14 @@ function AccountSettings() {
     setCurrentChangePasswordStep(1);
 
     setEmailData({
-      password: '',
-      email: '',
+      password: "",
+      email: "",
     });
 
     setPassData({
-      password: '',
-    newPass: '',
-    confirmNewPass: '',
+      password: "",
+      newPass: "",
+      confirmNewPass: "",
     });
   };
 
@@ -89,7 +89,7 @@ function AccountSettings() {
       ...prev,
       [name]: value,
     }));
-  }
+  };
 
   const handlePassChange = (e) => {
     const { name, value } = e.target;
@@ -97,40 +97,43 @@ function AccountSettings() {
       ...prev,
       [name]: value,
     }));
-  }
+  };
 
   //change email
   const handleVerifyPassword = () => {
-    if (emailData.password === '' || !emailData.password) {
-      toast.error('Input your password', {
-        autoClose: 2000
+    if (emailData.password === "" || !emailData.password) {
+      toast.error("Input your password", {
+        autoClose: 2000,
       });
       return;
     }
 
-    axios.post('http://localhost:8080/verifyPassword/accSettings', { password: emailData.password })
+    axios
+      .post("http://localhost:8080/verifyPassword/accSettings", {
+        password: emailData.password,
+      })
       .then((res) => {
         if (res.data.message === "Correct") {
           setCurrentChangeEmailStep((prev) => (prev < 3 ? prev + 1 : prev));
           toast.dismiss();
         } else {
-          toast.error('Your password is wrong', {
-            autoClose: 2000
+          toast.error("Your password is wrong", {
+            autoClose: 2000,
           });
         }
       })
       .catch((err) => {
-        toast.error('An error occurred. Please try again.', {
-          autoClose: 2000
+        toast.error("An error occurred. Please try again.", {
+          autoClose: 2000,
         });
         console.log("Error: " + err);
-      })
-  }
+      });
+  };
 
   const handleSubmitNewEmail = () => {
-    if (!emailData.email || emailData.email === '') {
-      toast.error('Input your current email', {
-        autoClose: 2000
+    if (!emailData.email || emailData.email === "") {
+      toast.error("Input your new email", {
+        autoClose: 2000,
       });
       return;
     }
@@ -144,14 +147,18 @@ function AccountSettings() {
       if (!validEmailRegex.test(email)) {
         toast.error(
           "Please enter a valid email in the format: dcs.firstname.lastname@cvsu.edu.ph"
-        ), {
-          autoClose: 2000
-        };
+        ),
+          {
+            autoClose: 2000,
+          };
         return;
       }
     }
 
-    axios.post('http://localhost:8080/changeEmail/accSettings', { email: emailData.email })
+    axios
+      .post("http://localhost:8080/changeEmail/accSettings", {
+        email: emailData.email,
+      })
       .then((res) => {
         if (res.data.message === "Success") {
           if (res.data.logout) {
@@ -163,14 +170,17 @@ function AccountSettings() {
             }, 3000);
           }
         } else {
-          toast.error('Failed to change email. Kindly reload the page and try again.', {
-            autoClose: 2000
-          });
+          toast.error(
+            "Failed to change email. Kindly reload the page and try again.",
+            {
+              autoClose: 2000,
+            }
+          );
         }
       })
       .catch((err) => {
-        toast.error('An error occurred. Please try again.', {
-          autoClose: 2000
+        toast.error("An error occurred. Please try again.", {
+          autoClose: 2000,
         });
         console.log("Error: " + err);
       });
@@ -178,67 +188,83 @@ function AccountSettings() {
 
   //change password
   const handleVerifyPassword1 = () => {
-    if (passData.password === '' || !passData.password) {
-      toast.error('Input your password', {
-        autoClose: 2000
+    if (passData.password === "" || !passData.password) {
+      toast.error("Input your password", {
+        autoClose: 2000,
       });
       return;
     }
 
-    axios.post('http://localhost:8080/verifyPassword/accSettings', { password: passData.password })
+    axios
+      .post("http://localhost:8080/verifyPassword/accSettings", {
+        password: passData.password,
+      })
       .then((res) => {
         if (res.data.message === "Correct") {
           setCurrentChangePasswordStep((prev) => (prev < 3 ? prev + 1 : prev));
           toast.dismiss();
         } else {
-          toast.error('Your password is wrong', {
-            autoClose: 2000
+          toast.error("Your password is wrong", {
+            autoClose: 2000,
           });
         }
       })
       .catch((err) => {
-        toast.error('An error occurred. Please try again.', {
-          autoClose: 2000
+        toast.error("An error occurred. Please try again.", {
+          autoClose: 2000,
         });
         console.log("Error: " + err);
-      })
-  }
+      });
+  };
 
   const handleSubmitNewPass = () => {
-    if (passData.newPass === '' || !passData.newPass || passData.confirmNewPass === '' || !passData.confirmNewPass) {
-      toast.error('Input your new password', {
-        autoClose: 2000
+    if (
+      passData.newPass === "" ||
+      !passData.newPass ||
+      passData.confirmNewPass === "" ||
+      !passData.confirmNewPass
+    ) {
+      toast.error("Both fields are required", {
+        autoClose: 2000,
       });
       return;
-    } else if(passData.newPass !== passData.confirmNewPass){
+    } else if (passData.newPass !== passData.confirmNewPass) {
       toast.error(`Passwords don't match`, {
-        autoClose: 2000
+        autoClose: 2000,
       });
       return;
     }
 
-    axios.post('http://localhost:8080/changePass/accSettings', { confirmNewPass: passData.confirmNewPass })
-    .then((res) => {
-      if(res.data.message === "Success"){
-        setCurrentChangePasswordStep((prev) => (prev < 3 ? prev + 1 : prev));
-        toast.dismiss();
-      } else {
-        toast.error('Failed to change password. Kindly reload the page and try again.', {
-          autoClose: 2000
+    axios
+      .post("http://localhost:8080/changePass/accSettings", {
+        confirmNewPass: passData.confirmNewPass,
+      })
+      .then((res) => {
+        if (res.data.message === "Success") {
+          setCurrentChangePasswordStep((prev) => (prev < 3 ? prev + 1 : prev));
+          toast.dismiss();
+        } else {
+          toast.error(
+            "Failed to change password. Kindly reload the page and try again.",
+            {
+              autoClose: 2000,
+            }
+          );
+        }
+      })
+      .catch((err) => {
+        toast.error("An error occurred. Please try again.", {
+          autoClose: 2000,
         });
-      }
-    })
-    .catch((err) => {
-      toast.error('An error occurred. Please try again.', {
-        autoClose: 2000
+        console.log("Error: " + err);
       });
-      console.log("Error: " + err);
-    })
-  }
+  };
 
   return (
     <div className={styles.container}>
-      {!(currentChangeEmailStep === 3 || currentChangePasswordStep === 3) && <Header />}
+      {!(currentChangeEmailStep === 3 || currentChangePasswordStep === 3) && (
+        <Header />
+      )}
 
       <div className={styles.main_content}>
         {/* main account setting page, dito pipili si user kung change email or change pass */}
@@ -310,7 +336,7 @@ function AccountSettings() {
                 <input
                   type="password"
                   value={emailData.password}
-                  name='password'
+                  name="password"
                   onChange={handleEmailChange}
                   className={styles.password_field}
                   placeholder="Password"
@@ -323,7 +349,10 @@ function AccountSettings() {
                 >
                   next
                 </button>
-                <button className={`${styles.button_cancel} ${styles.button}`} onClick={cancelForm}>
+                <button
+                  className={`${styles.button_cancel} ${styles.button}`}
+                  onClick={cancelForm}
+                >
                   cancel
                 </button>
               </div>
@@ -342,14 +371,16 @@ function AccountSettings() {
                 />
                 <h2 className={styles.content_title}>change email</h2>
                 <p className={styles.content_subtitle}>
-                  Your current email is <span className={styles.bolded_text}>{userEmail}</span>. <br />What would you like it to update to?
+                  Your current email is{" "}
+                  <span className={styles.bolded_text}>{userEmail}</span>.{" "}
+                  <br />
+                  What would you like it to update to?
                 </p>
               </div>
               <div className={styles.email_field_container}>
                 <input
-                  type="password"
                   value={emailData.email}
-                  name='email'
+                  name="email"
                   onChange={handleEmailChange}
                   className={styles.email_field}
                   placeholder="New email address"
@@ -362,7 +393,10 @@ function AccountSettings() {
                 >
                   next
                 </button>
-                <button className={`${styles.button_cancel} ${styles.button}`} onClick={cancelForm}>
+                <button
+                  className={`${styles.button_cancel} ${styles.button}`}
+                  onClick={cancelForm}
+                >
                   cancel
                 </button>
               </div>
@@ -382,24 +416,22 @@ function AccountSettings() {
                 <h2 className={styles.content_title}>email address changed!</h2>
                 <p className={styles.content_subtitle}>
                   Your email address has been successfully <br />
-                  changed to <span className={styles.bolded_text}>{emailData.email}</span>. Logging out in 3 seconds...
+                  changed to{" "}
+                  <span className={styles.bolded_text}>{emailData.email}</span>.
+                  Logging out in 3 seconds...
                 </p>
               </div>
               <div className={styles.nav_buttons_container}>
-
                 <button
                   className={`${styles.button_go_back} ${styles.button}`}
                   onClick={cancelForm}
                 >
                   go back
                 </button>
-
               </div>
             </div>
           </div>
         )}
-
-
 
         {/* kapag pinili yung change password  */}
         {selectedForm === "password" && currentChangePasswordStep === 1 && (
@@ -420,7 +452,7 @@ function AccountSettings() {
                 <input
                   type="password"
                   value={passData.email}
-                  name='password'
+                  name="password"
                   onChange={handlePassChange}
                   className={styles.password_field}
                   placeholder="Password"
@@ -433,7 +465,10 @@ function AccountSettings() {
                 >
                   next
                 </button>
-                <button className={`${styles.button_cancel} ${styles.button}`}>
+                <button
+                  className={`${styles.button_cancel} ${styles.button}`}
+                  onClick={cancelForm}
+                >
                   cancel
                 </button>
               </div>
@@ -455,12 +490,11 @@ function AccountSettings() {
                   Ensure the new password matches the confirmation password.
                 </p>
               </div>
-              <div className={styles.password_field_field_container}>                
-
+              <div className={styles.password_field_field_container}>
                 <input
                   type="password"
                   value={passData.newPass}
-                  name='newPass'
+                  name="newPass"
                   onChange={handlePassChange}
                   className={styles.password_field}
                   placeholder="New password"
@@ -469,7 +503,7 @@ function AccountSettings() {
                 <input
                   type="password"
                   value={passData.confirmNewPass}
-                  name='confirmNewPass'
+                  name="confirmNewPass"
                   onChange={handlePassChange}
                   className={styles.password_field}
                   placeholder="Confirm new password"
@@ -482,20 +516,16 @@ function AccountSettings() {
                 >
                   update password
                 </button>
-                <button className={`${styles.button_cancel} ${styles.button}`} onClick={cancelForm}>
+                <button
+                  className={`${styles.button_cancel} ${styles.button}`}
+                  onClick={cancelForm}
+                >
                   cancel
                 </button>
-
-                <Link to="" className={styles.forgot_password}>
-                  forgot password?
-                </Link>
-
               </div>
             </div>
           </div>
         )}
-
-
 
         {selectedForm === "password" && currentChangePasswordStep === 3 && (
           <div className={styles.change_password_form}>

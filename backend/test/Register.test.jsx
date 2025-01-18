@@ -128,7 +128,7 @@ app.post("/submitSignUp", (req, res) => {
   });
 });
 
-describe("Unit Testing for Sign Up Function", () => {
+describe("Sign Up Functionality", () => {
   jest.useFakeTimers("modern").setSystemTime(new Date(2024, 0, 1, 12));
 
   describe("For '/sendPIN'", () => {

@@ -72,7 +72,7 @@ const cronJob = () => {
   });
 };
 
-describe("Unit Testing for Log Out Function", () => {
+describe("Log Out Functionality", () => {
   let server;
 
   beforeAll(() => {

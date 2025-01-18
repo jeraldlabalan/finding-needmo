@@ -125,7 +125,7 @@ nodemailer.createTransport = jest.fn().mockReturnValue({
   sendMail: jest.fn().mockResolvedValue(true),
 });
 
-describe("Unit Testing for Forgot Password Function", () => {
+describe("Forgot Password Functionality", () => {
   it("Should send OTP if the email exists", async () => {
     const response = await request(app)
       .post("/sendOTP")

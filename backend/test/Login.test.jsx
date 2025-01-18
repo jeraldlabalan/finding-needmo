@@ -118,7 +118,7 @@ app.get("/", (req, res) => {
   }
 });
 
-describe("Unit Testing for Log In Function", () => {
+describe("Log In Functionality", () => {
   let mockQuery;
 
   beforeAll(() => {
