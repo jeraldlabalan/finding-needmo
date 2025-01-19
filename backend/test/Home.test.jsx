@@ -11,7 +11,7 @@ app.use(express.json());
 
 app.get("/", async (req, res) => {
   try {
-    const sessionResponse = await axios.get("mocked-session-url");
+    const sessionResponse = await axios.get("/");
     res.json(sessionResponse.data);
   } catch (error) {
     res.status(500).json({ error: "Error during session validation" });
@@ -25,7 +25,7 @@ app.post("/saveToSearchHistory", async (req, res) => {
       return res.status(400).json({ message: "Search term is required" });
     }
 
-    const response = await axios.post("mocked-save-search-url", {
+    const response = await axios.post("/saveToSearchHistory", {
       searchValue,
     });
     res.json(response.data);

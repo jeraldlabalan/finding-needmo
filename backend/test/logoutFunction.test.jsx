@@ -85,7 +85,7 @@ describe("Log Out Functionality", () => {
     console.error.mockRestore();
   });
 
-  describe("Log Out Functionality", () => {
+  describe("Log Out", () => {
     it("Should log out the user successfully", async () => {
       const mockDbResponse = { affectedRows: 1 };
       db.query.mockImplementationOnce((query, values, callback) => {

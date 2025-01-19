@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import styles from "./Profile.module.css";
 import Header from "../Header/Header";
 import default_photo from "../../assets/default-profile-photo.jpg";
@@ -18,19 +18,21 @@ import file_icon_black from "../../assets/file-icon-black.png";
 import add_file_icon from "../../assets/add-file-icon.png";
 import delete_file_icon_black from "../../assets/delete-file-icon-black.png";
 import delete_file_icon_white from "../../assets/delete-file-icon-white.png";
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import SecondHeader from '../SecondHeader/SecondHeader';
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import SecondHeader from "../SecondHeader/SecondHeader";
 
 function Profile() {
   // Modal logic
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isEditContentModalOpen, setIsEditContentModalOpen] = useState(false);
   const [isAddContentModalOpen, setIsAddContentModalOpen] = useState(false);
-  const [isArchiveContentModalOpen, setIsArchiveContentModalOpen] = useState(false);
-  const [isDeleteContentModalOpen, setIsDeleteContentModalOpen] = useState(false);
+  const [isArchiveContentModalOpen, setIsArchiveContentModalOpen] =
+    useState(false);
+  const [isDeleteContentModalOpen, setIsDeleteContentModalOpen] =
+    useState(false);
   const [currentStepDelete, setCurrentStepDelete] = useState(1);
   const [currentStepArchive, setCurrentStepArchive] = useState(1);
 
@@ -41,44 +43,44 @@ function Profile() {
   const [userColumns, setUserColumns] = useState([]);
   const [profileColumns, setProfileColumns] = useState([]);
   const [uploadedPFP, setUploadedPFP] = useState(null);
-  const [initialPFP, setInitialPFP] = useState(null);  
+  const [initialPFP, setInitialPFP] = useState(null);
 
   const [profileInfo, setProfileInfo] = useState({
     uploadPFP: null,
-    pfpURL: '',
-    firstName: '',
-    lastName: '',
-    position: '',
-    program: '',
+    pfpURL: "",
+    firstName: "",
+    lastName: "",
+    position: "",
+    program: "",
   });
 
   const [courses, setCourses] = useState([]);
   const [contentFiles, setContentFiles] = useState([]);
   const [contentDetails, setContentDetails] = useState({
-    title: '',
-    description: '',
-    subject: '',
-    program: '',
-    course: '',
-    keyword: '',
-    contentInput: '',
+    title: "",
+    description: "",
+    subject: "",
+    program: "",
+    course: "",
+    keyword: "",
+    contentInput: "",
   });
 
   const [filteredSubjects, setFilteredSubjects] = useState([]);
   const [selectedRequest, setSelectedRequest] = useState([]);
 
   const [uploadedContent, setUploadedContent] = useState([]);
-  
 
   useEffect(() => {
     // Fetch the uploaded content data
-    axios.get('http://localhost:8080/getUploadedContent')
-      .then(response => {
+    axios
+      .get("http://localhost:8080/getUploadedContent")
+      .then((response) => {
         if (response.data.uploadedContent) {
           setUploadedContent(response.data.uploadedContent);
-        }        
+        }
       })
-      .catch(error => console.error("Error fetching content:", error));
+      .catch((error) => console.error("Error fetching content:", error));
   }, [uploadedContent]);
 
   //Reuse in other pages that requires logging in
@@ -141,27 +143,28 @@ function Profile() {
     files: selectedRequest.Files, // Initialize files
   });
 
-  const [editContentFiles, setEditContentFiles] = useState(selectedRequest.Files || []); // Files for editing content
+  const [editContentFiles, setEditContentFiles] = useState(
+    selectedRequest.Files || []
+  ); // Files for editing content
 
   const handleEditContentFiles = (e) => {
     const selectedFiles = Array.from(e.target.files); // Convert FileList to array
-    const newFiles = selectedFiles.map(file => ({
+    const newFiles = selectedFiles.map((file) => ({
       originalName: file.name,
       file: file, // Store the actual file object
       mimeType: file.type,
-      size: file.size
+      size: file.size,
     }));
-  
+
     console.log("New Files:", newFiles);
-  
+
     // Append the new files to the existing files
     setEditContentFiles((prevFiles) => [...prevFiles, ...newFiles]);
     setEditContent((prevContent) => ({
       ...prevContent,
-      files: [...prevContent.files, ...newFiles] // Add new files to the files array
+      files: [...prevContent.files, ...newFiles], // Add new files to the files array
     }));
   };
-  
 
   const handleEditContentFileRemove = (index) => {
     console.log("Removing file at index:", index);
@@ -169,10 +172,9 @@ function Profile() {
     setEditContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     setEditContent((prevContent) => ({
       ...prevContent,
-      files: prevContent.files.filter((_, i) => i !== index)
+      files: prevContent.files.filter((_, i) => i !== index),
     }));
   };
-
 
   useEffect(() => {
     if (selectedRequest) {
@@ -186,10 +188,14 @@ function Profile() {
         courseID: selectedRequest.Course,
         courseTitle: selectedRequest.CourseTitle, // Add courseTitle
         keyword: selectedRequest.Tags,
-        files: Array.isArray(selectedRequest.Files) ? selectedRequest.Files : [], // Ensure files is an array
+        files: Array.isArray(selectedRequest.Files)
+          ? selectedRequest.Files
+          : [], // Ensure files is an array
       });
 
-      setEditContentFiles(Array.isArray(selectedRequest.Files) ? selectedRequest.Files : []); // Ensure files is an array
+      setEditContentFiles(
+        Array.isArray(selectedRequest.Files) ? selectedRequest.Files : []
+      ); // Ensure files is an array
     }
   }, [selectedRequest]);
 
@@ -202,11 +208,30 @@ function Profile() {
   };
 
   const handleAddContent = (e) => {
-    
     e.preventDefault();
 
+    // Validate the form fields
+    if (
+      !contentDetails.title ||
+      !contentDetails.description ||
+      !contentDetails.program ||
+      !contentDetails.subject ||
+      !contentDetails.keyword
+    ) {
+      // Display error toast if any field is missing
+      toast.error("All fields are required");
+      return; // Prevent submission
+    }
+
+    if (contentFiles.length === 0) {
+      toast.error("At least one file must be added");
+      return; // Prevent submission if no files
+    }
+
     const formData = new FormData();
-    contentFiles.forEach((contentFile) => formData.append("contentFiles", contentFile));
+    contentFiles.forEach((contentFile) =>
+      formData.append("contentFiles", contentFile)
+    );
     formData.append("title", contentDetails.title);
     formData.append("description", contentDetails.description);
     formData.append("subject", contentDetails.subject);
@@ -216,34 +241,31 @@ function Profile() {
     axios
       .post("http://localhost:8080/uploadContent", formData)
       .then((res) => {
-        
         console.log("Upload success:", res.data);
         toast.success("Upload success", {
-          autoClose: 2000
+          autoClose: 2000,
         });
 
         setContentFiles([]);
 
         setContentDetails({
-          title: '',
-          description: '',
-          subject: '',
-          program: '',
-          course: '',
-          keyword: '',
-          contentInput: '',
+          title: "",
+          description: "",
+          subject: "",
+          program: "",
+          course: "",
+          keyword: "",
+          contentInput: "",
         });
 
         setIsAddContentModalOpen(false);
       })
       .catch((err) => {
-        console.error("Upload error:", err);        
+        console.error("Upload error:", err);
       });
-
   };
 
   const handleEditContent = (e) => {
-    
     e.preventDefault();
 
     const formData = new FormData();
@@ -268,56 +290,59 @@ function Profile() {
       subject: editContent.subject,
       program: editContent.program,
       keyword: editContent.keyword,
-      files: editContentFiles
+      files: editContentFiles,
     });
 
     axios
       .post("http://localhost:8080/editUploadedContent", formData)
-      .then((res) => {        
+      .then((res) => {
         console.log("Edit success:", res.data);
         toast.success("Edit success", {
-          autoClose: 2000
+          autoClose: 2000,
         });
 
         setTimeout(() => {
           window.location.reload();
         }, 2000);
       })
-      .catch((err) => {    
+      .catch((err) => {
         console.error("Edit error:", err);
       });
   };
 
   useEffect(() => {
-    axios.get("http://localhost:8080/getContentPrograms")
+    axios
+      .get("http://localhost:8080/getContentPrograms")
       .then((res) => {
         console.log(res.data);
         setPrograms(res.data);
       })
       .catch((err) => {
         toast.error("Error: " + err, {
-          autoClose: 4000
-        })
-      })
+          autoClose: 4000,
+        });
+      });
   }, []);
 
   useEffect(() => {
     if (editContent.program) {
-      axios.get(`http://localhost:8080/getContentSubjects?program=${editContent.program}`)
+      axios
+        .get(
+          `http://localhost:8080/getContentSubjects?program=${editContent.program}`
+        )
         .then((res) => {
           console.log(res.data);
           setSubjects(res.data);
         })
         .catch((err) => {
           toast.error("Error: " + err, {
-            autoClose: 4000
-          })
-        })
+            autoClose: 4000,
+          });
+        });
     }
   }, [editContent.program]);
 
   useEffect(() => {
-
     // If program is selected, filter the courses accordingly
     if (contentDetails.program) {
       const filtered = courses.filter(
@@ -331,34 +356,33 @@ function Profile() {
     }
   }, [contentDetails.program, courses]); // Run when program or courses change
 
-
   //get courses
   useEffect(() => {
-    axios.get("http://localhost:8080/getCourses")
+    axios
+      .get("http://localhost:8080/getCourses")
       .then((res) => {
         console.log(res.data);
         setCourses(res.data);
       })
       .catch((err) => {
         toast.error("Error: " + err, {
-          autoClose: 4000
-        })
-      })
+          autoClose: 4000,
+        });
+      });
   }, []);
 
+  useEffect(() => {
+    axios.get("http://localhost:8080/getEduContributions").then((res) => {
+      if (res.data.message === "Contributions fetched") {
+        setCSContributions(res.data.csCount);
+        setITContributions(res.data.itCount);
+      }
+    });
+  });
 
   useEffect(() => {
-    axios.get("http://localhost:8080/getEduContributions")
-      .then((res) => {
-        if (res.data.message === "Contributions fetched") {
-          setCSContributions(res.data.csCount);
-          setITContributions(res.data.itCount);
-        }
-      })
-  })
-
-  useEffect(() => {
-    axios.get('http://localhost:8080/getProfile')
+    axios
+      .get("http://localhost:8080/getProfile")
       .then((res) => {
         const { message, pfp, userData, profileData } = res.data;
         if (message === "User profile fetched successfully") {
@@ -369,28 +393,27 @@ function Profile() {
 
           setProfileInfo({
             uploadPFP: pfp || null,
-            pfpURL: pfp || '',
-            firstName: profileData.Firstname || '',
-            lastName: profileData.Lastname || '',
-            position: profileData.Position || '',
-            program: profileData.Program || '',
+            pfpURL: pfp || "",
+            firstName: profileData.Firstname || "",
+            lastName: profileData.Lastname || "",
+            position: profileData.Position || "",
+            program: profileData.Program || "",
           });
         } else {
           toast.error(message, {
-            autoClose: 5000
-          })
+            autoClose: 5000,
+          });
         }
       })
       .catch((err) => {
         toast.error("Error: " + err, {
-          autoClose: 5000
-        })
-      })
+          autoClose: 5000,
+        });
+      });
   }, []);
 
-  const saveProfileChanges = () => {    
-
-    const data = new FormData();    
+  const saveProfileChanges = () => {
+    const data = new FormData();
 
     if (profileInfo.uploadPFP) {
       data.append("uploadPFP", profileInfo.uploadPFP);
@@ -401,14 +424,14 @@ function Profile() {
     data.append("position", profileInfo.position);
     data.append("program", profileInfo.program || null);
 
-
-    axios.post("http://localhost:8080/saveEducProfileChanges", data, {
-      headers: { "Content-Type": "multipart/form-data", },
-    })
+    axios
+      .post("http://localhost:8080/saveEducProfileChanges", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
       .then((res) => {
-        if (res.data.message === "Changes saved") {          
+        if (res.data.message === "Changes saved") {
           console.log("Changes saved:", res.data);
-          setUploadedPFP(`http://localhost:8080/${res.data.pfpURL}`);          
+          setUploadedPFP(`http://localhost:8080/${res.data.pfpURL}`);
 
           setTimeout(() => {
             window.location.reload();
@@ -417,10 +440,10 @@ function Profile() {
       })
       .catch((err) => {
         toast.error("Error: " + err, {
-          autoClose: 5000
-        })        
-      })
-  }
+          autoClose: 5000,
+        });
+      });
+  };
 
   // Function to open the modals
   const openEditProfileModal = () => {
@@ -439,10 +462,9 @@ function Profile() {
     setIsAddContentModalOpen(true);
   };
 
-
   // Function to close the modals
   const closeEditProfileModal = () => {
-    setIsEditProfileModalOpen(false);    
+    setIsEditProfileModalOpen(false);
     setUploadedPFP(initialPFP);
   };
 
@@ -466,17 +488,17 @@ function Profile() {
     if (isDeleteSuccess) {
       window.location.reload();
     }
-  }
+  };
 
   // Function to handle the file upload change
   const handleUploadChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       const url = URL.createObjectURL(file); // Create a URL for the selected image
-      setProfileInfo(prevState => ({
+      setProfileInfo((prevState) => ({
         ...prevState,
-        uploadPFP: file,   // Store the file itself
-        pfpURL: url,       // Store the image URL for previewing
+        uploadPFP: file, // Store the file itself
+        pfpURL: url, // Store the image URL for previewing
       }));
 
       setUploadedPFP(url);
@@ -484,8 +506,8 @@ function Profile() {
   };
 
   const [archiveContent, setArchiveContent] = useState({
-    contentID: '',
-    archive: '',
+    contentID: "",
+    archive: "",
   });
   const [isArchiveSuccess, setIsArchiveSuccess] = useState(false);
 
@@ -493,44 +515,53 @@ function Profile() {
     const { name, value } = e.target;
     setArchiveContent((prevContent) => ({
       ...prevContent,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleArchiveContent = () => {    
-    if (archiveContent.archive !== selectedRequest.Title || !archiveContent.archive) {
+  const handleArchiveContent = () => {
+    if (!archiveContent.archive) {
+      toast.error("Please enter a title", {
+        autoClose: 2000,
+      });
+      return;
+    }
+
+    if (
+      archiveContent.archive !== selectedRequest.Title ||
+      !archiveContent.archive
+    ) {
       toast.error("Title does not match", {
-        autoClose: 2000
+        autoClose: 2000,
       });
       return;
     }
 
     const data = {
       contentID: selectedRequest.ContentID,
-      title: archiveContent.archive
+      title: archiveContent.archive,
     };
-    
 
-    axios.post("http://localhost:8080/archiveUploadedContent", data)
-      .then((res) => {        
+    axios
+      .post("http://localhost:8080/archiveUploadedContent", data)
+      .then((res) => {
         console.log("Archive success:", res.data);
         toast.success("Archive success", {
-          autoClose: 2000
+          autoClose: 2000,
         });
 
         setCurrentStepArchive((prev) => (prev < 2 ? prev + 1 : prev));
         setIsArchiveSuccess(true);
       })
-      .catch((err) => {        
+      .catch((err) => {
         console.error("Archive error:", err);
         setIsArchiveSuccess(false);
       });
-  }
-
+  };
 
   const [deleteContent, setDeleteContent] = useState({
-    contentID: '',
-    delete: '',
+    contentID: "",
+    delete: "",
   });
   const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
 
@@ -538,38 +569,49 @@ function Profile() {
     const { name, value } = e.target;
     setDeleteContent((prevContent) => ({
       ...prevContent,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleDeleteContent = () => {
-    if (deleteContent.delete !== selectedRequest.Title || !deleteContent.delete) {
+    if (!deleteContent.delete) {
+      toast.error("Please enter a title", {
+        autoClose: 2000,
+      });
+      return;
+    }
+
+    if (
+      deleteContent.delete !== selectedRequest.Title ||
+      !deleteContent.delete
+    ) {
       toast.error("Title does not match", {
-        autoClose: 2000
+        autoClose: 2000,
       });
       return;
     }
 
     const data = {
       contentID: selectedRequest.ContentID,
-      title: deleteContent.delete
-    };    
+      title: deleteContent.delete,
+    };
 
-    axios.post("http://localhost:8080/deleteUploadedContent", data)
-      .then((res) => {        
+    axios
+      .post("http://localhost:8080/deleteUploadedContent", data)
+      .then((res) => {
         console.log("Delete success:", res.data);
         toast.success("Delete success", {
-          autoClose: 2000
+          autoClose: 2000,
         });
 
         setCurrentStepDelete((prev) => (prev < 2 ? prev + 1 : prev));
         setIsDeleteSuccess(true);
       })
-      .catch((err) => {        
+      .catch((err) => {
         console.error("Archive error:", err);
         setIsDeleteSuccess(false);
       });
-  }
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -582,7 +624,7 @@ function Profile() {
   const handleEditRow = (details) => {
     setSelectedRequest({
       ...details,
-      files: details.Files
+      files: details.Files,
     });
     setIsEditContentModalOpen(true);
   };
@@ -590,7 +632,7 @@ function Profile() {
   const handleArchiveRow = (details) => {
     setSelectedRequest({
       ...details,
-      files: details.Files
+      files: details.Files,
     });
     setIsArchiveContentModalOpen(true);
     toast.dismiss();
@@ -599,14 +641,14 @@ function Profile() {
   const handleDeleteRow = (details) => {
     setSelectedRequest({
       ...details,
-      files: details.Files
+      files: details.Files,
     });
     setIsDeleteContentModalOpen(true);
-  }
+  };
 
   return (
     <div className={styles.container}>
-      <ToastContainer position='top-center' />
+      <ToastContainer position="top-center" />
       <div className={styles.header_container}>
         <Header />
       </div>
@@ -614,10 +656,16 @@ function Profile() {
       <div className={styles.content}>
         <div className={styles.upper_content}>
           <div className={styles.profile_photo_container}>
-            <img src={uploadedPFP} className={styles.display_photo} alt="profile photo" />
+            <img
+              src={uploadedPFP}
+              className={styles.display_photo}
+              alt="profile photo"
+            />
           </div>
           <div className={styles.name_and_role_container}>
-            <h1 className={styles.name}>{profileColumns.Firstname} {profileColumns.Lastname}</h1>
+            <h1 className={styles.name}>
+              {profileColumns.Firstname} {profileColumns.Lastname}
+            </h1>
             <div className={styles.role_container}>
               <img
                 src={role_icon}
@@ -654,7 +702,10 @@ function Profile() {
                     alt="information icon"
                   />
                   <p className={styles.info}>
-                    {profileColumns.Position === null ? "______" : profileColumns.Position} at
+                    {profileColumns.Position === null
+                      ? "______"
+                      : profileColumns.Position}{" "}
+                    at
                     <span className={styles.bolded_text}>
                       Cavite State University
                     </span>
@@ -669,9 +720,13 @@ function Profile() {
                   />
                   <p className={styles.info}>
                     Bachelor of Science in
-                    <span className={styles.bolded_text}>{profileColumns.Program === 1 ? "Computer Science"
-                      : profileColumns.Program === 2 ? "Information Technology"
-                        : "_______"}</span>
+                    <span className={styles.bolded_text}>
+                      {profileColumns.Program === 1
+                        ? "Computer Science"
+                        : profileColumns.Program === 2
+                        ? "Information Technology"
+                        : "_______"}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -699,9 +754,8 @@ function Profile() {
 
             <div className={styles.content_cards_container}>
               <div className={styles.content_cards}>
-
                 {uploadedContent.length > 0 ? (
-                  uploadedContent.map(details => (
+                  uploadedContent.map((details) => (
                     <div className={styles.card} key={details.ContentID}>
                       <div className={styles.card_info}>
                         <h4 className={styles.card_title}>{details.Title}</h4>
@@ -712,7 +766,10 @@ function Profile() {
 
                       <div className={styles.card_action_container}>
                         <div className={styles.card_actions}>
-                          <button onClick={() => handleEditRow(details)} className={styles.action}>
+                          <button
+                            onClick={() => handleEditRow(details)}
+                            className={styles.action}
+                          >
                             <img
                               src={edit_icon}
                               className={styles.action_icon}
@@ -721,7 +778,10 @@ function Profile() {
                             />
                           </button>
 
-                          <button onClick={() => handleArchiveRow(details)} className={styles.action}>
+                          <button
+                            onClick={() => handleArchiveRow(details)}
+                            className={styles.action}
+                          >
                             <img
                               src={clock_back_icon}
                               className={styles.action_icon}
@@ -739,27 +799,46 @@ function Profile() {
                             />
                           </button>
                         </div>
-                        <span className={details.Program === 1 ? styles.program_cs
-                          : details.Program === 2 ? styles.program_it : ""}>
-                          {details.Program === 1 ? "Computer Science"
-                            : details.Program === 2 ? "Information Technology" : ""}</span>
+                        <span
+                          className={
+                            details.Program === 1
+                              ? styles.program_cs
+                              : details.Program === 2
+                              ? styles.program_it
+                              : ""
+                          }
+                        >
+                          {details.Program === 1
+                            ? "Computer Science"
+                            : details.Program === 2
+                            ? "Information Technology"
+                            : ""}
+                        </span>
                       </div>
                     </div>
-                  ))) : (<p>No uploaded content found.</p>)}
-
+                  ))
+                ) : (
+                  <p>No uploaded content found.</p>
+                )}
               </div>
             </div>
 
             {/* EDIT PROFILE Modal */}
             {isEditProfileModalOpen && (
-              <div className={styles.modal_overlay} onClick={closeEditProfileModal}>
+              <div
+                className={styles.modal_overlay}
+                onClick={closeEditProfileModal}
+              >
                 <div
                   className={styles.modal_content}
                   onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
                 >
                   <div className={styles.modal_header}>
                     <h2 className={styles.header_title}>Edit Profile</h2>
-                    <button className={styles.header_close_button} onClick={closeEditProfileModal}>
+                    <button
+                      className={styles.header_close_button}
+                      onClick={closeEditProfileModal}
+                    >
                       <img
                         src={modal_close_icon}
                         className={styles.header_close_icon}
@@ -823,13 +902,21 @@ function Profile() {
                         className={styles.modal_info_input}
                         id="position"
                         onChange={handleInputChange}
-                        value={profileInfo.position || ''}
+                        value={profileInfo.position || ""}
                         required
                       >
-                        <option value={null} disabled >Your position</option>
+                        <option value={null} disabled>
+                          Your position
+                        </option>
                         <option value="Instructor 1">Instructor 1</option>
                         <option value="Instructor 2">Instructor 2</option>
                         <option value="Instructor 3">Instructor 3</option>
+                        <option value="Assistant Professor 1">
+                          Assistant Professor 1
+                        </option>
+                        <option value="Assistant Professor 2">
+                          Assistant Professor 2
+                        </option>
                       </select>
 
                       <select
@@ -840,22 +927,30 @@ function Profile() {
                         value={profileInfo.program || null}
                         required
                       >
-                        <option value={null} disabled>Select Program</option>
-                        <option value="1">Bachelor of Science in Computer Science</option>
-                        <option value="2">Bachelor of Science in Information Technology</option>
+                        <option value={null} disabled>
+                          Select Program
+                        </option>
+                        <option value="1">
+                          Bachelor of Science in Computer Science
+                        </option>
+                        <option value="2">
+                          Bachelor of Science in Information Technology
+                        </option>
                       </select>
                     </div>
                   </div>
 
                   <div className={styles.save_changes_button_container}>
-                    <button onClick={saveProfileChanges} className={styles.save_changes_button}>
+                    <button
+                      onClick={saveProfileChanges}
+                      className={styles.save_changes_button}
+                    >
                       Save Changes
                     </button>
                   </div>
                 </div>
               </div>
             )}
-
 
             {/* ADD Content Modal */}
             {isAddContentModalOpen && (
@@ -919,11 +1014,11 @@ function Profile() {
                       value={contentDetails.program}
                       onChange={handleAddContentChange}
                     >
-                      <option value={null} disabled>Program</option>
-                      <option value="1">Computer Science</option>
-                      <option value="2">
-                        Information Technology
+                      <option value={null} disabled>
+                        Program
                       </option>
+                      <option value="1">Computer Science</option>
+                      <option value="2">Information Technology</option>
                     </select>
 
                     <select
@@ -938,7 +1033,10 @@ function Profile() {
                         filteredSubjects
                           .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
                           .map((course) => (
-                            <option value={course.CourseID} key={course.CourseID}>
+                            <option
+                              value={course.CourseID}
+                              key={course.CourseID}
+                            >
                               {course.Title} {/* Display course title */}
                             </option>
                           ))
@@ -962,14 +1060,19 @@ function Profile() {
                       {contentFiles.map((file, index) => (
                         <div
                           key={index}
-                          className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}
+                          className={`${styles.file} ${
+                            index % 2 === 0
+                              ? styles.file_icon_white
+                              : styles.file_icon_black
+                          }`}
                         >
                           <img
                             src={file_icon_white} // Use appropriate file icon
                             className={styles.file_icon}
                             alt="file icon"
                           />
-                          <p className={styles.file_name}>{file.name}</p> {/* Display file name */}
+                          <p className={styles.file_name}>{file.name}</p>{" "}
+                          {/* Display file name */}
                           <img
                             src={delete_file_icon_white} // Use appropriate delete icon
                             className={styles.file_icon}
@@ -978,12 +1081,10 @@ function Profile() {
                           />
                         </div>
                       ))}
-
                       <div className={`${styles.file} ${styles.add_file}`}>
-                        
                         <button className={styles.add_file_button_container}>
                           <input
-                            name='contentInput'
+                            name="contentInput"
                             value={contentDetails.contentInput}
                             type="file"
                             multiple
@@ -994,14 +1095,16 @@ function Profile() {
                             className={styles.file_icon}
                             alt="add file icon"
                           />
-                         add files
+                          add files
                         </button>
-                        
                       </div>
                     </div>
                   </div>
                   <div className={styles.save_changes_button_container}>
-                    <button className={styles.save_changes_button} onClick={handleAddContent}>
+                    <button
+                      className={styles.save_changes_button}
+                      onClick={handleAddContent}
+                    >
                       add content
                     </button>
                   </div>
@@ -1011,13 +1114,19 @@ function Profile() {
 
             {/* EDIT Content Modal */}
             {isEditContentModalOpen && selectedRequest && (
-              <div className={styles.modal_overlay} onClick={closeEditContentModal}>
+              <div
+                className={styles.modal_overlay}
+                onClick={closeEditContentModal}
+              >
                 <div
                   className={`${styles.modal_content} ${styles.modal_content_container}`}
                   onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
                 >
                   <div className={styles.modal_content_header}>
-                    <button className={styles.header_close_button} onClick={closeEditContentModal}>
+                    <button
+                      className={styles.header_close_button}
+                      onClick={closeEditContentModal}
+                    >
                       <img
                         src={modal_close_icon}
                         className={styles.header_close_icon}
@@ -1042,7 +1151,7 @@ function Profile() {
                       name="contentID"
                       value={editContent.contentID}
                       onChange={handleEditContentChange}
-                      style={{ display: 'none' }} // Hide the input field
+                      style={{ display: "none" }} // Hide the input field
                     />
 
                     <input
@@ -1071,10 +1180,17 @@ function Profile() {
                       className={`${styles.modal_content_input} ${styles.modal_content_select}`}
                     >
                       {programs.map((program) => (
-                        <option key={program.ProgramID} value={program.ProgramID}>
-                          {program.Name === "Bachelor of Science in Computer Science" ? "Computer Science"
-                            : program.Name === "Bachelor of Science in Information Technology" ? "Information Technology"
-                              : ""}
+                        <option
+                          key={program.ProgramID}
+                          value={program.ProgramID}
+                        >
+                          {program.Name ===
+                          "Bachelor of Science in Computer Science"
+                            ? "Computer Science"
+                            : program.Name ===
+                              "Bachelor of Science in Information Technology"
+                            ? "Information Technology"
+                            : ""}
                         </option>
                       ))}
                     </select>
@@ -1084,12 +1200,17 @@ function Profile() {
                       onChange={handleEditContentChange}
                       className={`${styles.modal_content_input} ${styles.modal_content_select}`}
                     >
-                      <option value={editContent.subject}>{editContent.courseTitle}</option>
+                      <option value={editContent.subject}>
+                        {editContent.courseTitle}
+                      </option>
                       {subjects.length > 0 ? (
                         subjects
                           .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
                           .map((course) => (
-                            <option value={course.CourseID} key={course.CourseID}>
+                            <option
+                              value={course.CourseID}
+                              key={course.CourseID}
+                            >
                               {course.Title} {/* Display course title */}
                             </option>
                           ))
@@ -1108,33 +1229,37 @@ function Profile() {
                     ></textarea>
 
                     <div className={styles.modal_file_container}>
-                      {editContent.files && editContent.files.map((file, index) => (
-                        <div key={index} className={`${styles.file} ${index % 2 === 0 ? styles.file_icon_white : styles.file_icon_black}`}>
-
-
-
-
-                          <img
-                            src={file_icon_white} // Use appropriate file icon
-                            className={styles.file_icon}
-                            alt="file icon"
-                          />
-
-
-                          
-                          <p className={styles.file_name}>{file.originalName}</p> {/* Display file name */}
-                          <img
-                            src={delete_file_icon_white} // Use appropriate delete icon
-                            className={styles.file_icon}
-                            alt="remove file icon"
-                            onClick={() => handleEditContentFileRemove(index)} // Remove file
-                          />
-                        </div>
-                      ))}
+                      {editContent.files &&
+                        editContent.files.map((file, index) => (
+                          <div
+                            key={index}
+                            className={`${styles.file} ${
+                              index % 2 === 0
+                                ? styles.file_icon_white
+                                : styles.file_icon_black
+                            }`}
+                          >
+                            <img
+                              src={file_icon_white} // Use appropriate file icon
+                              className={styles.file_icon}
+                              alt="file icon"
+                            />
+                            <p className={styles.file_name}>
+                              {file.originalName}
+                            </p>{" "}
+                            {/* Display file name */}
+                            <img
+                              src={delete_file_icon_white} // Use appropriate delete icon
+                              className={styles.file_icon}
+                              alt="remove file icon"
+                              onClick={() => handleEditContentFileRemove(index)} // Remove file
+                            />
+                          </div>
+                        ))}
                       <div className={`${styles.file} ${styles.add_file}`}>
-                      <button className={styles.add_file_button_container}>
+                        <button className={styles.add_file_button_container}>
                           <input
-                            name='contentInput'
+                            name="contentInput"
                             value={contentDetails.contentInput}
                             type="file"
                             multiple
@@ -1145,13 +1270,15 @@ function Profile() {
                             className={styles.file_icon}
                             alt="add file icon"
                           />
-                         add files
+                          add files
                         </button>
-
                       </div>
                     </div>
                     <div className={styles.save_changes_button_container}>
-                      <button className={styles.save_changes_button} onClick={handleEditContent}>
+                      <button
+                        className={styles.save_changes_button}
+                        onClick={handleEditContent}
+                      >
                         Save Changes
                       </button>
                     </div>
@@ -1196,13 +1323,19 @@ function Profile() {
                     </h2>
                   </div>
 
-
                   {currentStepArchive === 1 && (
                     <>
                       <div className={styles.archive_and_delete_content}>
                         <p className={styles.archive_and_delete_confirmation}>
-                          Are you sure you want to archive ‘{selectedRequest.Title}’? Type
-                          ‘{selectedRequest.Title}’ to confirm.
+                          Are you sure you want to archive ‘
+                          <strong className={styles.boldText}>
+                            {selectedRequest.Title}
+                          </strong>
+                          ’? Type ‘
+                          <strong className={styles.boldText}>
+                            {selectedRequest.Title}
+                          </strong>
+                          ’ to confirm.
                         </p>
 
                         <div
@@ -1210,7 +1343,14 @@ function Profile() {
                             styles.confirm_archive_and_delete_container
                           }
                         >
-                          <input type="text" name='contentID' onChange={handleArchiveContentChange} placeholder={selectedRequest.ContentID} value={archiveContent.contentID} style={{ display: "none" }} />
+                          <input
+                            type="text"
+                            name="contentID"
+                            onChange={handleArchiveContentChange}
+                            placeholder={selectedRequest.ContentID}
+                            value={archiveContent.contentID}
+                            style={{ display: "none" }}
+                          />
                           <input
                             type="text"
                             name="archive"
@@ -1233,7 +1373,11 @@ function Profile() {
                   {currentStepArchive === 2 && (
                     <>
                       <p className={styles.archive_and_delete_confirmation}>
-                        Archived ‘{selectedRequest.Title}’ successfully.
+                        Archived{" "}
+                        <strong className={styles.boldText}>
+                          ‘{selectedRequest.Title}’
+                        </strong>{" "}
+                        successfully.
                       </p>
 
                       <div className={styles.view_button_container}>
@@ -1243,13 +1387,11 @@ function Profile() {
                           view archived contents
                         </button>
                       </div>
-
                     </>
                   )}
                 </div>
               </div>
             )}
-
 
             {/* Delete Content Modal */}
             {isDeleteContentModalOpen && selectedRequest && (
@@ -1291,7 +1433,15 @@ function Profile() {
                     <>
                       <div className={styles.archive_and_delete_content}>
                         <p className={styles.archive_and_delete_confirmation}>
-                          Are you sure you want to delete ‘{selectedRequest.Title}’? Type ‘{selectedRequest.Title}’ to confirm.
+                          Are you sure you want to delete ‘
+                          <strong className={styles.boldText}>
+                            {selectedRequest.Title}
+                          </strong>
+                          ’? Type ‘
+                          <strong className={styles.boldText}>
+                            {selectedRequest.Title}
+                          </strong>
+                          ’ to confirm.
                         </p>
 
                         <div
@@ -1299,8 +1449,14 @@ function Profile() {
                             styles.confirm_archive_and_delete_container
                           }
                         >
-
-                          <input type="text" name='contentID' placeholder={selectedRequest.ContentID} value={deleteContent.contentID} onChange={handleDeleteContentChange} style={{ display: 'none' }} />
+                          <input
+                            type="text"
+                            name="contentID"
+                            placeholder={selectedRequest.ContentID}
+                            value={deleteContent.contentID}
+                            onChange={handleDeleteContentChange}
+                            style={{ display: "none" }}
+                          />
                           <input
                             type="text"
                             name="delete"
@@ -1323,23 +1479,17 @@ function Profile() {
                   {currentStepDelete === 2 && (
                     <>
                       <p className={styles.archive_and_delete_confirmation}>
-                        Deleted ‘{selectedRequest.Title}’ successfully.
+                        Deleted{" "}
+                        <strong className={styles.boldText}>
+                          ‘{selectedRequest.Title}’
+                        </strong>{" "}
+                        successfully.
                       </p>
-
-                      <div className={styles.view_button_container}>
-                        <button
-                          className={`${styles.view_archived_contents_button}`}
-                        >
-                          view deleted contents
-                        </button>
-                      </div>
-
                     </>
                   )}
                 </div>
               </div>
             )}
-
           </div>
         </div>
       </div>

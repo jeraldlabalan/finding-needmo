@@ -31,24 +31,23 @@
   align-items: center;
   gap: 0 30px;
   height: 100%;
-
 }
 
 .upper_content .profile_photo_container {
-
 }
 
 .display_photo {
   width: 150px;
   height: 150px;
   object-fit: cover;
+  cursor: default;
 }
 
 .profile_photo_container img {
   border-radius: 50%;
   border: 5px solid #235890;
   width: 150px;
-  object-fit: cover; 
+  object-fit: cover;
 }
 
 .upper_content .name_and_role_container {
@@ -76,6 +75,7 @@
 
 .role_container .role_icon {
   width: 25px;
+  cursor: default;
 }
 
 .role_container .role {
@@ -96,7 +96,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: flex-start ;
+  align-items: flex-start;
   width: 30%;
   height: 100%;
 }
@@ -108,7 +108,6 @@
   align-items: flex-start;
   width: 100%;
 }
-
 
 .contributions_container .contributions_counts {
   width: 100%;
@@ -169,6 +168,7 @@
 
 .info_group .information_icon {
   width: 15px;
+  cursor: default;
 }
 
 .info_group .info,
@@ -201,8 +201,6 @@
   font-weight: var(--font-semi-bold);
   text-transform: uppercase;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
-
-  
 }
 
 .lower_content .content_container {
@@ -225,7 +223,7 @@
 }
 
 .content_heading .add_content_button {
-  background-color: #F1D302;
+  background-color: #f1d302;
   color: black;
   border: none;
   border-radius: 50px;
@@ -234,8 +232,6 @@
   padding: 5px 0;
   width: 150px;
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
- 
-  
 }
 
 .content_cards_container {
@@ -282,7 +278,7 @@
 .card_action_container .program_cs {
   font-size: var(--smaller-font-size);
   text-transform: capitalize;
-  color: #C00202;
+  color: #c00202;
 }
 
 .card_action_container .program_it {
@@ -304,13 +300,11 @@
 }
 
 .card_actions .action {
-
 }
 
 .action .action_icon {
   width: 20px;
 }
-
 
 /* Modal */
 
@@ -379,8 +373,6 @@
 .modal_content_header {
 }
 
-
-
 .modal_header .header_close_button,
 .modal_content_header .header_close_icon {
   border: none;
@@ -413,15 +405,17 @@
   width: 135px;
   border: 5px solid #235890;
   border-radius: 50%;
-  object-fit: cover; 
+  object-fit: cover;
   display: block;
   height: 135px;
+  cursor: default;
 }
 
 .add_new_profile_button {
   position: absolute;
   right: 10px;
   top: 100px;
+  cursor: pointer;
 }
 
 .profile_container .edit_profile_photo_button {
@@ -430,10 +424,12 @@
   position: absolute;
   width: 20px;
   opacity: 0;
+  cursor: pointer;
 }
 
 .profile_container .edit_profile_icon {
   width: 20px;
+  cursor: pointer;
 }
 
 .modal_content .modal_info_container {
@@ -441,8 +437,6 @@
   padding: 0 30px;
   height: 35%;
 }
-
-
 
 .modal_content .modal_content_header {
   display: flex;
@@ -467,7 +461,7 @@
 
 .name_container .name {
   width: 48%;
-  background-color: #DDDDDD;
+  background-color: #dddddd;
   border: none;
   border-radius: 50px;
   height: 40px;
@@ -477,7 +471,7 @@
 
 .modal_info_group .modal_info_input {
   width: 100%;
-  background-color: #DDDDDD;
+  background-color: #dddddd;
   border: none;
   border-radius: 50px;
   height: 40px;
@@ -501,7 +495,6 @@
   font-weight: var(--font-semi-bold);
 }
 
-
 .modal_content .modal_subheader_container {
   width: 100%;
 }
@@ -509,7 +502,7 @@
 .archive_and_delete_content_container .subheader_container,
 .modal_subheader_container .subheader_container {
   width: 100%;
-  display: flex;  
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -517,6 +510,7 @@
 
 .subheader_container .subheader_icon {
   width: 30px;
+  cursor: default;
 }
 
 .subheader_container .subheader_description {
@@ -532,7 +526,7 @@
 }
 
 .modal_content_info_container .modal_content_input {
-  background-color: #DDDDDD;
+  background-color: #dddddd;
   border: none;
   color: black;
 }
@@ -549,7 +543,6 @@
   resize: none;
   border-radius: 8px;
   padding: 8px 16px;
-
 }
 
 .modal_content_info_container .modal_file_container {
@@ -566,10 +559,10 @@
 }
 
 .modal_file_container .file {
-  background-color: #DDDDDD;
+  background-color: #dddddd;
   display: flex;
   justify-content: center;
-  align-items:center;
+  align-items: center;
   gap: 0 5px;
   width: 31%;
   height: 25px;
@@ -589,7 +582,6 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    
   }
 }
 
@@ -607,12 +599,12 @@
 }
 
 .modal_file_container .file_icon_black {
-  background-color: #F1D302;
+  background-color: #f1d302;
 }
 
 .modal_file_container .add_file {
   position: relative;
-  background-color: #DDDDDD;
+  background-color: #dddddd;
   height: 25px;
   display: flex;
   cursor: pointer;
@@ -632,11 +624,11 @@
   text-transform: capitalize;
   color: black;
 
-  input[type="file"]{
+  input[type="file"] {
     position: absolute;
     opacity: 1;
     cursor: pointer;
-    top: 0; 
+    top: 0;
     left: 0;
     transform: scale(3);
     opacity: 0;
@@ -684,17 +676,21 @@
   width: 15px;
 }
 
-
 .archive_and_delete_content {
   display: flex;
   flex-direction: column;
-  gap: 20px ;
+  gap: 20px;
   padding: 0 1rem;
 }
 
 .archive_and_delete_confirmation {
   font-size: var(--small-font-size);
   text-align: center;
+  color: black;
+}
+
+.boldText {
+  font-weight: bold;
   color: black;
 }
 
@@ -713,7 +709,7 @@
 }
 
 .confirm_archive_and_delete_container .confirm_textbox {
-  background-color: #DDDDDD;
+  background-color: #dddddd;
   padding: 0 16px;
   text-align: center;
 }
@@ -746,13 +742,12 @@
   width: 100%;
   margin-top: auto;
   padding: 0 1rem;
-
 }
 
-.loadingContainer{
+.loadingContainer {
   width: 100%;
   height: 100%;
   display: flex;
   z-index: 100000;
-  background-color: rgba(0, 0, 0, 0.486);  
+  background-color: rgba(0, 0, 0, 0.486);
 }

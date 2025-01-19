@@ -421,14 +421,6 @@ function AccountSettings() {
                   Logging out in 3 seconds...
                 </p>
               </div>
-              <div className={styles.nav_buttons_container}>
-                <button
-                  className={`${styles.button_go_back} ${styles.button}`}
-                  onClick={cancelForm}
-                >
-                  go back
-                </button>
-              </div>
             </div>
           </div>
         )}

@@ -34,6 +34,7 @@
 
 .logo_container .logo {
   width: 250px;
+  cursor: default;
 }
 
 .content_search_bar_container {
@@ -53,7 +54,7 @@
   border-radius: 50px;
   font-size: var(--h3-font-size);
   position: relative;
-  background-color: #DDDDDD;
+  background-color: #dddddd;
 }
 
 .content_search_bar_container .search_button {
@@ -111,5 +112,3 @@
   height: 18px;
   margin: 0 20px;
 }
-
-

@@ -10,7 +10,7 @@ app.use(cors());
 
 app.get("/", async (req, res) => {
   try {
-    const sessionResponse = await axios.get("mocked-session-url");
+    const sessionResponse = await axios.get("/");
     res.json(sessionResponse.data);
   } catch (error) {
     res.status(500).json({ error: "Error during session validation" });
@@ -19,7 +19,7 @@ app.get("/", async (req, res) => {
 
 app.get("/getProfile", async (req, res) => {
   try {
-    const profileResponse = await axios.get("mocked-profile-url");
+    const profileResponse = await axios.get("/getProfile");
     res.json(profileResponse.data);
   } catch (error) {
     res.status(500).json({ error: "Error fetching profile" });
@@ -29,14 +29,14 @@ app.get("/getProfile", async (req, res) => {
 describe("User Session and Profile Fetching", () => {
   it("Should validate user session and set email and role", async () => {
     axios.get.mockResolvedValueOnce({
-      data: { valid: true, email: "test@example.com", role: "student" },
+      data: { valid: true, email: "test@example.com", role: "Educator" },
     });
 
     const response = await request(app).get("/");
 
     expect(response.body.valid).toBe(true);
     expect(response.body.email).toBe("test@example.com");
-    expect(response.body.role).toBe("student");
+    expect(response.body.role).toBe("Educator");
   });
 
   it("Should return error if session is not valid", async () => {

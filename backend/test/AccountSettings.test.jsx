@@ -11,7 +11,7 @@ app.use(express.json());
 
 app.get("/", async (req, res) => {
   try {
-    const sessionResponse = await axios.get("mocked-session-url");
+    const sessionResponse = await axios.get("/");
     res.json(sessionResponse.data);
   } catch (error) {
     res.status(500).json({ error: "Error during session validation" });
