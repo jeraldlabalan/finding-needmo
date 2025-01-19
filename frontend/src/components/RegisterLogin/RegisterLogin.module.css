@@ -231,6 +231,7 @@
 
 .modal_title_container .email_icon {
   width: 40px;
+  cursor: default;
 }
 
 .modal_title_container .modal_title {
@@ -286,6 +287,7 @@
 
 .verified_icon {
   width: 40px;
+  cursor: default;
 }
 
 .back_to_login {

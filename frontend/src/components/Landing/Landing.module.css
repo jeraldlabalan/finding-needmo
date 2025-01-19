@@ -33,6 +33,7 @@
 
 .logo_div .logo {
   height: 100px;
+  cursor: default;
 }
 
 .logo_div span {
@@ -146,6 +147,7 @@
   position: relative;
   top: -20px;
   left: 60px;
+  cursor: default;
 }
 
 /* Footer */
@@ -176,6 +178,7 @@
 .slide_topic {
   height: 20px;
   margin: 0 15px;
+  cursor: default;
 }
 
 .footer_slide_container {
