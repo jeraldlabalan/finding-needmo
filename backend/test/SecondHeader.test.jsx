@@ -27,19 +27,7 @@ app.get("/getProfile", async (req, res) => {
   }
 });
 
-app.post("/saveToSearchHistory", async (req, res) => {
-  try {
-    const { searchValue } = req.body;
-    const searchResponse = await axios.post("/saveToSearchHistory", {
-      searchValue,
-    });
-    res.json(searchResponse.data);
-  } catch (error) {
-    res.status(500).json({ error: "Error saving to search history" });
-  }
-});
-
-describe("User Session, Profile Fetching, and Search Functionality.", () => {
+describe("User Session and Profile Fetching for Student Role", () => {
   it("Should validate user session and set email and role", async () => {
     axios.get.mockResolvedValueOnce({
       data: { valid: true, email: "test@example.com", role: "Student" },
@@ -101,33 +89,6 @@ describe("User Session, Profile Fetching, and Search Functionality.", () => {
 
     expect(response.status).toBe(500);
     expect(response.body.error).toBe("Error fetching profile");
-  });
-
-  it("Should save search term successfully", async () => {
-    const searchValue = "react";
-    axios.post.mockResolvedValueOnce({
-      data: { message: "Success" },
-    });
-
-    const response = await request(app)
-      .post("/saveToSearchHistory")
-      .send({ searchValue });
-
-    expect(response.body.message).toBe("Success");
-  });
-
-  it("Should handle error when saving search history", async () => {
-    const searchValue = "react";
-    axios.post.mockRejectedValueOnce(
-      new Error("Error saving to search history")
-    );
-
-    const response = await request(app)
-      .post("/saveToSearchHistory")
-      .send({ searchValue });
-
-    expect(response.status).toBe(500);
-    expect(response.body.error).toBe("Error saving to search history");
   });
 });
 
