@@ -13,6 +13,7 @@ import SearchHistory from './components/SearchHistory/SearchHistory';
 import ContentManagement from './components/ContentManagement/ContentManagement';
 import SecondHeader from './components/SecondHeader/SecondHeader';
 import CreateDocument from './components/CreateDocument/CreateDocument';
+import FileCreation from './components/FileCreation/FileCreation';
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
         <Route path='/manage-content' element={<ContentManagement />} />
         <Route path='/second-header' element={<SecondHeader />} />
         <Route path='/create-document' element={<CreateDocument />} />
+        <Route path='/file-creation' element={<FileCreation />} />
       </Routes>
     </Router>
   )

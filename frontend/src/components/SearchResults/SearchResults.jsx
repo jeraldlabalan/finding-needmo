@@ -146,6 +146,7 @@ function SearchResults() {
     const fetchData = async () => {
       try {
         const res = await axios.get(`http://localhost:8080/searchResults/${search}`);
+        setActiveButton('contents');
         setSearchRes(res.data.results);
         setDocx(res.data.docxFiles);
         setPPTs(res.data.pptFiles);

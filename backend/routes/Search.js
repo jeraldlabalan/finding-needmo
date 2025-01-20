@@ -118,19 +118,23 @@ router.get("/searchResults/:search", (req, res) => {
     const { search } = req.params;
     const searchQuery = `
     SELECT content.*, profile.Firstname, profile.Lastname, course.Title AS CourseTitle
-        FROM content
-        JOIN profile ON content.CreatedBy = profile.User
-        JOIN course ON content.Course = course.CourseID
-        WHERE 
-            content.Title LIKE ? OR 
-            content.Description LIKE ? OR 
-            content.Tags LIKE ?
-        ORDER BY content.UploadedAt DESC
+    FROM content
+    JOIN profile ON content.CreatedBy = profile.User
+    JOIN course ON content.Course = course.CourseID
+    WHERE 
+        (LOWER(content.Title) LIKE LOWER(?) OR 
+        LOWER(content.Description) LIKE LOWER(?) OR 
+        LOWER(content.Tags) LIKE LOWER(?) OR 
+        LOWER(content.Files) LIKE LOWER('%"originalName":"%' ? '%"%' )) 
+        AND content.IsArchived = 0
+        AND content.IsDeleted = 0
+    ORDER BY content.UploadedAt DESC
+
     `;
 
     const searchKeyword = `%${search}%`;
 
-    db.query(searchQuery, [searchKeyword, searchKeyword, searchKeyword], (err, result) => {
+    db.query(searchQuery, [searchKeyword, searchKeyword, searchKeyword, searchKeyword], (err, result) => {
         if (err) {
             return res.json({ message: "Error in server:" + err });
         } else {
@@ -189,19 +193,14 @@ router.get("/searchResults/:search", (req, res) => {
                     item.pptFiles = itemPptFiles;
                     item.pdfFiles = itemPdfFiles;
     
-                    // Log the separated files for each content item
-                    console.log("DOCX Files for item", item.ContentID, itemDocxFiles);
-                    console.log("PPT Files for item", item.ContentID, itemPptFiles);
-                    console.log("PDF Files for item", item.ContentID, itemPdfFiles);
 
                     // Push the content item with its separated files into their respective arrays
                     if (itemDocxFiles.length > 0) docxFiles.push(item);
                     if (itemPptFiles.length > 0) pptFiles.push(item);
-                    if (itemPdfFiles.length > 0) pdfFiles.push(item);  // Make sure to push the entire content item with its PDFs
+                    if (itemPdfFiles.length > 0) pdfFiles.push(item); 
                 });
             }
     
-            console.log("PDFS: ", pdfFiles);  // Log the pdfFiles array to check if it includes multiple content items
     
             // Return both the full content with separated files and the individual file arrays
             res.json({
