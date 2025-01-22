@@ -490,6 +490,11 @@ function Profile() {
     }
   };
 
+  //view archived contents
+  const viewArchiveContents = () => {
+    navigate('/manage-content');
+  };
+
   // Function to handle the file upload change
   const handleUploadChange = (event) => {
     const file = event.target.files[0];
@@ -1383,6 +1388,7 @@ function Profile() {
                       <div className={styles.view_button_container}>
                         <button
                           className={`${styles.view_archived_contents_button}`}
+                          onClick={viewArchiveContents}               
                         >
                           view archived contents
                         </button>

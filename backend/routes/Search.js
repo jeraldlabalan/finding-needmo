@@ -20,6 +20,28 @@ db.connect((err) => {
     }
 });
 
+router.post('/deleteAllSearch', (req,res) => {
+    const getUser = `SELECT * FROM user WHERE Email = ?`;
+    const clear = `DELETE FROM searchhistory WHERE SearchedBy = ?`;
+    db.query(getUser, req.session.email, (err, getRes) => {
+        if(err){
+            console.error("Error: " + err);
+            return res.json("Error in server");
+        } else {
+            db.query(clear, getRes[0].UserID, (err, clearRes) => {
+                if(err){
+                    console.error("Error: " + err);
+                    return res.json("Error in server");
+                } else if(clearRes.affectedRows > 0){
+                    return res.json({message: "Success"});
+                } else{
+                    return res.json({message: "Failed"});
+                }
+            })
+        }
+    })
+})
+
 router.post('/deleteSearchByDate', (req, res) => {
     const { startDate, endDate } = req.body;
   
@@ -187,7 +209,6 @@ router.get("/searchResults/:search", (req, res) => {
                     });
                         
                     
-    
                     // Attach the separated files to the result item for later display in frontend
                     item.docxFiles = itemDocxFiles;
                     item.pptFiles = itemPptFiles;

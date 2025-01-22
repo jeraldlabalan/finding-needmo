@@ -92,7 +92,8 @@ function Header() {
         {activeDropdown === "profile" && (
           <div className={styles.dropdown_menu}>
             <ul>
-              <li
+              {userRole === "Educator" ? (
+                <li
                 className={
                   location.pathname === "/profile" ? styles.active_link : ""
                 }
@@ -106,6 +107,23 @@ function Header() {
                   Profile
                 </Link>
               </li>
+              ) : (
+                <li
+                className={
+                  location.pathname === "/profile-student" ? styles.active_link : ""
+                }
+              >
+                <Link to="/profile-student">
+                  <img
+                    src={profile}
+                    className={styles.dropdown_menu_logo}
+                    alt="Profile"
+                  />
+                  Profile
+                </Link>
+              </li>
+              )}            
+
               <li
                 className={
                   location.pathname === "/search-history"
