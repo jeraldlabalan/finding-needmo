@@ -29,6 +29,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logoutFunction from "../logoutFunction.jsx";
+import Header from "../Header/Header.jsx";
 
 function ContentManagement() {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -611,95 +612,10 @@ function ContentManagement() {
     <div className={styles.container}>
       <ToastContainer position="top-center" />
       <div className={styles.search_history_header}>
-        {/* Profile Menu */}
-        <button
-          className={`${styles.profile_menu} ${
-            activeDropdown === "profile" ? styles.active : ""
-          }`}
-          onClick={() => toggleDropdown("profile")}
-        >
-          <img
-            src={uploadedPFP}
-            className={styles.default_profile}
-            alt="Profile Icon"
-          />
-        </button>
-        {activeDropdown === "profile" && (
-          <div className={styles.dropdown_menu}>
-            <ul>
-              <li
-                className={
-                  location.pathname === "/profile" ? styles.active_link : ""
-                }
-              >
-                <Link to="/profile">
-                  <img
-                    src={profile}
-                    className={styles.dropdown_menu_logo}
-                    alt="Profile"
-                  />
-                  Profile
-                </Link>
-              </li>
-              <li
-                className={
-                  location.pathname === "/search-history"
-                    ? styles.active_link
-                    : ""
-                }
-              >
-                <Link to="/search-history">
-                  <img
-                    src={search_history}
-                    className={styles.dropdown_menu_logo}
-                    alt="Search History"
-                  />
-                  Search History
-                </Link>
-              </li>
-              <li
-                className={
-                  location.pathname === "/settings" ? styles.active_link : ""
-                }
-              >
-                <Link to="/account-settings">
-                  <img
-                    src={account_settings}
-                    className={styles.dropdown_menu_logo}
-                    alt="Account Settings"
-                  />
-                  Account Settings
-                </Link>
-              </li>
 
-              <li
-                className={
-                  location.pathname === "/settings" ? styles.active_link : ""
-                }
-              >
-                <Link to="/manage-content">
-                  <img
-                    src={manage_content}
-                    className={styles.dropdown_menu_logo}
-                    alt="Manage Content"
-                  />
-                  Manage Content
-                </Link>
-              </li>
+        {/* I just imported the header here, idk if this is different from the previous one which is a hard code header, don't get mad if it is. */}
 
-              <li>
-                <Link onClick={handleLogout}>
-                  <img
-                    src={logout}
-                    className={styles.dropdown_menu_logo}
-                    alt="Logout"
-                  />
-                  Logout
-                </Link>
-              </li>
-            </ul>
-          </div>
-        )}
+        <Header />
       </div>
 
       <img src={logo} className={styles.search_history_logo} alt="logo" />

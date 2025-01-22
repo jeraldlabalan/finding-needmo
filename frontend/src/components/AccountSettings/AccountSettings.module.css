@@ -3,6 +3,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding: 0 100px;
 }
 
 .main_content {
@@ -231,4 +232,105 @@
 .bolded_text {
   font-weight: var(--font-semi-bold);
   color: black;
+}
+
+
+
+
+@media (max-width: 768px) {
+  .main_content {
+    padding: 0 20px; 
+  }
+
+  .content_lower {
+    flex-direction: column; 
+    gap: 20px;
+  }
+
+  .content_lower .option {
+    width: 80%; 
+    padding: 20px;
+  }
+
+  .content_lower .option_icon {
+    width: 100px; 
+  }
+
+  .email_form_container,
+  .password_form_container,
+  .reusable_verify_password_form,
+  .reusable_sucess_form {
+    width: 80%; 
+    margin-top: 10%; 
+  }
+
+  .password_field_container,
+  .email_field_container,
+  .password_field_field_container {
+    padding: 0 20px; 
+  }
+
+  .email_field_container .email_field,
+  .password_field_container .password_field,
+  .password_field_field_container .password_field {
+    height: 35px; 
+    padding: 0 10px; 
+  }
+
+  .nav_buttons_container {
+    padding: 0 20px; 
+    gap: 15px; 
+  }
+
+  .nav_buttons_container .button {
+    height: 35px; 
+    font-size: 0.9rem; 
+  }
+}
+
+
+@media (max-width: 480px) {
+  .content_lower .option {
+    width: 90%; 
+    padding: 15px;
+  }
+
+  .content_lower .option_icon {
+    width: 80px; 
+  }
+
+  .option_title {
+    align-items: center;
+
+  }
+
+  .email_form_container,
+  .password_form_container,
+  .reusable_verify_password_form,
+  .reusable_sucess_form {
+    width: 90%; 
+    margin-top: 5%;
+  }
+
+  .password_field_container,
+  .email_field_container,
+  .password_field_field_container {
+    padding: 0 10px; 
+  }
+
+  .email_field_container .email_field,
+  .password_field_container .password_field,
+  .password_field_field_container .password_field {
+    height: 30px; 
+    font-size: 0.8rem; 
+  }
+
+  .nav_buttons_container .button {
+    height: 30px;
+    font-size: 0.8rem; 
+  }
+
+  .account_setting_icon {
+    width: 40px; 
+  }
 }

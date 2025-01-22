@@ -4,7 +4,6 @@
   min-height: 100vh;
   padding-left: 35px;
   padding-right: 100px;
-  gap: 20px;
 
 }
 
@@ -73,6 +72,13 @@
   border-radius: 8px;
   width:70%;
   padding: 13px;
+  cursor: pointer;
+}
+
+.content_container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .upper_section h3 {
@@ -286,6 +292,8 @@ option[value="information-technology"] {
   flex-wrap: wrap;
   width: 65%;
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   img {
     height: 100%;
@@ -349,7 +357,7 @@ option[value="information-technology"] {
   left: 50%;
   transform: translate(-50%, -50%);
   color: #ffffff;
-  font-size: var(--smaller-font-size);
+  font-size: var(--tiny-font-size);
   font-weight: bold;
   font-size: var(--h1-font-size);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -369,6 +377,8 @@ option[value="information-technology"] {
   flex-wrap: wrap;
   width: 65%;
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   img {
     height: 100%;
@@ -432,7 +442,7 @@ option[value="information-technology"] {
   left: 50%;
   transform: translate(-50%, -50%);
   color: #ffffff;
-  font-size: var(--smaller-font-size);
+  font-size: var(--tiny-font-size);
   font-weight: bold;
   font-size: var(--h1-font-size);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -452,6 +462,8 @@ option[value="information-technology"] {
   flex-wrap: wrap;
   width: 65%;
   flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   img {
     height: 100%;
@@ -515,11 +527,30 @@ option[value="information-technology"] {
   left: 50%;
   transform: translate(-50%, -50%);
   color: #ffffff;
-  font-size: var(--smaller-font-size);
+  font-size: var(--tiny-font-size);
   font-weight: bold;
-  font-size: var(--h1-font-size);
+  font-size: var(--h3-font-size);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   filter: blur(1px);
   text-transform: uppercase;
   letter-spacing: 2px;
+  
+}
+
+.pdf_details h3,
+.document_details h3,
+.presentation_details h3 {
+  max-width: 20ch;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.pdf_details p,
+.document_details p,
+.presentation_details p {
+  max-width: 35ch;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }

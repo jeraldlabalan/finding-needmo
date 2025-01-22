@@ -3,7 +3,6 @@
   flex-direction: column;
   min-height: 100vh;
   padding: 0 100px;
-  gap: 50px;
 }
 
 
@@ -13,8 +12,6 @@
   align-items: center;
   justify-content: flex-start;
   position: relative;
-  padding-left: 5px;
-  padding-top: 30px;
 }
 
 .profile_menu_container {
@@ -416,3 +413,239 @@
   pointer-events: none; /* Prevent direct interaction */
 }
 
+
+@media (min-width: 1025px) {
+  .search_history_action_buttons {
+    flex-direction: row;
+    gap: 5px;
+   
+
+    button:first-child {
+      background-color: var(--blue-color);
+      color: white;
+      font-size: var(--normal-font-size);
+      text-transform: capitalize;
+      height: 30px;
+      padding: 0 20px;
+      border-radius: 50px;
+      width: 145px;
+    }
+    
+
+    button:last-child {
+      background-color: white;
+      color: black;
+      font-size: var(--normal-font-size);
+      text-transform: capitalize;
+      height: 30px;
+      width: 85px;
+      border-radius: 50px;
+      padding: 0 20px;
+      border: 1px solid var(--blue-color);
+  
+    }
+    
+  }
+
+}
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 50px;
+  }
+
+  .search_history_container {
+    padding: 0 50px;
+  }
+
+  .search_history_content_header {
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  .search_history_action_buttons {
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  .search_history_content {
+    gap: 20px;
+  }
+
+  .search_history_item {
+    h1 {
+      font-size: var(--h2-font-size);
+    }
+
+    ul {
+      li {
+        p {
+          font-size: var(--small-font-size);
+        }
+      }
+    }
+  }
+
+  .modal_content {
+    padding: 20px;
+  }
+
+  .modal_content button {
+    padding: 10px 20px;
+  }
+
+  .modal_content button:last-of-type {
+    width: 200px;
+  }
+
+  .modal_content h2 {
+    font-size: var(--h2-font-size);
+  }
+
+  .modal_content p {
+    font-size: var(--small-font-size);
+  }
+
+  .modal_choose_date {
+    gap: 20px;
+  }
+
+  .calendarContainer {
+    width: 100%;
+  }
+
+  .label {
+    font-size: 16px;
+  }
+
+  .calendarIcon {
+    width: 20px;
+    height: 20px;
+  }
+}
+@media (max-width: 768px) {
+  .container {
+    padding: 0 20px;
+  }
+
+  .search_history_container {
+    padding: 0 20px;
+  }
+
+  .search_history_content_header {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .search_history_action_buttons {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .search_history_content {
+    gap: 10px;
+  }
+
+  .search_history_item {
+    h1 {
+      font-size: var(--h2-font-size);
+    }
+
+    ul {
+      li {
+        p {
+          font-size: var(--small-font-size);
+        }
+      }
+    }
+  }
+
+  .modal_content {
+    padding: 10px;
+  }
+
+  .modal_content button {
+    padding: 5px 10px;
+  }
+
+  .modal_content button:last-of-type {
+    width: 150px;
+  }
+
+  .modal_content h2 {
+    font-size: var(--h2-font-size);
+  }
+
+  .modal_content p {
+    font-size: var(--small-font-size);
+  }
+
+  .modal_content button {
+    padding: 5px 10px;
+  }
+
+  .modal_content button:last-of-type {
+    width: 150px;
+  }
+
+  .modal_content h2 {
+    font-size: var(--h2-font-size);
+  }
+
+  .modal_content p {
+    font-size: var(--small-font-size);
+  }
+
+  .modal_choose_date {
+    gap: 10px;
+  }
+
+  .calendarContainer {
+    width: 100%;
+  }
+
+  .label {
+    font-size: 14px;
+  }
+
+  .calendarIcon {
+    width: 15px;
+    height: 15px;
+  }
+  
+}
+
+@media (max-width: 320px) {
+  .search_history_action_buttons {
+    flex-direction: row;
+    gap: 5px;
+   
+
+    button:first-child {
+      background-color: var(--blue-color);
+      color: white;
+      font-size: var(--normal-font-size);
+      text-transform: capitalize;
+      height: 30px;
+      padding: 0 20px;
+      border-radius: 50px;
+      width: 145px;
+    }
+    
+
+    button:last-child {
+      background-color: white;
+      color: black;
+      font-size: var(--normal-font-size);
+      text-transform: capitalize;
+      height: 30px;
+      width: 85px;
+      border-radius: 50px;
+      padding: 0 20px;
+      border: 1px solid var(--blue-color);
+  
+    }
+    
+  }
+
+}

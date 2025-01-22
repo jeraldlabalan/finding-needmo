@@ -111,12 +111,6 @@ function Home() {
               >
                 create document
               </button>
-              <button
-                onClick={handleCreatePresentation}
-                className={styles.action_button}
-              >
-                create presentation
-              </button>
               <button className={styles.action_button}>upload content</button>
             </div>
           ) : (

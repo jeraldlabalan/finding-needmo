@@ -53,6 +53,16 @@
     --z-tooltip: 10;
     --z-fixed: 100;
     --z-modal: 1000;
+
+    /* Color Palette */
+
+    --blue: #235890;
+    --grey: #DDDDDD;
+    --yellow: #F1D302;
+    --red: #C00202;
+    --white: #fff;
+    --black: #000;
+    --green: #057008;
   }
 
 

@@ -14,6 +14,8 @@ import ContentManagement from './components/ContentManagement/ContentManagement'
 import SecondHeader from './components/SecondHeader/SecondHeader';
 import CreateDocument from './components/CreateDocument/CreateDocument';
 import FileCreation from './components/FileCreation/FileCreation';
+import AddContentPage from './components/AddContentPage/AddContentPage';
+import ProfileStudent from './components/ProfileStudent/ProfileStudent';
 
 function App() {
 
@@ -34,6 +36,8 @@ function App() {
         <Route path='/second-header' element={<SecondHeader />} />
         <Route path='/create-document' element={<CreateDocument />} />
         <Route path='/file-creation' element={<FileCreation />} />
+        <Route path='/add-content' element={<AddContentPage />} />
+        <Route path='/profile-student' element={<ProfileStudent />} />
       </Routes>
     </Router>
   )

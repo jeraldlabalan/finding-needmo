@@ -205,7 +205,7 @@ describe("Search Bar", () => {
 
   test("Typing animation works correctly", async () => {
     //NAGLOLOKO 'TO. MINSAN PASSED, MINSAN FAILED.
-    // I-RUN LANG 'YUNG TEST ULIT PARA MAGING PASSED.
+    // I-RUN LANG 'YUNG TEST ULIT PARA MAGING PASSED. //kapag nag test lahat nagiging failed
     jest.setTimeout(5000);
     render(
       <Router>

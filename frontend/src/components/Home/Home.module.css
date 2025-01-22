@@ -112,3 +112,121 @@
   height: 18px;
   margin: 0 20px;
 }
+
+
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 20px;
+  }
+
+  .content {
+    padding: 50px 20px;
+  }
+
+  .logo_container .logo {
+    width: 180px; 
+  }
+
+  .content_search_bar_container .content_search_bar {
+    width: 100%;
+    width: 500px;
+    height: 50px;
+    border: none;
+    padding: 30px;
+    border-radius: 50px;
+    font-size: var(--h3-font-size);
+    position: relative;
+    background-color: #DDDDDD;
+  }
+  
+  .content_search_bar_container .search_button {
+    position: relative;
+    top: 50%;
+    right: 60px;
+    background-color: aqua;
+  }
+  
+  .search_button .search_icon {
+    position: absolute;
+    transform: translateY(-50%);
+    width: 50px;
+  }
+
+  
+
+  .action_buttons_container {
+    max-width: 400px;
+    flex-direction: column; 
+    gap: 10px;
+  }
+
+  .downloaded_contents_button_container {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+  }
+
+  .download_contents_button {
+    width: 100%; 
+    max-width: 300px;
+    height: 50px;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .logo_container .logo {
+    width: 200px;
+  }
+  
+  .content_search_bar_container .content_search_bar {
+    width: 300px;
+    height: 50px;
+    padding: 15px;
+    font-size: 14px;
+    border-radius: 30px;
+  }
+  
+  .content_search_bar_container .search_button {
+    right: 40px;
+  }
+  
+  .search_button .search_icon {
+    width: 35px;
+  }
+  
+  .action_buttons_container {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+  
+  .action_buttons_container .action_button {
+    width: 100%;
+    padding: 5px 0;
+    font-size: 14px;
+  }
+  
+  .download_contents_button {
+    width: 70%;
+    padding: 10px 0;
+    font-size: 14px;
+    border-radius: 30px;
+  }
+  
+  .download_contents_button .download_contents_icon {
+    height: 14px;
+    margin: 0 10px;
+  }
+  
+  .content {
+    padding: 20px 10px;
+  }
+  }
+
+
+
+
+
+

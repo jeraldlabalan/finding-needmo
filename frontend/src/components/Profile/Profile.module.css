@@ -553,7 +553,7 @@
   align-items: center;
   gap: 10px;
   max-height: 80px;
-  overflow-y: scroll;
+  overflow-y: auto;
   padding: 3px;
   border-radius: 16px;
 }
@@ -585,7 +585,7 @@
   }
 }
 
-.modal_file_container .file_icon_white {
+ .file_icon_white {
   background-color: #235890;
 }
 
@@ -750,4 +750,139 @@
   display: flex;
   z-index: 100000;
   background-color: rgba(0, 0, 0, 0.486);
+}
+
+
+@media (max-width: 768px) {
+  .content .lower_content {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: auto;
+    gap: 20px;
+  }
+
+  .lower_content .contributions_and_about_container,
+  .lower_content .content_container {
+    width: 90%;
+    height: auto;
+  }
+
+  .contributions_and_about_container .contributions_container,
+  .contributions_and_about_container .about_container {
+    width: 100%;
+  }
+
+  .content_container .content_heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .content_heading .add_content_button {
+    width: 50%;
+    align-items: center;  
+  }
+
+  .content_cards_container .content_cards .card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .card .card_info,
+  .card .card_action_container {
+    width: 100%;
+  }
+
+  .card_action_container .card_actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .modal_content {
+    width: 50%;
+  }
+
+  .modal_file_container .file {
+    width: 48%;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+  .content .lower_content {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: auto;
+    gap: 20px;
+  }
+
+  .lower_content .contributions_and_about_container,
+  .lower_content .content_container {
+    width: 90%;
+    height: auto;
+  }
+
+  .contributions_counts {
+    flex-direction: row;
+    gap: 50px;
+  }
+
+  .about_info_container .info_group {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .edit_profile_button_container .edit_profile_button {
+    width: 100%;
+  }
+
+  .add_content_button {
+    width: 100%;
+  }
+
+  .contributions_and_about_container .contributions_container,
+  .contributions_and_about_container .about_container {
+    width: 100%;
+  }
+
+  .content_container .content_heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .content_heading .add_content_button {
+    width: 50%;
+    align-items: center;  
+  }
+
+  .content_cards_container .content_cards .card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .card .card_info,
+  .card .card_action_container {
+    width: 100%;
+  }
+
+  .card_action_container .card_actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .modal_content {
+    width: 80%;
+  }
+
+  .modal_file_container .file {
+    width: 48%;
+  }
 }

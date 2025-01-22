@@ -7,11 +7,11 @@ import next_page from "../../assets/next_page.png";
 import thumbnail1 from "../../assets/thumbnail_1.jpg";
 import thumbnail2 from "../../assets/thumbnail_2.jpg";
 import thumbnail3 from "../../assets/thumbnail_3.jpg";
-import axios from 'axios';
+import axios from "axios";
 import { useParams } from "react-router-dom";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import logoutFunction from '../logoutFunction.jsx';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import logoutFunction from "../logoutFunction.jsx";
 import SecondHeader from "../SecondHeader/SecondHeader.jsx";
 
 function SearchResults() {
@@ -92,8 +92,8 @@ function SearchResults() {
 
   const [userEmail, setUserEmail] = useState("");
   const [uploadedPFP, setUploadedPFP] = useState(null);
-  const [searchValue, setSearchValue] = useState('');
-  const [userRole, setUserRole] = useState('');
+  const [searchValue, setSearchValue] = useState("");
+  const [userRole, setUserRole] = useState("");
   const [docx, setDocx] = useState([]);
   const [ppts, setPPTs] = useState([]);
   const [pdfs, setPDFs] = useState([]);
@@ -120,22 +120,23 @@ function SearchResults() {
 
   //get user pfp
   useEffect(() => {
-    axios.get('http://localhost:8080/getProfile')
+    axios
+      .get("http://localhost:8080/getProfile")
       .then((res) => {
         const { message, pfp } = res.data;
         if (message === "User profile fetched successfully") {
           setUploadedPFP(pfp);
         } else {
           toast.error(message, {
-            autoClose: 5000
-          })
+            autoClose: 5000,
+          });
         }
       })
       .catch((err) => {
         toast.error("Error: " + err, {
-          autoClose: 5000
-        })
-      })
+          autoClose: 5000,
+        });
+      });
   }, []);
 
   //get search value from home page
@@ -145,17 +146,18 @@ function SearchResults() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/searchResults/${search}`);
-        setActiveButton('contents');
+        const res = await axios.get(
+          `http://localhost:8080/searchResults/${search}`
+        );
+        setActiveButton("contents");
         setSearchRes(res.data.results);
         setDocx(res.data.docxFiles);
         setPPTs(res.data.pptFiles);
         setPDFs(res.data.pdfFiles);
-
       } catch (error) {
         console.error("Error occurred:", error);
-        toast.error('Error getting search results', {
-          autoClose: 2000
+        toast.error("Error getting search results", {
+          autoClose: 2000,
         });
       }
     };
@@ -210,7 +212,9 @@ function SearchResults() {
   }, [searchRes]);
 
   const handleNextPage = () => {
-    setCurrentPage((prevPage) => (prevPage < totalPages ? prevPage + 1 : prevPage));
+    setCurrentPage((prevPage) =>
+      prevPage < totalPages ? prevPage + 1 : prevPage
+    );
   };
 
   const handlePreviousPage = () => {
@@ -226,7 +230,9 @@ function SearchResults() {
       ? item.Program === parseInt(programFilter, 10)
       : true;
     const matchesSubject = subjectFilter
-      ? (item.CourseTitle || '').toLowerCase().includes(subjectFilter.toLowerCase())
+      ? (item.CourseTitle || "")
+          .toLowerCase()
+          .includes(subjectFilter.toLowerCase())
       : true;
     return matchesProgram && matchesSubject;
   });
@@ -241,7 +247,6 @@ function SearchResults() {
     setSubjectFilter(e.target.value);
   };
 
-
   const currentItems = searchRes.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -249,7 +254,7 @@ function SearchResults() {
 
   return (
     <div className={styles.container}>
-      <ToastContainer position='top-center' />
+      <ToastContainer position="top-center" />
 
       <div className={styles.search_result_header}>
         <SecondHeader />
@@ -260,7 +265,9 @@ function SearchResults() {
         <div className={styles.search_result_sidebar}>
           <div className={styles.search_result_sidebar_filter}>
             <h3>sort by</h3>
-            <div className={styles.search_result_sidebar_filter_options_container}>
+            <div
+              className={styles.search_result_sidebar_filter_options_container}
+            >
               <div className={styles.search_result_sidebar_filter_option}>
                 <input type="checkbox" />
                 <label htmlFor="">Oldest to Newest</label>
@@ -318,55 +325,70 @@ function SearchResults() {
         <div className={styles.search_result_main_content}>
           <div className={styles.search_result_main_content_header}>
             <button
-              className={`${styles.search_result_main_content_header_button} ${activeButton === 'contents' ? styles.active_button : ''}`}
-              onClick={() => handleButtonClick('contents')}
+              className={`${styles.search_result_main_content_header_button} ${
+                activeButton === "contents" ? styles.active_button : ""
+              }`}
+              onClick={() => handleButtonClick("contents")}
             >
               Contents
             </button>
             <button
-              className={`${styles.search_result_main_content_header_button} ${activeButton === 'documents' ? styles.active_button : ''}`}
-              onClick={() => handleButtonClick('documents')}
+              className={`${styles.search_result_main_content_header_button} ${
+                activeButton === "documents" ? styles.active_button : ""
+              }`}
+              onClick={() => handleButtonClick("documents")}
             >
               Documents
             </button>
             <button
-              className={`${styles.search_result_main_content_header_button} ${activeButton === 'presentations' ? styles.active_button : ''}`}
-              onClick={() => handleButtonClick('presentations')}
+              className={`${styles.search_result_main_content_header_button} ${
+                activeButton === "presentations" ? styles.active_button : ""
+              }`}
+              onClick={() => handleButtonClick("presentations")}
             >
               Presentations
             </button>
             <button
-              className={`${styles.search_result_main_content_header_button} ${activeButton === 'pdfs' ? styles.active_button : ''}`}
-              onClick={() => handleButtonClick('pdfs')}
+              className={`${styles.search_result_main_content_header_button} ${
+                activeButton === "pdfs" ? styles.active_button : ""
+              }`}
+              onClick={() => handleButtonClick("pdfs")}
             >
               PDFs
             </button>
           </div>
+
           <div className={styles.search_result_main_content_body}>
-
-
-            {activeButton === 'contents' && (
+            {activeButton === "contents" && (
               <>
+                <div className={styles.content_container}>
                 {filteredResults.map((row, index) => (
                   <div key={index} className={styles.main_content_body_item}>
                     <div className={styles.upper_section}>
                       <h3>{row.Title}</h3>
-                      <p>{row.Firstname} {row.Lastname}</p>
+                      <p>
+                        {row.Firstname} {row.Lastname}
+                      </p>
                     </div>
                     <div className={styles.lower_section}>
                       <p>{row.CourseTitle}</p>
                       {row.Program === 1 ? (
-                        <p className={styles.lower_section_program_cs}>computer science</p>
+                        <p className={styles.lower_section_program_cs}>
+                          computer science
+                        </p>
                       ) : (
-                        <p className={styles.lower_section_program_it}>information technology</p>
+                        <p className={styles.lower_section_program_it}>
+                          information technology
+                        </p>
                       )}
                     </div>
                   </div>
                 ))}
+                </div>
               </>
             )}
 
-            {activeButton === 'documents' && (
+            {activeButton === "documents" && (
               <>
                 <div className={styles.document_container}>
                   {docx.length > 0 ? (
@@ -378,32 +400,36 @@ function SearchResults() {
                       }
 
                       return docxFiles.map((file, fileIndex) => {
-                        const fileUrl = `http://localhost:8080/${file.path.replace(/\\/g, '/')}`; // Replace backslashes with forward slashes
+                        const fileUrl = `http://localhost:8080/${file.path.replace(
+                          /\\/g,
+                          "/"
+                        )}`; // Replace backslashes with forward slashes
                         return (
                           <div key={`${index}-${fileIndex}`}>
-                            <a 
+                            <a
                               href={fileUrl} // Use the dynamically generated file URL
                               download={file.originalName} // Set the file name for download
                               target="_blank"
                               className={styles.document}
                             >
                               <div className={styles.thumbnail_container}>
-                              <img
-                                src={thumbnail3}
-                                alt={file.originalName}
-                                className={styles.document_thumbnail}
-                              />
-                              <div className={styles.lesson_text}>{item.Title}</div>
-                            </div>
-                      
-                            <div className={styles.document_details}>                      
+                                <img
+                                  src={thumbnail3}
+                                  alt={file.originalName}
+                                  className={styles.document_thumbnail}
+                                />
+                                <div className={styles.lesson_text}>
+                                  {item.Title}
+                                </div>
+                              </div>
+
+                              <div className={styles.document_details}>
                                 <h3>{file.originalName}</h3>
-                                <p>{item.Firstname} {item.Lastname}</p>                              
-                            </div>
+                                <p>
+                                  {item.Firstname} {item.Lastname}
+                                </p>
+                              </div>
                             </a>
-                      
-                            
-                            
                           </div>
                         );
                       });
@@ -415,7 +441,7 @@ function SearchResults() {
               </>
             )}
 
-            {activeButton === 'presentations' && (
+            {activeButton === "presentations" && (
               <>
                 <div className={styles.presentation_container}>
                   {ppts.length > 0 ? (
@@ -427,34 +453,36 @@ function SearchResults() {
                       }
 
                       return pptFiles.map((file, fileIndex) => {
-                        const fileUrl = `http://localhost:8080/${file.path.replace(/\\/g, '/')}`; // Replace backslashes with forward slashes
+                        const fileUrl = `http://localhost:8080/${file.path.replace(
+                          /\\/g,
+                          "/"
+                        )}`; // Replace backslashes with forward slashes
                         return (
                           <div key={`${index}-${fileIndex}`}>
-                            <a 
+                            <a
                               href={fileUrl} // Use the dynamically generated file URL
                               download={file.originalName} // Set the file name for download
                               target="_blank"
                               className={styles.document}
                             >
                               <div className={styles.thumbnail_container}>
-                              <img
-                                src={thumbnail3}
-                                alt={file.originalName}
-                                className={styles.document_thumbnail}
-                              />
-                              <div className={styles.lesson_text}>{item.Title}</div>
-                            </div>
-                      
-                            <div className={styles.document_details}>
-                      
+                                <img
+                                  src={thumbnail3}
+                                  alt={file.originalName}
+                                  className={styles.document_thumbnail}
+                                />
+                                <div className={styles.lesson_text}>
+                                  {item.Title}
+                                </div>
+                              </div>
+
+                              <div className={styles.document_details}>
                                 <h3>{file.originalName}</h3>
-                                <p>{item.Firstname} {item.Lastname}</p>
-                              
-                            </div>
+                                <p>
+                                  {item.Firstname} {item.Lastname}
+                                </p>
+                              </div>
                             </a>
-                      
-                            
-                            
                           </div>
                         );
                       });
@@ -466,51 +494,52 @@ function SearchResults() {
               </>
             )}
 
-            {activeButton === 'pdfs' && (
+            {activeButton === "pdfs" && (
               <>
                 <div className={styles.pdf_container}>
                   {pdfs.length > 0 ? (
                     pdfs.map((item, index) => {
-                      const pdfFiles = item.pdfFiles; 
-                      
+                      const pdfFiles = item.pdfFiles;
+
                       if (pdfFiles.length === 0) {
                         return null;
                       }
 
                       // Render all the PDF files
-return pdfFiles.map((file, fileIndex) => {
-  const fileUrl = `http://localhost:8080/${file.path.replace(/\\/g, '/')}`; // Replace backslashes with forward slashes
-  return (
-    <div key={`${index}-${fileIndex}`}>
-      <a 
-        href={fileUrl} // Use the dynamically generated file URL
-        download={file.originalName} // Set the file name for download
-        target="_blank"
-        className={styles.document}
-      >
-        <div className={styles.thumbnail_container}>
-        <img
-          src={thumbnail3}
-          alt={file.originalName}
-          className={styles.document_thumbnail}
-        />
-        <div className={styles.lesson_text}>{item.Title}</div>
-      </div>
+                      return pdfFiles.map((file, fileIndex) => {
+                        const fileUrl = `http://localhost:8080/${file.path.replace(
+                          /\\/g,
+                          "/"
+                        )}`; // Replace backslashes with forward slashes
+                        return (
+                          <div key={`${index}-${fileIndex}`}>
+                            <a
+                              href={fileUrl} // Use the dynamically generated file URL
+                              download={file.originalName} // Set the file name for download
+                              target="_blank"
+                              className={styles.document}
+                            >
+                              <div className={styles.thumbnail_container}>
+                                <img
+                                  src={thumbnail3}
+                                  alt={file.originalName}
+                                  className={styles.document_thumbnail}
+                                />
+                                <div className={styles.lesson_text}>
+                                  {item.Title}
+                                </div>
+                              </div>
 
-      <div className={styles.document_details}>
-
-          <h3>{file.originalName}</h3>
-          <p>{item.Firstname} {item.Lastname}</p>
-        
-      </div>
-      </a>
-
-      
-      
-    </div>
-  );
-});
-
+                              <div className={styles.document_details}>
+                                <h3>{file.originalName}</h3>
+                                <p>
+                                  {item.Firstname} {item.Lastname}
+                                </p>
+                              </div>
+                            </a>
+                          </div>
+                        );
+                      });
                     })
                   ) : (
                     <p>No PDF files available</p>
@@ -518,9 +547,6 @@ return pdfFiles.map((file, fileIndex) => {
                 </div>
               </>
             )}
-
-
-
 
             {/* Pagination */}
             <div className={styles.search_result_footer}>
@@ -530,7 +556,7 @@ return pdfFiles.map((file, fileIndex) => {
                   className={styles.search_result_footer_nav_button}
                   alt="previous arrow"
                   onClick={handlePreviousPage}
-                  style={currentPage === 1 && { opacity: '30%' }}
+                  style={currentPage === 1 && { opacity: "30%" }}
                 />
 
                 <div className={styles.search_result_footer_nav_page}>
@@ -538,7 +564,9 @@ return pdfFiles.map((file, fileIndex) => {
                     <img
                       key={index}
                       src={index + 1 === currentPage ? current_page : next_page}
-                      className={`${styles.page} ${index + 1 === currentPage ? styles.current_page : ""}`}
+                      className={`${styles.page} ${
+                        index + 1 === currentPage ? styles.current_page : ""
+                      }`}
                       alt={`Page ${index + 1}`}
                       onClick={() => setCurrentPage(index + 1)}
                     />
@@ -550,7 +578,7 @@ return pdfFiles.map((file, fileIndex) => {
                   className={`${styles.search_result_footer_nav_button} ${styles.rotated}`}
                   alt="next arrow"
                   onClick={handleNextPage}
-                  style={currentPage === totalPages && { opacity: '30%' }}
+                  style={currentPage === totalPages && { opacity: "30%" }}
                 />
               </div>
 
