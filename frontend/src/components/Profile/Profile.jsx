@@ -242,17 +242,9 @@ function Profile() {
           autoClose: 2000,
         });
 
-        setContentFiles([]);
-
-        setContentDetails({
-          title: "",
-          description: "",
-          subject: "",
-          program: "",
-          course: "",
-          keyword: "",
-          contentInput: "",
-        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
 
         setIsAddContentModalOpen(false);
       })
@@ -1178,13 +1170,10 @@ function Profile() {
                     </select>
                     <select
                       name="subject"
-                      value={editContent.subject}
+                      value={editContent.subject || ""}
                       onChange={handleEditContentChange}
                       className={`${styles.modal_content_input} ${styles.modal_content_select}`}
                     >
-                      <option value={editContent.subject}>
-                        {editContent.courseTitle}
-                      </option>
                       {subjects.length > 0 ? (
                         subjects
                           .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically

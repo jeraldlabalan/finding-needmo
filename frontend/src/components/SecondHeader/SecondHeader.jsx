@@ -97,10 +97,14 @@ function SecondHeader() {
     }
   };
 
+  const goToHome = () => {
+    navigate('/home')
+  };
+
   return (
     <div className={styles.second_header_container}>
       <ToastContainer position="top-center" />
-      <img className={styles.logo} src={logo} alt="Logo" />
+      <img className={styles.logo} src={logo} alt="Logo" onClick={goToHome} />
 
       <div className={styles.search_result_headercontent_search_bar_container}>
         <input

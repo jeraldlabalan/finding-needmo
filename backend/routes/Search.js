@@ -138,6 +138,9 @@ router.post('/saveToSearchHistory', (req, res) => {
 
 router.get("/searchResults/:search", (req, res) => {
     const { search } = req.params;
+    const { order } = req.query;  // Get order parameter from query string
+    const orderBy = order === 'ASC' ? 'ASC' : 'DESC';
+
     const searchQuery = `
     SELECT content.*, profile.Firstname, profile.Lastname, course.Title AS CourseTitle
     FROM content
@@ -150,8 +153,7 @@ router.get("/searchResults/:search", (req, res) => {
         LOWER(content.Files) LIKE LOWER('%"originalName":"%' ? '%"%' )) 
         AND content.IsArchived = 0
         AND content.IsDeleted = 0
-    ORDER BY content.UploadedAt DESC
-
+    ORDER BY content.UploadedAt ${orderBy}
     `;
 
     const searchKeyword = `%${search}%`;
@@ -190,11 +192,12 @@ router.get("/searchResults/:search", (req, res) => {
                                 ? file.extension.toLowerCase() 
                                 : file.originalName.split('.').pop().toLowerCase();
                     
+                            // Log the file and its derived extension
                     
                             // Filter files by extension
                             if (fileExtension === 'docx') {
                                 itemDocxFiles.push(file);
-                            } else if (fileExtension === 'ppt') {
+                            } else if (fileExtension === 'pptx') {
                                 itemPptFiles.push(file);
                             } else if (fileExtension === 'pdf') {
                                 itemPdfFiles.push(file);

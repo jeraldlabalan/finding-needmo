@@ -65,11 +65,11 @@ function Home() {
   };
 
   const handleCreateDocument = () => {
-    navigate("/file-creation");
-  };
+    window.open("/file-creation", "_blank");
+};
 
-  const handleCreatePresentation = () => {
-    navigate("/create-document?section=presentation");
+  const handleUploadDocument = () => {
+    navigate("/add-content");
   };
 
   return (
@@ -111,7 +111,7 @@ function Home() {
               >
                 create document
               </button>
-              <button className={styles.action_button}>upload content</button>
+              <button className={styles.action_button} onClick={handleUploadDocument}>upload content</button>
             </div>
           ) : (
             ""

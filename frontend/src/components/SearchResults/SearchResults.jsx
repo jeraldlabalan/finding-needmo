@@ -15,80 +15,6 @@ import logoutFunction from "../logoutFunction.jsx";
 import SecondHeader from "../SecondHeader/SecondHeader.jsx";
 
 function SearchResults() {
-  const files = [
-    {
-      id: 1,
-      title: "CP1_ARRAYS",
-      lesson: "ARRAYS",
-      extension: "docx",
-      author: "Jusko Po",
-      thumbnail: thumbnail1,
-    },
-    {
-      id: 2,
-      title: "CP2_ARRAYS",
-      lesson: "ARRAYS",
-      extension: "docx",
-      author: "Wag Mag Paistress",
-      thumbnail: thumbnail2,
-    },
-    {
-      id: 3,
-      title: "CP3_ARRAYS",
-      lesson: "ARRAYS",
-      extension: "pptx",
-      author: "Aw Aw",
-      thumbnail: thumbnail3,
-    },
-    {
-      id: 4,
-      title: "CP2_ARRAYS",
-      lesson: "ARRAYS",
-      extension: "pdf",
-      author: "PDF Author",
-      thumbnail: thumbnail2,
-    },
-    {
-      id: 5,
-      title: "CP1_ARRAYS",
-      lesson: "ARRAYS",
-      extension: "pptx",
-      author: "Jusko Po",
-      thumbnail: thumbnail1,
-    },
-    {
-      id: 6,
-      title: "CP1_ARRAYS",
-      lesson: "ARRAYS",
-      extension: "pdf",
-      author: "Jusko Po",
-      thumbnail: thumbnail1,
-    },
-    {
-      id: 7,
-      title: "CP3_ARRAYS",
-      lesson: "ARRAYS",
-      extension: "docx",
-      author: "Aw Aw",
-      thumbnail: thumbnail3,
-    },
-    {
-      id: 8,
-      title: "CP2_ARRAYS",
-      lesson: "ARRAYS",
-      extension: "pptx",
-      author: "Wag Mag Paistress",
-      thumbnail: thumbnail2,
-    },
-    {
-      id: 9,
-      title: "CP2_ARRAYS",
-      lesson: "ARRAYS",
-      extension: "pdf",
-      author: "PDF Author",
-      thumbnail: thumbnail3,
-    },
-  ];
 
   const [userEmail, setUserEmail] = useState("");
   const [uploadedPFP, setUploadedPFP] = useState(null);
@@ -97,6 +23,12 @@ function SearchResults() {
   const [docx, setDocx] = useState([]);
   const [ppts, setPPTs] = useState([]);
   const [pdfs, setPDFs] = useState([]);
+  const [programFilter, setProgramFilter] = useState("");
+  const [filteredSubjects, setFilteredSubjects] = useState([]);
+  const [subjectFilter, setSubjectFilter] = useState('');  // Set as an array
+  const [courses, setCourses] = useState([]);
+  const [sortOrder, setSortOrder] = useState(null);
+  const [programSubjectFilterChecked, setProgramSubjectFilterChecked] = useState(false);
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -145,10 +77,9 @@ function SearchResults() {
 
   useEffect(() => {
     const fetchData = async () => {
+      const order = sortOrder === 'oldestToNewest' ? 'ASC' : 'DESC';
       try {
-        const res = await axios.get(
-          `http://localhost:8080/searchResults/${search}`
-        );
+        const res = await axios.get(`http://localhost:8080/searchResults/${search}`, { params: {order: order} });
         setActiveButton("contents");
         setSearchRes(res.data.results);
         setDocx(res.data.docxFiles);
@@ -162,7 +93,7 @@ function SearchResults() {
       }
     };
     fetchData();
-  }, [search]);
+  }, [search, sortOrder]);
 
   // Search result header logic
   const [activeButton, setActiveButton] = useState("contents");
@@ -192,9 +123,9 @@ function SearchResults() {
   };
 
   const getColor = (value) => {
-    if (value === "computer-science") {
+    if (value === "computer-science" || value === 1) {
       return "#C00202";
-    } else if (value === "information-technology") {
+    } else if (value === "information-technology" || value === 2) {
       return "#057008";
     }
     return "#000";
@@ -221,36 +152,69 @@ function SearchResults() {
     setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
   };
 
-  const [programFilter, setProgramFilter] = useState("");
-  const [subjectFilter, setSubjectFilter] = useState("");
+const handleSortChange = (e) => {
+  const { value, checked } = e.target;
 
-  // Filter by program and subject
-  const filteredResults = searchRes.filter((item) => {
-    const matchesProgram = programFilter
-      ? item.Program === parseInt(programFilter, 10)
-      : true;
-    const matchesSubject = subjectFilter
-      ? (item.CourseTitle || "")
-          .toLowerCase()
-          .includes(subjectFilter.toLowerCase())
-      : true;
-    return matchesProgram && matchesSubject;
-  });
+  if (checked) {
+    setSortOrder(value);
+  } else {
+    setSortOrder(null);  // If unchecked, reset to null
+  }
+};
 
-  // Handler for program filter change
-  const handleProgramFilterChange = (e) => {
-    setProgramFilter(e.target.value);
-  };
+const handleProgramSubjectSortChecked = () => {
+  setProgramSubjectFilterChecked((prev) => !prev);
+};
+// Filter by program and subject
+const filteredResults = searchRes.filter((item) => {
+  const matchesProgram = programSubjectFilterChecked
+    ? item.Program === parseInt(programFilter, 10)
+    : true;
+  const matchesSubject = programSubjectFilterChecked
+    ? (item.CourseTitle).includes(subjectFilter)
+    : true;
+  return matchesProgram && matchesSubject;
+});
 
-  // Handler for subject filter change
-  const handleSubjectFilterChange = (e) => {
-    setSubjectFilter(e.target.value);
-  };
+// Handler for program filter change
+const handleProgramFilterChange = (e) => {
+  setProgramFilter(e.target.value);
+};
 
-  const currentItems = searchRes.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+// Handler for subject filter change
+const handleSubjectFilterChange = (e) => {
+  setSubjectFilter([e.target.value]);  // Set as an array
+};
+
+const currentItems = searchRes.slice(
+  (currentPage - 1) * itemsPerPage,
+  currentPage * itemsPerPage
+);
+
+useEffect(() => {
+  if (programFilter) {
+    const filtered = courses.filter(
+      (course) => course.Program === parseInt(programFilter)
+    );
+    setFilteredSubjects(filtered); // Set as array
+  } else {
+    setFilteredSubjects(courses);  // Clear as an empty array
+  }
+}, [programFilter, courses]);
+
+// Get courses
+useEffect(() => {
+  axios
+    .get("http://localhost:8080/getCourses")
+    .then((res) => {
+      setCourses(res.data);
+    })
+    .catch((err) => {
+      toast.error("Error: " + err, {
+        autoClose: 4000,
+      });
+    });
+}, []);
 
   return (
     <div className={styles.container}>
@@ -269,24 +233,29 @@ function SearchResults() {
               className={styles.search_result_sidebar_filter_options_container}
             >
               <div className={styles.search_result_sidebar_filter_option}>
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  value="oldestToNewest"
+                  checked={sortOrder === "oldestToNewest"}
+                  onChange={handleSortChange}
+                />
                 <label htmlFor="">Oldest to Newest</label>
-              </div>
-
-              <div className={styles.search_result_sidebar_filter_option}>
-                <input type="checkbox" />
-                <label htmlFor="">Relevance</label>
               </div>
 
               <div
                 className={`${styles.search_result_sidebar_filter_option} ${styles.search_result_sidebar_filter_option_dropdown}`}
               >
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  checked={programSubjectFilterChecked}
+                  onChange={handleProgramSubjectSortChecked}
+                />
                 <label>
                   Program
                   <select
                     value={programFilter}
                     onChange={handleProgramFilterChange}
+                    disabled={!programSubjectFilterChecked}
                     style={{ color: getColor(programFilter) }}
                   >
                     <option value="">All</option>
@@ -298,23 +267,30 @@ function SearchResults() {
 
               <div
                 className={`${styles.search_result_sidebar_filter_option} ${styles.search_result_sidebar_filter_option_dropdown}`}
-              >
-                <input type="checkbox" />
+              >                
                 <label>
-                  Subject
-                  <select name="subject">
-                    <option value="introduction-to-computing">
-                      Introduction to Computing
-                    </option>
-                    <option value="computer-programming-1">
-                      Computer Programming I
-                    </option>
-                    <option value="computer-programming-2">
-                      Computer Programming II
-                    </option>
-                    <option value="object-oriented-programming">OOP</option>
-                    <option value="data-structures-and-algorithms">DSA</option>
-                  </select>
+                  Subject                  
+                  <select
+    value={subjectFilter}
+    onChange={handleSubjectFilterChange}
+    disabled={!programSubjectFilterChecked}
+  >
+    <option value="">All</option>
+    {filteredSubjects.length > 0 ? (
+                        filteredSubjects
+                          .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
+                          .map((course) => (
+                            <option
+                              value={course.Title}
+                              key={course.CourseID}
+                            >
+                              {course.Title} {/* Display course title */}
+                            </option>
+                          ))
+                      ) : (
+                        <option disabled>No subjects available</option> // Fallback message
+                      )}
+  </select>
                 </label>
               </div>
             </div>
@@ -414,7 +390,7 @@ function SearchResults() {
                             >
                               <div className={styles.thumbnail_container}>
                                 <img
-                                  src={thumbnail3}
+                                  src={thumbnail1}
                                   alt={file.originalName}
                                   className={styles.document_thumbnail}
                                 />
@@ -467,7 +443,7 @@ function SearchResults() {
                             >
                               <div className={styles.thumbnail_container}>
                                 <img
-                                  src={thumbnail3}
+                                  src={thumbnail2}
                                   alt={file.originalName}
                                   className={styles.document_thumbnail}
                                 />
