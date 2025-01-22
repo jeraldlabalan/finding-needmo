@@ -24,6 +24,7 @@
 
 .content_upper .account_setting_icon {
   width: 40px;
+  cursor: default;
 }
 
 .content_lower {
@@ -147,6 +148,7 @@
 
 .content_title {
   text-transform: uppercase;
+  font-size: 20px;
 }
 
 .content_subtitle {
@@ -166,6 +168,7 @@
 
 .account_setting_icon {
   width: 50px;
+  cursor: default;
 }
 
 .password_field_container,

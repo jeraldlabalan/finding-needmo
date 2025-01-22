@@ -18,6 +18,17 @@ jest.mock("react-router-dom", () => ({
 
 jest.mock("../Header/Header", () => () => <div data-testid="header-component">Header</div>);
 
+beforeAll(() => {
+  global.console.error = jest.fn();
+  global.console.log = jest.fn();
+});
+
+afterAll(() => {
+  jest.clearAllMocks();
+  global.console.error.mockRestore();
+  global.console.log.mockRestore();
+});
+
 describe("Home Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();

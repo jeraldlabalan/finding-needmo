@@ -13,6 +13,17 @@ jest.mock('react-router-dom', () => ({
   useNavigate: jest.fn(),
 }));
 
+beforeAll(() => {
+  global.console.error = jest.fn();
+  global.console.log = jest.fn();
+});
+
+afterAll(() => {
+  jest.clearAllMocks();
+  global.console.error.mockRestore();
+  global.console.log.mockRestore();
+});
+
 describe('File Creation Component', () => {
   let mockNavigate;
 

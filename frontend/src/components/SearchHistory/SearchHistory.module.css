@@ -330,6 +330,7 @@
   .trash_icon {
     width: 30px;
     margin: 0 auto;
+    cursor: default;
   }
 
   h2 {

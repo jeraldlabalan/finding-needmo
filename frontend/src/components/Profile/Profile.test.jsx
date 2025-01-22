@@ -8,6 +8,16 @@ jest.mock('react-toastify', () => ({
   ToastContainer: jest.fn(() => <div data-testid="toast-container">ToastContainer</div>),
 }));
 
+beforeAll(() => {
+  global.console.error = jest.fn();
+  global.console.log = jest.fn();
+});
+
+afterAll(() => {
+  jest.clearAllMocks();
+  global.console.error.mockRestore();
+  global.console.log.mockRestore();
+});
 
 
 describe('Profile Component', () => {

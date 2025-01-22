@@ -8,6 +8,17 @@ import logoutFunction from '../logoutFunction';
 jest.mock('axios');
 jest.mock('../logoutFunction');
 
+beforeAll(() => {
+  global.console.error = jest.fn();
+  global.console.log = jest.fn();
+});
+
+afterAll(() => {
+  jest.clearAllMocks();
+  global.console.error.mockRestore();
+  global.console.log.mockRestore();
+});
+
 describe('Header Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();

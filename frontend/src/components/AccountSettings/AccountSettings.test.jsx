@@ -10,6 +10,17 @@ jest.mock('../../assets/verify-icon-black.png', () => 'verify-icon-black.png');
 jest.mock('../../assets/email.png', () => 'email.png');
 jest.mock('../../assets/verified_icon.png', () => 'verified_icon.png');
 
+beforeAll(() => {
+  global.console.error = jest.fn();
+  global.console.log = jest.fn();
+});
+
+afterAll(() => {
+  jest.clearAllMocks();
+  global.console.error.mockRestore();
+  global.console.log.mockRestore();
+});
+
 describe('AccountSettings', () => {
  
   test('renders account settings page', () => {
