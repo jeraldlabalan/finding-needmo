@@ -65,7 +65,7 @@ function Home() {
   };
 
   const handleCreateDocument = () => {
-    navigate("/create-document?section=document");
+    navigate("/file-creation");
   };
 
   const handleCreatePresentation = () => {

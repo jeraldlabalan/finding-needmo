@@ -156,7 +156,6 @@ function Profile() {
       size: file.size,
     }));
 
-    console.log("New Files:", newFiles);
 
     // Append the new files to the existing files
     setEditContentFiles((prevFiles) => [...prevFiles, ...newFiles]);
@@ -167,7 +166,6 @@ function Profile() {
   };
 
   const handleEditContentFileRemove = (index) => {
-    console.log("Removing file at index:", index);
 
     setEditContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     setEditContent((prevContent) => ({
@@ -178,7 +176,6 @@ function Profile() {
 
   useEffect(() => {
     if (selectedRequest) {
-      console.log("Selected Request:", selectedRequest.Course);
       setEditContent({
         contentID: selectedRequest.ContentID,
         title: selectedRequest.Title,
@@ -241,7 +238,6 @@ function Profile() {
     axios
       .post("http://localhost:8080/uploadContent", formData)
       .then((res) => {
-        console.log("Upload success:", res.data);
         toast.success("Upload success", {
           autoClose: 2000,
         });
@@ -283,20 +279,9 @@ function Profile() {
     formData.append("program", editContent.program);
     formData.append("keyword", editContent.keyword);
 
-    console.log("Form Data:", {
-      contentID: editContent.contentID,
-      title: editContent.title,
-      description: editContent.description,
-      subject: editContent.subject,
-      program: editContent.program,
-      keyword: editContent.keyword,
-      files: editContentFiles,
-    });
-
     axios
       .post("http://localhost:8080/editUploadedContent", formData)
       .then((res) => {
-        console.log("Edit success:", res.data);
         toast.success("Edit success", {
           autoClose: 2000,
         });
@@ -314,7 +299,6 @@ function Profile() {
     axios
       .get("http://localhost:8080/getContentPrograms")
       .then((res) => {
-        console.log(res.data);
         setPrograms(res.data);
       })
       .catch((err) => {
@@ -331,7 +315,6 @@ function Profile() {
           `http://localhost:8080/getContentSubjects?program=${editContent.program}`
         )
         .then((res) => {
-          console.log(res.data);
           setSubjects(res.data);
         })
         .catch((err) => {
@@ -348,10 +331,8 @@ function Profile() {
       const filtered = courses.filter(
         (course) => course.Program === parseInt(contentDetails.program)
       );
-      console.log("Filtered Subjects:", filtered);
       setFilteredSubjects(filtered);
     } else {
-      console.log("Program not selected, clearing subjects...");
       setFilteredSubjects([]); // Clear subjects when no program is selected
     }
   }, [contentDetails.program, courses]); // Run when program or courses change
@@ -361,7 +342,6 @@ function Profile() {
     axios
       .get("http://localhost:8080/getCourses")
       .then((res) => {
-        console.log(res.data);
         setCourses(res.data);
       })
       .catch((err) => {
@@ -430,7 +410,6 @@ function Profile() {
       })
       .then((res) => {
         if (res.data.message === "Changes saved") {
-          console.log("Changes saved:", res.data);
           setUploadedPFP(`http://localhost:8080/${res.data.pfpURL}`);
 
           setTimeout(() => {
@@ -550,7 +529,6 @@ function Profile() {
     axios
       .post("http://localhost:8080/archiveUploadedContent", data)
       .then((res) => {
-        console.log("Archive success:", res.data);
         toast.success("Archive success", {
           autoClose: 2000,
         });
@@ -604,7 +582,6 @@ function Profile() {
     axios
       .post("http://localhost:8080/deleteUploadedContent", data)
       .then((res) => {
-        console.log("Delete success:", res.data);
         toast.success("Delete success", {
           autoClose: 2000,
         });
@@ -1019,7 +996,7 @@ function Profile() {
                       value={contentDetails.program}
                       onChange={handleAddContentChange}
                     >
-                      <option value={null} disabled>
+                      <option value={null}>
                         Program
                       </option>
                       <option value="1">Computer Science</option>

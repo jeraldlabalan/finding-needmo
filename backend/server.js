@@ -10,6 +10,7 @@ import bcrypt from 'bcrypt';
 import multer from 'multer';
 import path from 'path';
 import EducatorProfile from './routes/EducatorProfile.js';
+import StudentProfile from './routes/StudentProfile.js';
 import handleContent from './routes/handleContent.js';
 import Search from './routes/Search.js';
 import AccountSettings from './routes/AccountSettings.js';
@@ -69,6 +70,7 @@ app.use('/', handleContent);
 app.use('/', Search);
 app.use('/', AccountSettings);
 app.use('/', FileCreation);
+app.use('/', StudentProfile);
 
 // Scheduled task to mark users as inactive without triggering anything in frontend
 cron.schedule("0 0 * * *", () => {
