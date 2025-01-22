@@ -52,7 +52,6 @@ function ContentManagement() {
     );
   };
 
-
   const handleLogout = () => {
     logoutFunction(navigate);
   };
@@ -76,7 +75,7 @@ function ContentManagement() {
   };
 
   const [userRole, setUserRole] = useState("");
-  const [userEmail, setUserEmail] = useState('');
+  const [userEmail, setUserEmail] = useState("");
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -266,7 +265,6 @@ function ContentManagement() {
   };
 
   const handleEditContentFileRemove = (index) => {
-
     setEditContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     setEditContent((prevContent) => ({
       ...prevContent,
@@ -285,7 +283,9 @@ function ContentManagement() {
         courseID: selectedRequest.Course || "", // Ensure this is set as well
         courseTitle: selectedRequest.CourseTitle, // Add courseTitle
         keyword: selectedRequest.Tags,
-        files: Array.isArray(selectedRequest.Files) ? selectedRequest.Files : [], // Ensure files is an array
+        files: Array.isArray(selectedRequest.Files)
+          ? selectedRequest.Files
+          : [], // Ensure files is an array
       });
 
       setEditContentFiles(
@@ -304,6 +304,24 @@ function ContentManagement() {
 
   const handleAddContent = (e) => {
     e.preventDefault();
+
+    // Validate the form fields
+    if (
+      !contentDetails.title ||
+      !contentDetails.description ||
+      !contentDetails.keyword ||
+      contentDetails.program === "" ||
+      contentDetails.subject === ""
+    ) {
+      // Display error toast if any field is missing
+      toast.error("All fields are required");
+      return; // Prevent submission
+    }
+
+    if (contentFiles.length === 0) {
+      toast.error("At least one file must be added");
+      return; // Prevent submission if no files
+    }
 
     const formData = new FormData();
     contentFiles.forEach((contentFile) =>
@@ -333,6 +351,11 @@ function ContentManagement() {
 
   const handleEditContent = (e) => {
     e.preventDefault();
+
+    if (!editContent.files || editContent.files.length === 0) {
+      toast.error("At least one file must be added");
+      return; // Prevent submission if no files are uploaded
+    }
 
     const formData = new FormData();
     editContentFiles.forEach((editContentFile) => {
@@ -437,6 +460,13 @@ function ContentManagement() {
   };
 
   const handleArchiveContent = () => {
+    if (!archiveContent.archive) {
+      toast.error("Please enter a title", {
+        autoClose: 2000,
+      });
+      return;
+    }
+
     if (
       archiveContent.archive !== selectedRequest.Title ||
       !archiveContent.archive
@@ -470,49 +500,52 @@ function ContentManagement() {
   };
 
   const handleArchiveSelectedRows = () => {
-    axios.post('http://localhost:8080/archiveSelectedRows', { selectedCards })
+    axios
+      .post("http://localhost:8080/archiveSelectedRows", { selectedCards })
       .then((res) => {
         if (res.data.message === "Success") {
           toast.dismiss();
           window.location.reload();
         } else {
-          toast.error(`Failed to archive selected contents`)
+          toast.error(`Failed to archive selected contents`);
         }
       })
       .catch((err) => {
         console.error("Error: ", err);
-      })
-  }
+      });
+  };
 
   const handleUnarchiveSelectedRows = () => {
-    axios.post('http://localhost:8080/unarchiveSelectedRows', { selectedCards })
+    axios
+      .post("http://localhost:8080/unarchiveSelectedRows", { selectedCards })
       .then((res) => {
         if (res.data.message === "Success") {
           toast.dismiss();
           window.location.reload();
         } else {
-          toast.error(`Failed to unarchive selected contents`)
+          toast.error(`Failed to unarchive selected contents`);
         }
       })
       .catch((err) => {
         console.error("Error: ", err);
-      })
-  }
+      });
+  };
 
   const handleDeleteSelectedRows = () => {
-    axios.post('http://localhost:8080/deleteSelectedRows', { selectedCards })
+    axios
+      .post("http://localhost:8080/deleteSelectedRows", { selectedCards })
       .then((res) => {
         if (res.data.message === "Success") {
           toast.dismiss();
           window.location.reload();
         } else {
-          toast.error(`Failed to delete selected contents`)
+          toast.error(`Failed to delete selected contents`);
         }
       })
       .catch((err) => {
         console.error("Error: ", err);
-      })
-  }
+      });
+  };
 
   const [deleteContent, setDeleteContent] = useState({
     contentID: "",
@@ -530,6 +563,13 @@ function ContentManagement() {
   };
 
   const handleDeleteContent = () => {
+    if (!deleteContent.delete) {
+      toast.error("Please enter a title", {
+        autoClose: 2000,
+      });
+      return;
+    }
+
     if (
       deleteContent.delete !== selectedRequest.Title ||
       !deleteContent.delete
@@ -614,13 +654,10 @@ function ContentManagement() {
       });
   };
 
-
-
   return (
     <div className={styles.container}>
       <ToastContainer position="top-center" />
       <div className={styles.search_history_header}>
-
         {/* I just imported the header here, idk if this is different from the previous one which is a hard code header, don't get mad if it is. */}
 
         <Header />
@@ -634,15 +671,17 @@ function ContentManagement() {
             {!isMultipleSelect ? (
               <>
                 <button
-                  className={`${styles.search_result_main_content_header_button
-                    } ${activeButton === "all" ? styles.active_button : ""}`}
+                  className={`${
+                    styles.search_result_main_content_header_button
+                  } ${activeButton === "all" ? styles.active_button : ""}`}
                   onClick={() => handleButtonClick("all")}
                 >
                   All
                 </button>
                 <button
-                  className={`${styles.search_result_main_content_header_button
-                    } ${activeButton === "archive" ? styles.active_button : ""}`}
+                  className={`${
+                    styles.search_result_main_content_header_button
+                  } ${activeButton === "archive" ? styles.active_button : ""}`}
                   onClick={() => handleButtonClick("archive")}
                 >
                   Archived
@@ -666,46 +705,58 @@ function ContentManagement() {
           </div>
 
           {confirmDeleteRows && (
-        <div className={styles.modal_overlay} onClick={closeDeleteContentModal}>
-          <div
-            className={`${styles.archive_and_delete_content_container}`}
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
-          >
-            {/* Modal Content Here */}
+            <div
+              className={styles.modal_overlay}
+              onClick={closeDeleteContentModal}
+            >
+              <div
+                className={`${styles.archive_and_delete_content_container}`}
+                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+              >
+                {/* Modal Content Here */}
 
+                <div className={styles.subheader_container}>
+                  <img
+                    src={delte_content_icon}
+                    className={styles.subheader_icon}
+                    alt="delete content icon"
+                  />
+                  <h2 className={styles.subheader_description}>
+                    delete content
+                  </h2>
+                </div>
 
-            <div className={styles.subheader_container}>
-              <img
-                src={delte_content_icon}
-                className={styles.subheader_icon}
-                alt="delete content icon"
-              />
-              <h2 className={styles.subheader_description}>delete content</h2>
+                <>
+                  <p className={styles.archive_and_delete_confirmation}>
+                    Are you sure you want to delete the selected contents? This
+                    action is permanent and cannot be undone.
+                  </p>
+
+                  <div className={styles.view_button_container}>
+                    <button
+                      onClick={handleDeleteSelectedRows}
+                      className={`${styles.view_archived_contents_button}`}
+                    >
+                      Delete
+                    </button>
+
+                    <button
+                      onClick={() => setConfirmDeleteRows(false)}
+                      style={{
+                        textAlign: "center",
+                        width: "100%",
+                        marginTop: "10px",
+                        background: "transparent",
+                        fontSize: "1rem",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              </div>
             </div>
-
-            <>
-        <p className={styles.archive_and_delete_confirmation}>
-          Are you sure you want to delete the selected contents? This action is permanent and cannot be undone.
-        </p>
-
-        <div className={styles.view_button_container}>
-          <button
-            onClick={handleDeleteSelectedRows}
-            className={`${styles.view_archived_contents_button}`}>
-            Delete
-          </button>
-
-          <button
-            onClick={()=>setConfirmDeleteRows(false)}
-            style={{textAlign:'center', width:'100%', marginTop:'10px', background:'transparent', fontSize: '1rem'}}>
-            Cancel
-          </button>
-        </div>
-      </>
-          </div>
-        </div>
-      )}
-
+          )}
 
           {/* {confirmDeleteRows && (
         <>
@@ -748,17 +799,23 @@ function ContentManagement() {
               <>
                 {activeButton === "all" ? (
                   <>
-                    <button style={{ background: 'transparent' }} onClick={handleArchiveSelectedRows}>
+                    <button
+                      style={{ background: "transparent" }}
+                      onClick={handleArchiveSelectedRows}
+                    >
                       <img
                         className={styles.content_archive_button}
                         src={clock_back_icon}
                         alt="archive content"
                       />
-                    </button>                    
+                    </button>
                   </>
                 ) : (
                   <>
-                    <button style={{ background: 'transparent' }} onClick={handleUnarchiveSelectedRows}>
+                    <button
+                      style={{ background: "transparent" }}
+                      onClick={handleUnarchiveSelectedRows}
+                    >
                       <img
                         className={styles.content_archive_button}
                         src={unarchive_icon}
@@ -767,14 +824,16 @@ function ContentManagement() {
                     </button>
                   </>
                 )}
-                <button style={{ background: 'transparent' }}
-                onClick={() => setConfirmDeleteRows(true)}>
-                      <img
-                        className={styles.content_delete_button}
-                        src={trash_icon}
-                        alt="delete content"
-                      />
-                    </button>
+                <button
+                  style={{ background: "transparent" }}
+                  onClick={() => setConfirmDeleteRows(true)}
+                >
+                  <img
+                    className={styles.content_delete_button}
+                    src={trash_icon}
+                    alt="delete content"
+                  />
+                </button>
               </>
             )}
           </div>
@@ -787,11 +846,12 @@ function ContentManagement() {
                 {uploadedContent.length > 0 ? (
                   uploadedContent.map((details) => (
                     <div
-                      className={`${styles.card} ${isMultipleSelect &&
-                          selectedCards.includes(details.ContentID)
+                      className={`${styles.card} ${
+                        isMultipleSelect &&
+                        selectedCards.includes(details.ContentID)
                           ? styles.selected_card
                           : ""
-                        }`}
+                      }`}
                       key={details.ContentID}
                       onClick={() =>
                         isMultipleSelect && handleCardSelect(details.ContentID)
@@ -850,15 +910,15 @@ function ContentManagement() {
                             details.Program === 1
                               ? styles.program_cs
                               : details.Program === 2
-                                ? styles.program_it
-                                : ""
+                              ? styles.program_it
+                              : ""
                           }
                         >
                           {details.Program === 1
                             ? "Computer Science"
                             : details.Program === 2
-                              ? "Information Technology"
-                              : ""}
+                            ? "Information Technology"
+                            : ""}
                         </span>
                       </div>
                     </div>
@@ -876,11 +936,12 @@ function ContentManagement() {
                 {archivedContent.length > 0 ? (
                   archivedContent.map((details) => (
                     <div
-                      className={`${styles.card} ${isMultipleSelect &&
-                          selectedCards.includes(details.ContentID)
+                      className={`${styles.card} ${
+                        isMultipleSelect &&
+                        selectedCards.includes(details.ContentID)
                           ? styles.selected_card
                           : ""
-                        }`}
+                      }`}
                       key={details.ContentID}
                       onClick={() =>
                         isMultipleSelect && handleCardSelect(details.ContentID)
@@ -917,15 +978,15 @@ function ContentManagement() {
                             details.Program === 1
                               ? styles.program_cs
                               : details.Program === 2
-                                ? styles.program_it
-                                : ""
+                              ? styles.program_it
+                              : ""
                           }
                         >
                           {details.Program === 1
                             ? "Computer Science"
                             : details.Program === 2
-                              ? "Information Technology"
-                              : ""}
+                            ? "Information Technology"
+                            : ""}
                         </span>
                       </div>
                     </div>
@@ -1037,10 +1098,11 @@ function ContentManagement() {
                 {contentFiles.map((file, index) => (
                   <div
                     key={index}
-                    className={`${styles.file} ${index % 2 === 0
+                    className={`${styles.file} ${
+                      index % 2 === 0
                         ? styles.file_icon_white
                         : styles.file_icon_black
-                      }`}
+                    }`}
                   >
                     <img
                       src={file_icon_white} // Use appropriate file icon
@@ -1156,8 +1218,8 @@ function ContentManagement() {
                       ? "Computer Science"
                       : program.Name ===
                         "Bachelor of Science in Information Technology"
-                        ? "Information Technology"
-                        : ""}
+                      ? "Information Technology"
+                      : ""}
                   </option>
                 ))}
               </select>
@@ -1194,10 +1256,11 @@ function ContentManagement() {
                   editContent.files.map((file, index) => (
                     <div
                       key={index}
-                      className={`${styles.file} ${index % 2 === 0
+                      className={`${styles.file} ${
+                        index % 2 === 0
                           ? styles.file_icon_white
                           : styles.file_icon_black
-                        }`}
+                      }`}
                     >
                       <img
                         src={file_icon_white} // Use appropriate file icon
@@ -1283,8 +1346,15 @@ function ContentManagement() {
               <>
                 <div className={styles.archive_and_delete_content}>
                   <p className={styles.archive_and_delete_confirmation}>
-                    Are you sure you want to archive ‘{selectedRequest.Title}’?
-                    Type ‘{selectedRequest.Title}’ to confirm.
+                    Are you sure you want to archive ‘
+                    <strong className={styles.boldText}>
+                      {selectedRequest.Title}
+                    </strong>
+                    ’? Type ‘
+                    <strong className={styles.boldText}>
+                      {selectedRequest.Title}
+                    </strong>
+                    ’ to confirm.
                   </p>
 
                   <div className={styles.confirm_archive_and_delete_container}>
@@ -1318,8 +1388,20 @@ function ContentManagement() {
             {currentStepArchive === 2 && (
               <>
                 <p className={styles.archive_and_delete_confirmation}>
-                  Archived ‘{selectedRequest.Title}’ successfully.
+                  Archived{" "}
+                  <strong className={styles.boldText}>
+                    ‘{selectedRequest.Title}’
+                  </strong>{" "}
+                  successfully.
                 </p>
+                <div className={styles.view_button_container}>
+                  <button
+                    onClick={closeArchiveContentModal}
+                    className={`${styles.view_archived_contents_button}`}
+                  >
+                    Done
+                  </button>
+                </div>
               </>
             )}
           </div>
@@ -1361,8 +1443,15 @@ function ContentManagement() {
               <>
                 <div className={styles.archive_and_delete_content}>
                   <p className={styles.archive_and_delete_confirmation}>
-                    Are you sure you want to delete ‘{selectedRequest.Title}’?
-                    Type ‘{selectedRequest.Title}’ to confirm.
+                    Are you sure you want to delete ‘
+                    <strong className={styles.boldText}>
+                      {selectedRequest.Title}
+                    </strong>
+                    ’? Type ‘
+                    <strong className={styles.boldText}>
+                      {selectedRequest.Title}
+                    </strong>
+                    ’ to confirm.
                   </p>
 
                   <div className={styles.confirm_archive_and_delete_container}>
@@ -1396,13 +1485,18 @@ function ContentManagement() {
             {currentStepDelete === 2 && (
               <>
                 <p className={styles.archive_and_delete_confirmation}>
-                  Deleted ‘{selectedRequest.Title}’ successfully.
+                  Deleted{" "}
+                  <strong className={styles.boldText}>
+                    ‘{selectedRequest.Title}’
+                  </strong>{" "}
+                  successfully.
                 </p>
 
                 <div className={styles.view_button_container}>
                   <button
                     onClick={closeDeleteContentModal}
-                    className={`${styles.view_archived_contents_button}`}>
+                    className={`${styles.view_archived_contents_button}`}
+                  >
                     Done
                   </button>
                 </div>
@@ -1410,7 +1504,7 @@ function ContentManagement() {
             )}
           </div>
         </div>
-      )}    
+      )}
     </div>
   );
 }

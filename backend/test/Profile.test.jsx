@@ -9,6 +9,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", async (req, res) => {
+  try {
+    const response = await axios.get("/");
+    if (response.data.valid) {
+      res.json({
+        valid: true,
+        email: response.data.email,
+        role: response.data.role,
+      });
+    } else {
+      res.status(401).json({ valid: false });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Error during session validation" });
+  }
+});
+
 app.get("/getUploadedContent", async (req, res) => {
   try {
     const response = await axios.get("/getUploadedContent");
@@ -109,7 +126,50 @@ app.post("/deleteUploadedContent", async (req, res) => {
   }
 });
 
-describe("Functionalities included in Profile Page Testing", () => {
+describe("Functionalities included in Profile Page", () => {
+  it("Should validate user session and set email and role", async () => {
+    axios.get.mockResolvedValueOnce({
+      data: { valid: true, email: "test@example.com", role: "Student" },
+    });
+
+    const response = await request(app).get("/");
+
+    expect(response.body.valid).toBe(true);
+    expect(response.body.email).toBe("test@example.com");
+    expect(response.body.role).toBe("Student");
+  });
+
+  it("Should return error if session is not valid", async () => {
+    axios.get.mockResolvedValueOnce({
+      data: { valid: false },
+    });
+
+    const response = await request(app).get("/");
+
+    expect(response.body.valid).toBe(false);
+  });
+
+  it("Should handle error while validating session", async () => {
+    axios.get.mockRejectedValueOnce(new Error("Network Error"));
+
+    const response = await request(app).get("/");
+
+    expect(response.status).toBe(500);
+    expect(response.body.error).toBe("Error during session validation");
+  });
+
+  it("Should handle unexpected or incomplete session data gracefully", async () => {
+    axios.get.mockResolvedValueOnce({
+      data: { valid: true },
+    });
+
+    const response = await request(app).get("/");
+
+    expect(response.body.valid).toBe(true);
+    expect(response.body.email).toBeUndefined();
+    expect(response.body.role).toBeUndefined();
+  });
+
   describe("For /getUploadedContent", () => {
     it("Should fetch uploaded content successfully", async () => {
       axios.get.mockResolvedValueOnce({

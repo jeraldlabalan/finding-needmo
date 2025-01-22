@@ -527,6 +527,7 @@ li .dropdown_menu_logo {
 
 .subheader_container .subheader_icon {
   width: 30px;
+  cursor: default;
 }
 
 .subheader_container .subheader_description {
@@ -705,6 +706,11 @@ li .dropdown_menu_logo {
 .archive_and_delete_confirmation {
   font-size: var(--small-font-size);
   text-align: center;
+  color: black;
+}
+
+.boldText {
+  font-weight: bold;
   color: black;
 }
 

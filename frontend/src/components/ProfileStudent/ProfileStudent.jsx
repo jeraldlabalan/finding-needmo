@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import styles from "./ProfileStudent.module.css"
+import styles from "./ProfileStudent.module.css";
 import Header from "../Header/Header";
 import default_photo from "../../assets/default-profile-photo.jpg";
-import role_icon_black from "../../assets/role-icon-black.png"
+import role_icon_black from "../../assets/role-icon-black.png";
 import information_icon from "../../assets/information-icon.png";
 import modal_close_icon from "../../assets/close-icon-modal.png";
 import edit_profile_icon from "../../assets/edit-profile-icon.png";
@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 
 function ProfileStudent() {
   // Modal logic
@@ -89,8 +88,8 @@ function ProfileStudent() {
   }, []);
   //Reuse in other pages that requires logging in
 
-   // Function to open the modals
-   const openEditProfileModal = () => {
+  // Function to open the modals
+  const openEditProfileModal = () => {
     setIsEditProfileModalOpen(true);
   };
 
@@ -130,7 +129,7 @@ function ProfileStudent() {
   const [editContentFiles, setEditContentFiles] = useState(
     selectedRequest.Files || []
   ); // Files for editing content
-  
+
   useEffect(() => {
     if (selectedRequest) {
       setEditContent({
@@ -196,7 +195,6 @@ function ProfileStudent() {
       });
   }, []);
 
-
   const getProfile = () => {
     axios
       .get("http://localhost:8080/getProfile")
@@ -233,6 +231,15 @@ function ProfileStudent() {
   }, []);
 
   const saveProfileChanges = () => {
+    if (
+      !profileInfo.firstName ||
+      !profileInfo.lastName ||
+      profileInfo.program === ""
+    ) {
+      toast.error("Please fill out all fields");
+      return; // Stop function execution
+    }
+
     const data = new FormData();
 
     if (profileInfo.uploadPFP) {
@@ -249,7 +256,7 @@ function ProfileStudent() {
       })
       .then((res) => {
         if (res.data.message === "Changes saved") {
-          setUploadedPFP(`http://localhost:8080/${res.data.pfpURL}`);          
+          setUploadedPFP(`http://localhost:8080/${res.data.pfpURL}`);
           getProfile();
           setTimeout(() => {
             window.location.reload();
@@ -269,7 +276,7 @@ function ProfileStudent() {
       ...prevState,
       [name]: value, // Dynamically update state
     }));
-  };  
+  };
 
   return (
     <div className={styles.container}>
@@ -313,7 +320,8 @@ function ProfileStudent() {
                     className={styles.information_icon}
                     alt="information icon"
                   />
-                  <p className={styles.info}>Student at
+                  <p className={styles.info}>
+                    Student at
                     <span className={styles.bolded_text}>
                       Cavite State University
                     </span>
@@ -332,8 +340,8 @@ function ProfileStudent() {
                       {profileColumns.Program === 1
                         ? "Computer Science"
                         : profileColumns.Program === 2
-                          ? "Information Technology"
-                          : "_______"}
+                        ? "Information Technology"
+                        : "_______"}
                     </span>
                   </p>
                 </div>
@@ -350,7 +358,6 @@ function ProfileStudent() {
           </div>
 
           <div className={styles.content_container}>
-
             {/* EDIT PROFILE Modal */}
             {isEditProfileModalOpen && (
               <div
@@ -429,12 +436,10 @@ function ProfileStudent() {
                         className={styles.modal_info_input}
                         id="program"
                         onChange={handleInputChange}
-                        value={profileInfo.program || null}
+                        value={profileInfo.program || ""}
                         required
                       >
-                        <option value={null} disabled>
-                          Select Program
-                        </option>
+                        <option value="">Select Program</option>
                         <option value="1">
                           Bachelor of Science in Computer Science
                         </option>
@@ -456,8 +461,6 @@ function ProfileStudent() {
                 </div>
               </div>
             )}
-
-
           </div>
         </div>
       </div>

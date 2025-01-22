@@ -156,7 +156,6 @@ function Profile() {
       size: file.size,
     }));
 
-
     // Append the new files to the existing files
     setEditContentFiles((prevFiles) => [...prevFiles, ...newFiles]);
     setEditContent((prevContent) => ({
@@ -166,7 +165,6 @@ function Profile() {
   };
 
   const handleEditContentFileRemove = (index) => {
-
     setEditContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     setEditContent((prevContent) => ({
       ...prevContent,
@@ -211,9 +209,9 @@ function Profile() {
     if (
       !contentDetails.title ||
       !contentDetails.description ||
-      !contentDetails.program ||
-      !contentDetails.subject ||
-      !contentDetails.keyword
+      !contentDetails.keyword ||
+      contentDetails.program === "" ||
+      contentDetails.subject === "" 
     ) {
       // Display error toast if any field is missing
       toast.error("All fields are required");
@@ -255,6 +253,11 @@ function Profile() {
 
   const handleEditContent = (e) => {
     e.preventDefault();
+
+    if (!editContent.files || editContent.files.length === 0) {
+      toast.error("At least one file must be added");
+      return; // Prevent submission if no files are uploaded
+    }
 
     const formData = new FormData();
     editContentFiles.forEach((editContentFile) => {
@@ -385,6 +388,18 @@ function Profile() {
   }, []);
 
   const saveProfileChanges = () => {
+    if (
+      !profileInfo.firstName ||
+      !profileInfo.lastName ||
+      !profileInfo.position ||
+      !profileInfo.program ||
+      profileInfo.position === "" ||
+      profileInfo.program === ""
+    ) {
+      toast.error("Please fill out all fields");
+      return; // Stop further execution if validation fails
+    }
+
     const data = new FormData();
 
     if (profileInfo.uploadPFP) {
@@ -463,7 +478,7 @@ function Profile() {
 
   //view archived contents
   const viewArchiveContents = () => {
-    navigate('/manage-content');
+    navigate("/manage-content");
   };
 
   // Function to handle the file upload change
@@ -879,9 +894,7 @@ function Profile() {
                         value={profileInfo.position || ""}
                         required
                       >
-                        <option value={null} disabled>
-                          Your position
-                        </option>
+                        <option value="">Your position</option>
                         <option value="Instructor 1">Instructor 1</option>
                         <option value="Instructor 2">Instructor 2</option>
                         <option value="Instructor 3">Instructor 3</option>
@@ -898,12 +911,10 @@ function Profile() {
                         className={styles.modal_info_input}
                         id="program"
                         onChange={handleInputChange}
-                        value={profileInfo.program || null}
+                        value={profileInfo.program || ""}
                         required
                       >
-                        <option value={null} disabled>
-                          Select Program
-                        </option>
+                        <option value="">Select Program</option>
                         <option value="1">
                           Bachelor of Science in Computer Science
                         </option>
@@ -985,12 +996,10 @@ function Profile() {
                       name="program"
                       id="program"
                       className={`${styles.modal_content_input} ${styles.modal_content_select}`}
-                      value={contentDetails.program}
+                      value={contentDetails.program || ""}
                       onChange={handleAddContentChange}
                     >
-                      <option value={null}>
-                        Program
-                      </option>
+                      <option value="">Program</option>
                       <option value="1">Computer Science</option>
                       <option value="2">Information Technology</option>
                     </select>
@@ -999,10 +1008,10 @@ function Profile() {
                       name="subject"
                       id="subject"
                       className={`${styles.modal_content_input} ${styles.modal_content_select}`}
-                      value={contentDetails.subject}
+                      value={contentDetails.subject || ""}
                       onChange={handleAddContentChange}
                     >
-                      <option value={null}>Subject</option>
+                      <option value="">Subject</option>
                       {filteredSubjects.length > 0 ? (
                         filteredSubjects
                           .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
@@ -1354,7 +1363,7 @@ function Profile() {
                       <div className={styles.view_button_container}>
                         <button
                           className={`${styles.view_archived_contents_button}`}
-                          onClick={viewArchiveContents}               
+                          onClick={viewArchiveContents}
                         >
                           view archived contents
                         </button>

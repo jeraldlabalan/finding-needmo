@@ -171,7 +171,7 @@ function SearchHistory() {
         setIsAllStepTwo(true);
         toast.dismiss();
       } else {
-        toast.error(`Failed to delete searches. Please try again`, {
+        toast.error(`Failed to delete searches. Please try again.`, {
           autoClose: 2000
         })
       }
@@ -225,7 +225,7 @@ function SearchHistory() {
         setIsClearSearchStepTwo(true);
         toast.dismiss();
       } else{
-        toast.error(`Failed to delete Searches. Please try again`, {
+        toast.error(`Failed to delete searches. Please try again.`, {
           autoClose: 2000
         })
       }
