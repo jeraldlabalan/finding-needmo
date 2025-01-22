@@ -232,12 +232,6 @@ router.get('/getArchivedContents', (req, res) => {
 router.post('/deleteUploadedContent', (req, res) => {
     const { contentID, title } = req.body;
 
-    console.log("Received Data for Archiving:", {
-        contentID,
-        title,
-        userID: req.session.userID
-    });
-
     const sql = `UPDATE content 
     SET UpdatedAt = NOW(), 
         IsDeleted = 1,
@@ -251,7 +245,6 @@ router.post('/deleteUploadedContent', (req, res) => {
         } else if (result.affectedRows > 0) {
             return res.json({ message: "Content deleted successfully!" });
         } else {
-            console.log("Failed to archive content");
             return res.json({ message: "Failed to delete content" });
         }
     });
@@ -259,12 +252,6 @@ router.post('/deleteUploadedContent', (req, res) => {
 
 router.post('/archiveUploadedContent', (req, res) => {
     const { contentID, title } = req.body;
-
-    console.log("Received Data for Archiving:", {
-        contentID,
-        title,
-        userID: req.session.userID
-    });
 
     const sql = `UPDATE content 
     SET UpdatedAt = NOW(), 
@@ -276,10 +263,8 @@ router.post('/archiveUploadedContent', (req, res) => {
             console.error("Error archiving content:", err);
             return res.json({ message: "Error in server: " + err });
         } else if (result.affectedRows > 0) {
-            console.log("Content archived successfully!");
             return res.json({ message: "Content archived successfully!" });
         } else {
-            console.log("Failed to archive content");
             return res.json({ message: "Failed to archive content" });
         }
     });
@@ -311,12 +296,12 @@ router.post('/editUploadedContent', upload.array("editContentFiles"), (req, res)
     try {
         const { contentID, title, description, subject, program, keyword, existingFiles } = req.body;
         const files = req.files;
-
-
+    
+    
         if (!contentID || !title || !description || !subject || !program || !keyword) {
             return res.status(400).json({ message: "All fields are required" });
         }
-
+    
         // Check if the subject (CourseID) exists in the course table
         const checkCourseSql = 'SELECT * FROM course WHERE CourseID = ?';
         db.query(checkCourseSql, [subject], (err, courseResult) => {
@@ -324,26 +309,25 @@ router.post('/editUploadedContent', upload.array("editContentFiles"), (req, res)
                 console.error("Error checking course:", err);
                 return res.status(500).json({ message: "Database error: " + err });
             }
-
+    
             if (courseResult.length === 0) {
-                console.log("Invalid CourseID:", subject);
                 return res.status(400).json({ message: "Invalid CourseID" });
             }
-
-            const existingFilesMetadata = existingFiles ? [JSON.parse(existingFiles)] : [];
-            const newFilesMetadata = files.map(file => ({
+    
+            // Parse existing files
+            const existingFilesMetadata = existingFiles
+                ? existingFiles.map((file) => JSON.parse(file))
+                : [];
+            const newFilesMetadata = files.map((file) => ({
                 originalName: file.originalname,
                 path: file.path,
                 mimeType: file.mimetype,
-                size: file.size
+                size: file.size,
             }));
-
+    
             const allFilesMetadata = [...existingFilesMetadata, ...newFilesMetadata];
-
-            
-
             const datetimeUpload = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
+    
             const sql = `
                 UPDATE content
                 SET Title = ?,
@@ -356,7 +340,7 @@ router.post('/editUploadedContent', upload.array("editContentFiles"), (req, res)
                     UpdatedAt = NOW()
                 WHERE ContentID = ? AND CreatedBy = ?
             `;
-
+    
             db.query(
                 sql,
                 [
@@ -368,14 +352,14 @@ router.post('/editUploadedContent', upload.array("editContentFiles"), (req, res)
                     keyword,
                     datetimeUpload,
                     contentID,
-                    req.session.userID
+                    req.session.userID,
                 ],
                 (err, result) => {
                     if (err) {
                         console.error("Error saving content:", err);
                         return res.status(500).json({ message: "Database error: " + err });
                     }
-
+    
                     res.json({
                         message: "Content edited successfully!",
                         contentId: contentID,
@@ -387,6 +371,7 @@ router.post('/editUploadedContent', upload.array("editContentFiles"), (req, res)
         console.error("Unexpected error:", error);
         return res.status(500).json({ message: "Unexpected error occurred" });
     }
+    
 });
 
 router.get('/getUploadedContent/manageContent', (req, res) => {

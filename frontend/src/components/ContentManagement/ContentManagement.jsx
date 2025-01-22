@@ -319,22 +319,12 @@ function ContentManagement() {
       .post("http://localhost:8080/uploadContent", formData)
       .then((res) => {
         toast.success("Upload success", {
-          autoClose: 2000,
+          autoClose: 1000,
         });
 
-        setContentFiles([]);
-
-        setContentDetails({
-          title: "",
-          description: "",
-          subject: "",
-          program: "",
-          course: "",
-          keyword: "",
-          contentInput: "",
-        });
-
-        setIsAddContentModalOpen(false);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       })
       .catch((err) => {
         console.error("Upload error:", err);
