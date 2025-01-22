@@ -52,12 +52,12 @@ function ContentManagement() {
     );
   };
 
+
   const handleLogout = () => {
     logoutFunction(navigate);
   };
 
   // Modal logic
-  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isEditContentModalOpen, setIsEditContentModalOpen] = useState(false);
   const [isAddContentModalOpen, setIsAddContentModalOpen] = useState(false);
   const [isArchiveContentModalOpen, setIsArchiveContentModalOpen] =
@@ -66,6 +66,7 @@ function ContentManagement() {
     useState(false);
   const [currentStepDelete, setCurrentStepDelete] = useState(1);
   const [currentStepArchive, setCurrentStepArchive] = useState(1);
+  const [confirmDeleteRows, setConfirmDeleteRows] = useState(false);
 
   // Search result header logic
   const [activeButton, setActiveButton] = useState("all");
@@ -75,6 +76,7 @@ function ContentManagement() {
   };
 
   const [userRole, setUserRole] = useState("");
+  const [userEmail, setUserEmail] = useState('');
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -86,7 +88,6 @@ function ContentManagement() {
         if (res.data.valid) {
           setUserEmail(res.data.email);
           setUserRole(res.data.role);
-          console.log(res.data.role);
         } else {
           navigate("/registerlogin");
         }
@@ -160,11 +161,11 @@ function ContentManagement() {
       });
   }, []);
 
-  //get uploaded content
   const [uploadedContent, setUploadedContent] = useState([]);
+  const [archivedContent, setArchivedContent] = useState([]);
 
-  useEffect(() => {
-    // Fetch the uploaded content data
+  //fetch both uploaded and archived contents
+  const fetchContents = () => {
     axios
       .get("http://localhost:8080/getUploadedContent/manageContent")
       .then((response) => {
@@ -173,7 +174,20 @@ function ContentManagement() {
         }
       })
       .catch((error) => console.error("Error fetching content:", error));
-  }, [uploadedContent]);
+
+    axios
+      .get("http://localhost:8080/getArchivedContents/manageContent")
+      .then((response) => {
+        if (response.data.archivedRes) {
+          setArchivedContent(response.data.archivedRes);
+        }
+      })
+      .catch((error) => console.error("Error fetching content:", error));
+  };
+
+  useEffect(() => {
+    fetchContents();
+  }, []);
 
   const [courses, setCourses] = useState([]);
   const [contentFiles, setContentFiles] = useState([]);
@@ -244,8 +258,6 @@ function ContentManagement() {
       size: file.size,
     }));
 
-    console.log("New Files:", newFiles);
-
     setEditContentFiles((prevFiles) => [...prevFiles, ...newFiles]);
     setEditContent((prevContent) => ({
       ...prevContent,
@@ -254,7 +266,6 @@ function ContentManagement() {
   };
 
   const handleEditContentFileRemove = (index) => {
-    console.log("Removing file at index:", index);
 
     setEditContentFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     setEditContent((prevContent) => ({
@@ -265,24 +276,21 @@ function ContentManagement() {
 
   useEffect(() => {
     if (selectedRequest) {
-      console.log("Selected Request:", selectedRequest.Course);
       setEditContent({
         contentID: selectedRequest.ContentID,
         title: selectedRequest.Title,
         description: selectedRequest.Description,
-        subject: selectedRequest.Course, // Ensure this is correctly set
+        subject: selectedRequest.Course || "", // Always set this to a valid value (empty string if undefined)
         program: selectedRequest.Program,
-        courseID: selectedRequest.Course,
+        courseID: selectedRequest.Course || "", // Ensure this is set as well
         courseTitle: selectedRequest.CourseTitle, // Add courseTitle
         keyword: selectedRequest.Tags,
-        files: Array.isArray(selectedRequest.Files)
-          ? selectedRequest.Files
-          : [], // Ensure files is an array
+        files: Array.isArray(selectedRequest.Files) ? selectedRequest.Files : [], // Ensure files is an array
       });
 
       setEditContentFiles(
-        Array.isArray(selectedRequest.Files) ? selectedRequest.Files : []
-      ); // Ensure files is an array
+        Array.isArray(selectedRequest.Files) ? selectedRequest.Files : [] // Ensure files is an array
+      );
     }
   }, [selectedRequest]);
 
@@ -310,7 +318,6 @@ function ContentManagement() {
     axios
       .post("http://localhost:8080/uploadContent", formData)
       .then((res) => {
-        console.log("Upload success:", res.data);
         toast.success("Upload success", {
           autoClose: 2000,
         });
@@ -347,32 +354,22 @@ function ContentManagement() {
     });
     formData.append("contentID", editContent.contentID);
     formData.append("title", editContent.title);
+    formData.append("course", editContent.course);
     formData.append("description", editContent.description);
     formData.append("subject", editContent.subject); // Ensure this is a valid CourseID
     formData.append("program", editContent.program);
     formData.append("keyword", editContent.keyword);
 
-    console.log("Form Data:", {
-      contentID: editContent.contentID,
-      title: editContent.title,
-      description: editContent.description,
-      subject: editContent.subject,
-      program: editContent.program,
-      keyword: editContent.keyword,
-      files: editContentFiles,
-    });
-
     axios
       .post("http://localhost:8080/editUploadedContent", formData)
       .then((res) => {
-        console.log("Edit success:", res.data);
         toast.success("Edit success", {
-          autoClose: 2000,
+          autoClose: 1000,
         });
 
         setTimeout(() => {
           window.location.reload();
-        }, 2000);
+        }, 1000);
       })
       .catch((err) => {
         console.error("Edit error:", err);
@@ -383,7 +380,6 @@ function ContentManagement() {
     axios
       .get("http://localhost:8080/getContentPrograms")
       .then((res) => {
-        console.log(res.data);
         setPrograms(res.data);
       })
       .catch((err) => {
@@ -400,7 +396,6 @@ function ContentManagement() {
           `http://localhost:8080/getContentSubjects?program=${editContent.program}`
         )
         .then((res) => {
-          console.log(res.data);
           setSubjects(res.data);
         })
         .catch((err) => {
@@ -417,10 +412,8 @@ function ContentManagement() {
       const filtered = courses.filter(
         (course) => course.Program === parseInt(contentDetails.program)
       );
-      console.log("Filtered Subjects:", filtered);
       setFilteredSubjects(filtered);
     } else {
-      console.log("Program not selected, clearing subjects...");
       setFilteredSubjects([]); // Clear subjects when no program is selected
     }
   }, [contentDetails.program, courses]); // Run when program or courses change
@@ -430,7 +423,6 @@ function ContentManagement() {
     axios
       .get("http://localhost:8080/getCourses")
       .then((res) => {
-        console.log(res.data);
         setCourses(res.data);
       })
       .catch((err) => {
@@ -473,23 +465,70 @@ function ContentManagement() {
     axios
       .post("http://localhost:8080/archiveUploadedContent", data)
       .then((res) => {
-        console.log("Archive success:", res.data);
         toast.success("Archive success", {
           autoClose: 2000,
         });
 
         setCurrentStepArchive((prev) => (prev < 2 ? prev + 1 : prev));
         setIsArchiveSuccess(true);
+        fetchContents();
       })
       .catch((err) => {
         console.error("Archive error:", err);
         setIsArchiveSuccess(false);
       });
   };
+
+  const handleArchiveSelectedRows = () => {
+    axios.post('http://localhost:8080/archiveSelectedRows', { selectedCards })
+      .then((res) => {
+        if (res.data.message === "Success") {
+          toast.dismiss();
+          window.location.reload();
+        } else {
+          toast.error(`Failed to archive selected contents`)
+        }
+      })
+      .catch((err) => {
+        console.error("Error: ", err);
+      })
+  }
+
+  const handleUnarchiveSelectedRows = () => {
+    axios.post('http://localhost:8080/unarchiveSelectedRows', { selectedCards })
+      .then((res) => {
+        if (res.data.message === "Success") {
+          toast.dismiss();
+          window.location.reload();
+        } else {
+          toast.error(`Failed to unarchive selected contents`)
+        }
+      })
+      .catch((err) => {
+        console.error("Error: ", err);
+      })
+  }
+
+  const handleDeleteSelectedRows = () => {
+    axios.post('http://localhost:8080/deleteSelectedRows', { selectedCards })
+      .then((res) => {
+        if (res.data.message === "Success") {
+          toast.dismiss();
+          window.location.reload();
+        } else {
+          toast.error(`Failed to delete selected contents`)
+        }
+      })
+      .catch((err) => {
+        console.error("Error: ", err);
+      })
+  }
+
   const [deleteContent, setDeleteContent] = useState({
     contentID: "",
     delete: "",
   });
+
   const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
 
   const handleDeleteContentChange = (e) => {
@@ -519,7 +558,6 @@ function ContentManagement() {
     axios
       .post("http://localhost:8080/deleteUploadedContent", data)
       .then((res) => {
-        console.log("Delete success:", res.data);
         toast.success("Delete success", {
           autoClose: 2000,
         });
@@ -558,24 +596,8 @@ function ContentManagement() {
     setIsDeleteContentModalOpen(true);
   };
 
-  //get all archived contents
-  const [archivedContent, setArchivedContent] = useState([]);
-  useEffect(() => {
-    // Fetch the uploaded content data
-    axios
-      .get("http://localhost:8080/getArchivedContents")
-      .then((response) => {
-        if (response.data.archivedRes) {
-          setArchivedContent(response.data.archivedRes);
-        }
-      })
-      .catch((error) => console.error("Error fetching content:", error));
-  }, [archivedContent]);
-
   //handle unarchive a content
   const handleUnarchiveContent = (details) => {
-    console.log(details.ContentID);
-
     axios
       .post("http://localhost:8080/unarchiveContent", {
         contentID: details.ContentID,
@@ -584,11 +606,11 @@ function ContentManagement() {
       .then((res) => {
         if (res.data.message === "Success") {
           toast.success(`Successfully unarchived content: '${details.Title}'`, {
-            autoClose: 1000,
+            autoClose: 500,
           });
           setTimeout(() => {
             window.location.reload();
-          }, 1000);
+          }, 500);
         } else {
           toast.error(`Failed to unarchive content: '${details.Title}'`, {
             autoClose: 2000,
@@ -602,6 +624,8 @@ function ContentManagement() {
       });
   };
 
+
+
   return (
     <div className={styles.container}>
       <ToastContainer position="top-center" />
@@ -612,7 +636,7 @@ function ContentManagement() {
         <Header />
       </div>
       <Link className={styles.search_history_logo} to="/home">
-      <img src={logo} className={styles.search_history_logo} alt="logo" />
+        <img src={logo} className={styles.search_history_logo} alt="logo" />
       </Link>
       <div className={styles.search_history_container}>
         <div className={styles.search_history_content_header}>
@@ -620,17 +644,15 @@ function ContentManagement() {
             {!isMultipleSelect ? (
               <>
                 <button
-                  className={`${
-                    styles.search_result_main_content_header_button
-                  } ${activeButton === "all" ? styles.active_button : ""}`}
+                  className={`${styles.search_result_main_content_header_button
+                    } ${activeButton === "all" ? styles.active_button : ""}`}
                   onClick={() => handleButtonClick("all")}
                 >
                   All
                 </button>
                 <button
-                  className={`${
-                    styles.search_result_main_content_header_button
-                  } ${activeButton === "archive" ? styles.active_button : ""}`}
+                  className={`${styles.search_result_main_content_header_button
+                    } ${activeButton === "archive" ? styles.active_button : ""}`}
                   onClick={() => handleButtonClick("archive")}
                 >
                   Archived
@@ -652,6 +674,70 @@ function ContentManagement() {
               </>
             )}
           </div>
+
+          {confirmDeleteRows && (
+        <div className={styles.modal_overlay} onClick={closeDeleteContentModal}>
+          <div
+            className={`${styles.archive_and_delete_content_container}`}
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+          >
+            {/* Modal Content Here */}
+
+
+            <div className={styles.subheader_container}>
+              <img
+                src={delte_content_icon}
+                className={styles.subheader_icon}
+                alt="delete content icon"
+              />
+              <h2 className={styles.subheader_description}>delete content</h2>
+            </div>
+
+            <>
+        <p className={styles.archive_and_delete_confirmation}>
+          Are you sure you want to delete the selected contents? This action is permanent and cannot be undone.
+        </p>
+
+        <div className={styles.view_button_container}>
+          <button
+            onClick={handleDeleteSelectedRows}
+            className={`${styles.view_archived_contents_button}`}>
+            Delete
+          </button>
+
+          <button
+            onClick={()=>setConfirmDeleteRows(false)}
+            style={{textAlign:'center', width:'100%', marginTop:'10px', background:'transparent', fontSize: '1rem'}}>
+            Cancel
+          </button>
+        </div>
+      </>
+          </div>
+        </div>
+      )}
+
+
+          {/* {confirmDeleteRows && (
+        <>
+        <p className={styles.archive_and_delete_confirmation}>
+          Are you sure you want to delete the selected contents? This action is permanent and cannot be undone.
+        </p>
+
+        <div className={styles.view_button_container}>
+          <button
+            onClick={handleDeleteSelectedRows}
+            className={`${styles.view_archived_contents_button}`}>
+            Delete
+          </button>
+
+          <button
+            onClick={()=>setConfirmDeleteRows(false)}
+            className={`${styles.view_archived_contents_button}`}>
+            Cancel
+          </button>
+        </div>
+      </>
+      )} */}
           <div className={styles.search_history_content_manipulation}>
             {!isMultipleSelect ? (
               <>
@@ -670,16 +756,35 @@ function ContentManagement() {
               </>
             ) : (
               <>
-                <img
-                  className={styles.content_archive_button}
-                  src={clock_back_icon}
-                  alt="archive content"
-                />
-                <img
-                  className={styles.content_delete_button}
-                  src={trash_icon}
-                  alt="delete content"
-                />
+                {activeButton === "all" ? (
+                  <>
+                    <button style={{ background: 'transparent' }} onClick={handleArchiveSelectedRows}>
+                      <img
+                        className={styles.content_archive_button}
+                        src={clock_back_icon}
+                        alt="archive content"
+                      />
+                    </button>                    
+                  </>
+                ) : (
+                  <>
+                    <button style={{ background: 'transparent' }} onClick={handleUnarchiveSelectedRows}>
+                      <img
+                        className={styles.content_archive_button}
+                        src={unarchive_icon}
+                        alt="unarchive content"
+                      />
+                    </button>
+                  </>
+                )}
+                <button style={{ background: 'transparent' }}
+                onClick={() => setConfirmDeleteRows(true)}>
+                      <img
+                        className={styles.content_delete_button}
+                        src={trash_icon}
+                        alt="delete content"
+                      />
+                    </button>
               </>
             )}
           </div>
@@ -692,12 +797,11 @@ function ContentManagement() {
                 {uploadedContent.length > 0 ? (
                   uploadedContent.map((details) => (
                     <div
-                      className={`${styles.card} ${
-                        isMultipleSelect &&
-                        selectedCards.includes(details.ContentID)
+                      className={`${styles.card} ${isMultipleSelect &&
+                          selectedCards.includes(details.ContentID)
                           ? styles.selected_card
                           : ""
-                      }`}
+                        }`}
                       key={details.ContentID}
                       onClick={() =>
                         isMultipleSelect && handleCardSelect(details.ContentID)
@@ -756,15 +860,15 @@ function ContentManagement() {
                             details.Program === 1
                               ? styles.program_cs
                               : details.Program === 2
-                              ? styles.program_it
-                              : ""
+                                ? styles.program_it
+                                : ""
                           }
                         >
                           {details.Program === 1
                             ? "Computer Science"
                             : details.Program === 2
-                            ? "Information Technology"
-                            : ""}
+                              ? "Information Technology"
+                              : ""}
                         </span>
                       </div>
                     </div>
@@ -782,12 +886,11 @@ function ContentManagement() {
                 {archivedContent.length > 0 ? (
                   archivedContent.map((details) => (
                     <div
-                      className={`${styles.card} ${
-                        isMultipleSelect &&
-                        selectedCards.includes(details.ContentID)
+                      className={`${styles.card} ${isMultipleSelect &&
+                          selectedCards.includes(details.ContentID)
                           ? styles.selected_card
                           : ""
-                      }`}
+                        }`}
                       key={details.ContentID}
                       onClick={() =>
                         isMultipleSelect && handleCardSelect(details.ContentID)
@@ -824,21 +927,21 @@ function ContentManagement() {
                             details.Program === 1
                               ? styles.program_cs
                               : details.Program === 2
-                              ? styles.program_it
-                              : ""
+                                ? styles.program_it
+                                : ""
                           }
                         >
                           {details.Program === 1
                             ? "Computer Science"
                             : details.Program === 2
-                            ? "Information Technology"
-                            : ""}
+                              ? "Information Technology"
+                              : ""}
                         </span>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p>No uploaded content found.</p>
+                  <p>No archived content found.</p>
                 )}
               </div>
             </>
@@ -944,11 +1047,10 @@ function ContentManagement() {
                 {contentFiles.map((file, index) => (
                   <div
                     key={index}
-                    className={`${styles.file} ${
-                      index % 2 === 0
+                    className={`${styles.file} ${index % 2 === 0
                         ? styles.file_icon_white
                         : styles.file_icon_black
-                    }`}
+                      }`}
                   >
                     <img
                       src={file_icon_white} // Use appropriate file icon
@@ -1064,20 +1166,17 @@ function ContentManagement() {
                       ? "Computer Science"
                       : program.Name ===
                         "Bachelor of Science in Information Technology"
-                      ? "Information Technology"
-                      : ""}
+                        ? "Information Technology"
+                        : ""}
                   </option>
                 ))}
               </select>
               <select
                 name="subject"
-                value={editContent.subject}
+                value={editContent.subject || ""}
                 onChange={handleEditContentChange}
                 className={`${styles.modal_content_input} ${styles.modal_content_select}`}
               >
-                <option value={editContent.subject}>
-                  {editContent.courseTitle}
-                </option>
                 {subjects.length > 0 ? (
                   subjects
                     .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
@@ -1105,11 +1204,10 @@ function ContentManagement() {
                   editContent.files.map((file, index) => (
                     <div
                       key={index}
-                      className={`${styles.file} ${
-                        index % 2 === 0
+                      className={`${styles.file} ${index % 2 === 0
                           ? styles.file_icon_white
                           : styles.file_icon_black
-                      }`}
+                        }`}
                     >
                       <img
                         src={file_icon_white} // Use appropriate file icon
@@ -1232,18 +1330,6 @@ function ContentManagement() {
                 <p className={styles.archive_and_delete_confirmation}>
                   Archived ‘{selectedRequest.Title}’ successfully.
                 </p>
-
-                <div className={styles.view_button_container}>
-                  <button
-                    className={`${styles.view_archived_contents_button}`}
-                    onClick={() => {
-                      setActiveButton("archive");
-                      setIsArchiveContentModalOpen(false);
-                    }}
-                  >
-                    view archived contents
-                  </button>
-                </div>
               </>
             )}
           </div>
@@ -1324,9 +1410,9 @@ function ContentManagement() {
                 </p>
 
                 <div className={styles.view_button_container}>
-                  <button 
-                  onClick={closeDeleteContentModal}
-                  className={`${styles.view_archived_contents_button}`}>
+                  <button
+                    onClick={closeDeleteContentModal}
+                    className={`${styles.view_archived_contents_button}`}>
                     Done
                   </button>
                 </div>
@@ -1334,7 +1420,7 @@ function ContentManagement() {
             )}
           </div>
         </div>
-      )}
+      )}    
     </div>
   );
 }

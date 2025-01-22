@@ -164,7 +164,6 @@ router.get("/searchResults/:search", (req, res) => {
             const docxFiles = [];
             const pptFiles = [];
             const pdfFiles = [];
-            console.log("Contents: ", result);  // Log the content result for debugging
     
             // Check if result has multiple content entries
             if (result && result.length > 0) {
@@ -177,7 +176,6 @@ router.get("/searchResults/:search", (req, res) => {
                     } catch (err) {
                         console.error("Error parsing files for ContentID", item.ContentID, err);
                     }
-                    console.log("Files for item", item.ContentID, files);  // Log files for each content item
                     
                     // Create separate arrays for docx, ppt, and pdf files for each content item
                     const itemDocxFiles = [];
@@ -192,8 +190,6 @@ router.get("/searchResults/:search", (req, res) => {
                                 ? file.extension.toLowerCase() 
                                 : file.originalName.split('.').pop().toLowerCase();
                     
-                            // Log the file and its derived extension
-                            console.log(`Processing file: ${file.originalName}, Derived Extension: ${fileExtension}`);
                     
                             // Filter files by extension
                             if (fileExtension === 'docx') {
