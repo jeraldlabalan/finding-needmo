@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import styles from "./SearchHistory.module.css";
 import logo from "../../assets/logo.png";
 import calendar_icon from "../../assets/calendar-icon.png";
@@ -245,9 +245,9 @@ function SearchHistory() {
       <div className={styles.search_history_header}>
         <Header />
       </div>
-
+      <Link to="/home" className={styles.search_history_logo}>
       <img src={logo} className={styles.search_history_logo} alt="logo" />
-
+      </Link>
       <div className={styles.search_history_container}>
         <div className={styles.search_history_content_header}>
           <div className={styles.calendar_container}>

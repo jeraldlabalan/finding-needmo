@@ -224,7 +224,7 @@ li .dropdown_menu_logo {
   color: black;
   font-weight: var(--font-semi-bold);
   position: relative;
-  padding-bottom: 20px;
+  padding-bottom: 5px;
 }
 
 .search_result_main_content_header_button::before {

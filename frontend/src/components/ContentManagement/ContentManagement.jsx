@@ -2,12 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link, useLocation } from "react-router-dom";
 import styles from "./ContentManagement.module.css";
-import uploadedPFP from "../../assets/default-profile-photo.jpg";
-import profile from "../../assets/profile.jpg";
-import search_history from "../../assets/search-history.jpg";
-import account_settings from "../../assets/account-settings.jpg";
-import manage_content from "../../assets/manage-content.jpg";
-import logout from "../../assets/logout.jpg";
 import logo from "../../assets/logo.png";
 import add_content_icon from "../../assets/add-content-icon.png";
 import file_icon_white from "../../assets/file-icon-white.png";
@@ -617,9 +611,9 @@ function ContentManagement() {
 
         <Header />
       </div>
-
+      <Link className={styles.search_history_logo} to="/home">
       <img src={logo} className={styles.search_history_logo} alt="logo" />
-
+      </Link>
       <div className={styles.search_history_container}>
         <div className={styles.search_history_content_header}>
           <div className={styles.search_history_action_buttons}>
@@ -1330,8 +1324,10 @@ function ContentManagement() {
                 </p>
 
                 <div className={styles.view_button_container}>
-                  <button className={`${styles.view_archived_contents_button}`}>
-                    view deleted contents
+                  <button 
+                  onClick={closeDeleteContentModal}
+                  className={`${styles.view_archived_contents_button}`}>
+                    Done
                   </button>
                 </div>
               </>

@@ -1485,6 +1485,15 @@ function Profile() {
                         </strong>{" "}
                         successfully.
                       </p>
+
+                      <div className={styles.view_button_container}>
+                        <button
+                          onClick={closeDeleteContentModal}
+                          className={`${styles.view_archived_contents_button}`}
+                        >
+                          Done
+                        </button>
+                      </div>
                     </>
                   )}
                 </div>
