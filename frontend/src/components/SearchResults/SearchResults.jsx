@@ -411,7 +411,7 @@ useEffect(() => {
                       });
                     })
                   ) : (
-                    <p>No PPT files available</p>
+                    <p>No DOC files available</p>
                   )}
                 </div>
               </>

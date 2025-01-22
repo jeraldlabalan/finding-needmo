@@ -243,6 +243,7 @@ option[value="information-technology"] {
 .search_result_footer_nav_page .page {
   height: 10px;
   width: 10px;
+  cursor: default;
 }
 
 .search_result_footer_nav_page .current_page {

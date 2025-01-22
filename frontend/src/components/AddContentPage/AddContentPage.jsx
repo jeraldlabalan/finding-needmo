@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import styles from "./AddContentPage.module.css";
 import Header from "../Header/Header";
 import add_icon from "../../assets/add-content-icon.png";
-import add_file from "../../assets/add-file-icon.png"
+import add_file from "../../assets/add-file-icon.png";
 import delete_file_icon_white from "../../assets/delete-file-icon-white.png";
 import file_icon_white from "../../assets/file-icon-white.png";
 
@@ -104,9 +104,9 @@ function AddContentPage() {
     if (
       !contentDetails.title ||
       !contentDetails.description ||
-      !contentDetails.program ||
-      !contentDetails.subject ||
-      !contentDetails.keyword
+      !contentDetails.keyword ||
+      contentDetails.program === "" ||
+      contentDetails.subject === ""
     ) {
       // Display error toast if any field is missing
       toast.error("All fields are required");
@@ -152,7 +152,6 @@ function AddContentPage() {
       });
   };
 
-
   return (
     <div className={styles.container}>
       <ToastContainer position="top-center" />
@@ -163,17 +162,16 @@ function AddContentPage() {
       <div className={styles.content}>
         <div className={styles.content_header}>
           <div className={styles.content_header_content}>
-            <img src={add_icon} alt="edit" />
+            <img src={add_icon} alt="edit" style={{ cursor: "default" }} />
             <h2>add content</h2>
           </div>
         </div>
 
         <div className={styles.content_content}>
-
           <div className={styles.content_content_actual_content}>
             <div className={styles.actual_content_left}>
-
-              <input type="text"
+              <input
+                type="text"
                 name="title"
                 id="title"
                 placeholder="Title"
@@ -187,23 +185,18 @@ function AddContentPage() {
                 id="description"
                 value={contentDetails.description}
                 onChange={handleAddContentChange}
-              >
-              </textarea>
+              ></textarea>
 
               <select
                 name="program"
                 id="program"
-                value={contentDetails.program}
+                value={contentDetails.program || ""}
                 onChange={handleAddContentChange}
               >
-                <option value={null}>
-                  Program
-                </option>
+                <option value="">Program</option>
                 <option value="1">Computer Science</option>
                 <option value="2">Information Technology</option>
               </select>
-
-
             </div>
 
             <div className={styles.actual_content_right}>
@@ -211,18 +204,15 @@ function AddContentPage() {
                 name="subject"
                 id="subject"
                 className={`${styles.modal_content_input} ${styles.modal_content_select}`}
-                value={contentDetails.subject}
+                value={contentDetails.subject || ""}
                 onChange={handleAddContentChange}
               >
-                <option value={null}>Subject</option>
+                <option value="">Subject</option>
                 {filteredSubjects.length > 0 ? (
                   filteredSubjects
                     .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
                     .map((course) => (
-                      <option
-                        value={course.CourseID}
-                        key={course.CourseID}
-                      >
+                      <option value={course.CourseID} key={course.CourseID}>
                         {course.Title} {/* Display course title */}
                       </option>
                     ))
@@ -236,19 +226,17 @@ function AddContentPage() {
                 value={contentDetails.keyword}
                 onChange={handleAddContentChange}
                 placeholder="Write keywords here (e.g. webdev, appdev, gamedev)..."
-              >
-              </textarea>
-
-
+              ></textarea>
 
               <div className={styles.file_holder}>
                 {contentFiles.map((file, index) => (
                   <div
                     key={index}
-                    className={`${styles.file} ${index % 2 === 0
-                      ? styles.file_icon_white
-                      : styles.file_icon_black
-                      }`}
+                    className={`${styles.file} ${
+                      index % 2 === 0
+                        ? styles.file_icon_white
+                        : styles.file_icon_black
+                    }`}
                   >
                     <img
                       src={file_icon_white} // Use appropriate file icon
@@ -265,7 +253,6 @@ function AddContentPage() {
                     />
                   </div>
                 ))}
-
 
                 {/* Add File button */}
 
@@ -286,10 +273,8 @@ function AddContentPage() {
                     add files
                   </button>
                 </div>
-
               </div>
             </div>
-
           </div>
         </div>
 
