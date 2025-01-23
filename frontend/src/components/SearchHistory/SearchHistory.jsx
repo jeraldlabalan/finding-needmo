@@ -289,7 +289,7 @@ function SearchHistory() {
               <ul>
                 {entries.map((entry, index) => (
                   <li key={index}>
-                    <p>{entry.Entry}</p> {/* Assuming entry.Entry contains the search query */}
+                    <p onClick={() => navigate(`/search-results/${entry.Entry}`)}>{entry.Entry}</p> {/* Assuming entry.Entry contains the search query */}
                     <button onClick={() => handleDeleteSearch(entry)} style={{ background: 'transparent' }}><img src={delete_search} alt="delete" /></button>
                   </li>
                 ))}
