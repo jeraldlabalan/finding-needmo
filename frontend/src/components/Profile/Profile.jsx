@@ -758,6 +758,7 @@ function Profile() {
                           <button
                             onClick={() => handleEditRow(details)}
                             className={styles.action}
+                            id="edit"
                           >
                             <img
                               src={edit_icon}
@@ -770,6 +771,7 @@ function Profile() {
                           <button
                             onClick={() => handleArchiveRow(details)}
                             className={styles.action}
+                            id="archive"
                           >
                             <img
                               src={clock_back_icon}
@@ -779,7 +781,7 @@ function Profile() {
                             />
                           </button>
 
-                          <button className={styles.action}>
+                          <button className={styles.action} id="delete">
                             <img
                               src={delete_icon}
                               className={styles.action_icon}

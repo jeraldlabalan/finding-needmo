@@ -762,7 +762,10 @@ li .dropdown_menu_logo {
   width: 100%;
   margin-top: auto;
   padding: 0 1rem;
+}
 
+.selected {
+  border: 3px solid var(--blue)
 }
 
 

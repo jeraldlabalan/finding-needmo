@@ -871,6 +871,7 @@ function ContentManagement() {
                               <button
                                 onClick={() => handleEditRow(details)}
                                 className={styles.action}
+                                id="edit"
                               >
                                 <img
                                   src={edit_icon}
@@ -883,6 +884,7 @@ function ContentManagement() {
                               <button
                                 onClick={() => handleArchiveRow(details)}
                                 className={styles.action}
+                                id="archive"
                               >
                                 <img
                                   src={clock_back_icon}
@@ -898,6 +900,7 @@ function ContentManagement() {
                                   className={styles.action_icon}
                                   alt="delete icon"
                                   onClick={() => handleDeleteRow(details)}
+                                  id="delete"
                                 />
                               </button>
                             </div>
@@ -961,11 +964,12 @@ function ContentManagement() {
                               <button
                                 className={styles.action}
                                 onClick={() => handleUnarchiveContent(details)}
+                                id="unarchive"
                               >
                                 <img
                                   src={unarchive_icon}
                                   className={styles.action_icon}
-                                  alt="edit icon"
+                                  alt="unarchive icon"
                                 />
                               </button>
                             </div>

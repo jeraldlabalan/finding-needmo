@@ -16,13 +16,15 @@ import CreateDocument from './components/CreateDocument/CreateDocument';
 import FileCreation from './components/FileCreation/FileCreation';
 import AddContentPage from './components/AddContentPage/AddContentPage';
 import ProfileStudent from './components/ProfileStudent/ProfileStudent';
+import 'react-tooltip/dist/react-tooltip.css'
+import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 function App() {
 
   return (
     <Router>
       <Routes>
-      <Route path='/header' element={<Header />} />
+        <Route path='/header' element={<Header />} />
         <Route path='/' element={<Landing />} />
         <Route path='/registerlogin' element={<RegisterLogin />} />
         <Route path='/home' element={<Home />} />
@@ -39,6 +41,30 @@ function App() {
         <Route path='/add-content' element={<AddContentPage />} />
         <Route path='/profile-student' element={<ProfileStudent />} />
       </Routes>
+
+      <ReactTooltip
+        anchorId="edit"
+        className="custom-tooltip"
+        content='Edit Content'
+        noArrow />
+
+    <ReactTooltip
+        anchorId="archive"
+        className="custom-tooltip"
+        content='Archive Content'
+        noArrow />
+
+    <ReactTooltip
+        anchorId="delete"
+        className="custom-tooltip"
+        content='Delete Content'
+        noArrow />
+
+    <ReactTooltip
+        anchorId="unarchive"
+        className="custom-tooltip"
+        content='Unarchive Content'
+        noArrow />
     </Router>
   )
 }
