@@ -136,3 +136,9 @@ h1, h2, h3, h4, h5, h6 {
 img {
   cursor: pointer;
 }
+
+.custom-tooltip {
+  background-color: var(--blue) !important;
+  color: var(--white) !important;
+  border-radius: 50px !important;
+}

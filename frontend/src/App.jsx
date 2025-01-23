@@ -17,7 +17,7 @@ import FileCreation from './components/FileCreation/FileCreation';
 import AddContentPage from './components/AddContentPage/AddContentPage';
 import ProfileStudent from './components/ProfileStudent/ProfileStudent';
 import 'react-tooltip/dist/react-tooltip.css'
-import { Tooltip as ReactTooltip } from 'react-tooltip'
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 function App() {
 
@@ -43,27 +43,35 @@ function App() {
       </Routes>
 
       <ReactTooltip
-        anchorId="edit"
+        id="edit"
         className="custom-tooltip"
         content='Edit Content'
+        place="top"
+        effect="solid"
         noArrow />
 
     <ReactTooltip
-        anchorId="archive"
+        id="archive"
         className="custom-tooltip"
         content='Archive Content'
+        place="top"
+        effect="solid"
         noArrow />
 
     <ReactTooltip
-        anchorId="delete"
+        id="delete"
         className="custom-tooltip"
         content='Delete Content'
+        place="top"
+        effect="solid"
         noArrow />
 
     <ReactTooltip
-        anchorId="unarchive"
+        id="unarchive"
         className="custom-tooltip"
         content='Unarchive Content'
+        place="top"
+        effect="solid"
         noArrow />
     </Router>
   )

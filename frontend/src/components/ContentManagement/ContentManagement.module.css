@@ -764,8 +764,8 @@ li .dropdown_menu_logo {
   padding: 0 1rem;
 }
 
-.selected {
-  border: 3px solid var(--blue)
+.selected_card {
+  border: 3px solid var(--blue) !important;
 }
 
 

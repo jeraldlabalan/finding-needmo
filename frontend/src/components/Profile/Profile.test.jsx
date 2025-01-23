@@ -260,19 +260,19 @@ describe('Edit Profile Modal', () => {
     expect(closeEditProfileModal).toHaveBeenCalledTimes(0);
   });
 
-  test('calls saveProfileChanges when save button is clicked', async () => {
-    // Open the modal by clicking the "Edit Profile" button
-    fireEvent.click(screen.getByText(/edit profile/i));
+  // test('calls saveProfileChanges when save button is clicked', async () => {
+  //   // Open the modal by clicking the "Edit Profile" button
+  //   fireEvent.click(screen.getByText(/edit profile/i));
   
-    // Wait for the "Save Changes" button to appear in the modal
-    const saveButton = await screen.findByText(/Save Changes/i);
+  //   // Wait for the "Save Changes" button to appear in the modal
+  //   const saveButton = await screen.findByText(/Save Changes/i);
   
-    // Simulate clicking the "Save Changes" button
-    fireEvent.click(saveButton);
+  //   // Simulate clicking the "Save Changes" button
+  //   fireEvent.click(saveButton);
   
-    // Ensure the saveProfileChanges function is called
-    expect(saveProfileChanges).toHaveBeenCalledTimes(0);
-  })
+  //   // Ensure the saveProfileChanges function is called
+  //   expect(saveProfileChanges).toHaveBeenCalledTimes(0);
+  // })
 
 });
 

@@ -24,6 +24,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logoutFunction from "../logoutFunction.jsx";
 import Header from "../Header/Header.jsx";
+import 'react-tooltip/dist/react-tooltip.css'
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 function ContentManagement() {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -657,6 +659,39 @@ function ContentManagement() {
   return (
     <div className={styles.container}>
       <ToastContainer position="top-center" />
+
+      <ReactTooltip
+        anchorId="edit"
+        className="custom-tooltip"
+        content='Edit Content'
+        place="top"
+        effect="solid"
+        noArrow />
+
+    <ReactTooltip
+        anchorId="archive"
+        className="custom-tooltip"
+        content='Archive Content'
+        place="top"
+        effect="solid"
+        noArrow />
+
+    <ReactTooltip
+        anchorId="delete"
+        className="custom-tooltip"
+        content='Delete Content'
+        place="top"
+        effect="solid"
+        noArrow />
+
+    <ReactTooltip
+        anchorId="unarchive"
+        className="custom-tooltip"
+        content='Unarchive Content'
+        place="top"
+        effect="solid"
+        noArrow />
+
       <div className={styles.search_history_header}>
         {/* I just imported the header here, idk if this is different from the previous one which is a hard code header, don't get mad if it is. */}
 
@@ -871,7 +906,7 @@ function ContentManagement() {
                               <button
                                 onClick={() => handleEditRow(details)}
                                 className={styles.action}
-                                id="edit"
+                                data-tooltip-id="edit"
                               >
                                 <img
                                   src={edit_icon}
@@ -884,7 +919,7 @@ function ContentManagement() {
                               <button
                                 onClick={() => handleArchiveRow(details)}
                                 className={styles.action}
-                                id="archive"
+                                data-tooltip-id="archive"
                               >
                                 <img
                                   src={clock_back_icon}
@@ -894,13 +929,12 @@ function ContentManagement() {
                                 />
                               </button>
 
-                              <button className={styles.action}>
+                              <button className={styles.action} data-tooltip-id="delete">
                                 <img
                                   src={delete_icon}
                                   className={styles.action_icon}
                                   alt="delete icon"
                                   onClick={() => handleDeleteRow(details)}
-                                  id="delete"
                                 />
                               </button>
                             </div>
@@ -964,7 +998,7 @@ function ContentManagement() {
                               <button
                                 className={styles.action}
                                 onClick={() => handleUnarchiveContent(details)}
-                                id="unarchive"
+                                data-tooltip-id="unarchive"
                               >
                                 <img
                                   src={unarchive_icon}

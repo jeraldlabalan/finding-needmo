@@ -22,7 +22,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import SecondHeader from "../SecondHeader/SecondHeader";
+import 'react-tooltip/dist/react-tooltip.css'
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 function Profile() {
   // Modal logic
@@ -638,6 +639,38 @@ function Profile() {
   return (
     <div className={styles.container}>
       <ToastContainer position="top-center" />
+      <ReactTooltip
+        anchorId="edit"
+        className="custom-tooltip"
+        content='Edit Content'
+        place="top"
+        effect="solid"
+        noArrow />
+
+    <ReactTooltip
+        anchorId="archive"
+        className="custom-tooltip"
+        content='Archive Content'
+        place="top"
+        effect="solid"
+        noArrow />
+
+    <ReactTooltip
+        anchorId="delete"
+        className="custom-tooltip"
+        content='Delete Content'
+        place="top"
+        effect="solid"
+        noArrow />
+
+    <ReactTooltip
+        anchorId="unarchive"
+        className="custom-tooltip"
+        content='Unarchive Content'
+        place="top"
+        effect="solid"
+        noArrow />
+
       <div className={styles.header_container}>
         <Header />
       </div>
@@ -758,7 +791,7 @@ function Profile() {
                           <button
                             onClick={() => handleEditRow(details)}
                             className={styles.action}
-                            id="edit"
+                            data-tooltip-id="edit"
                           >
                             <img
                               src={edit_icon}
@@ -771,7 +804,7 @@ function Profile() {
                           <button
                             onClick={() => handleArchiveRow(details)}
                             className={styles.action}
-                            id="archive"
+                            data-tooltip-id="archive"
                           >
                             <img
                               src={clock_back_icon}
@@ -781,7 +814,7 @@ function Profile() {
                             />
                           </button>
 
-                          <button className={styles.action} id="delete">
+                          <button className={styles.action} data-tooltip-id="delete">
                             <img
                               src={delete_icon}
                               className={styles.action_icon}
