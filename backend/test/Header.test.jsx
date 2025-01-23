@@ -26,7 +26,7 @@ app.get("/getProfile", async (req, res) => {
   }
 });
 
-describe("User Session and Profile Fetching for Educator Role", () => {
+describe("User Session and Profile Fetching", () => {
   it("Should validate user session and set email and role", async () => {
     axios.get.mockResolvedValueOnce({
       data: { valid: true, email: "test@example.com", role: "Educator" },

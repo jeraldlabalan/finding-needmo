@@ -119,7 +119,7 @@ function ViewContent() {
             <img
               src={authorPFP}
               alt="Author"
-              style={{ width: "150px", height: "150px", borderRadius: "50%" }}
+              style={{ width: "150px", height: "150px", borderRadius: "50%", cursor: "default"}}
             />
               <div className={styles.author_details}>
                 <h4>{searchRes.Firstname} {searchRes.Lastname}</h4>

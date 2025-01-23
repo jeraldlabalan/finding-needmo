@@ -70,7 +70,7 @@ function SecondHeader() {
 
   const handleSearch = async () => {
     if (!searchValue.trim() || searchValue === "") {
-      toast.error("Please enter a search term to continue.", {
+      toast.error("Please enter a search term to continue", {
         autoClose: 2000,
       });
       return;

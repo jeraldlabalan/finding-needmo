@@ -129,14 +129,14 @@ app.post("/deleteUploadedContent", async (req, res) => {
 describe("Functionalities included in Profile Page", () => {
   it("Should validate user session and set email and role", async () => {
     axios.get.mockResolvedValueOnce({
-      data: { valid: true, email: "test@example.com", role: "Student" },
+      data: { valid: true, email: "test@example.com", role: "Educator" },
     });
 
     const response = await request(app).get("/");
 
     expect(response.body.valid).toBe(true);
     expect(response.body.email).toBe("test@example.com");
-    expect(response.body.role).toBe("Student");
+    expect(response.body.role).toBe("Educator");
   });
 
   it("Should return error if session is not valid", async () => {

@@ -27,7 +27,23 @@ app.get("/getProfile", async (req, res) => {
   }
 });
 
-describe("User Session and Profile Fetching for Student Role", () => {
+app.post("/saveToSearchHistory", async (req, res) => {
+  const { searchValue } = req.body;
+  try {
+    if (!searchValue) {
+      return res.status(400).json({ message: "Search term is required" });
+    }
+
+    const response = await axios.post("/saveToSearchHistory", {
+      searchValue,
+    });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: "Error saving search history" });
+  }
+});
+
+describe("User Session, Profile Fetching, and Search Functionality.", () => {
   it("Should validate user session and set email and role", async () => {
     axios.get.mockResolvedValueOnce({
       data: { valid: true, email: "test@example.com", role: "Student" },
@@ -89,6 +105,58 @@ describe("User Session and Profile Fetching for Student Role", () => {
 
     expect(response.status).toBe(500);
     expect(response.body.error).toBe("Error fetching profile");
+  });
+
+  it("Should successfully save search history and return success", async () => {
+    const searchValue = "React";
+    axios.post.mockResolvedValueOnce({
+      data: { message: "Success" },
+    });
+
+    const response = await request(app)
+      .post("/saveToSearchHistory")
+      .send({ searchValue });
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("Success");
+  });
+
+  it("Should return an error when the search term is missing", async () => {
+    const response = await request(app).post("/saveToSearchHistory").send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Search term is required");
+  });
+
+  it("Should return an error when the search term is an empty string", async () => {
+    const response = await request(app)
+      .post("/saveToSearchHistory")
+      .send({ searchValue: "" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Search term is required");
+  });
+
+  it("Should handle error while saving search history", async () => {
+    const searchValue = "React";
+    axios.post.mockRejectedValueOnce(new Error("Network Error"));
+
+    const response = await request(app)
+      .post("/saveToSearchHistory")
+      .send({ searchValue });
+
+    expect(response.status).toBe(500);
+    expect(response.body.error).toBe("Error saving search history");
+  });
+
+  it("Should return an error for incorrectly formatted request data", async () => {
+    const response = await request(app)
+      .post("/saveToSearchHistory")
+      .set("Content-Type", "application/x-www-form-urlencoded")
+      .send("searchValue=React");
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Search term is required");
   });
 });
 
