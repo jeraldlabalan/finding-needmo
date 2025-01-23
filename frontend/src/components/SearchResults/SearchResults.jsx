@@ -79,7 +79,7 @@ function SearchResults() {
     const fetchData = async () => {
       const order = sortOrder === 'oldestToNewest' ? 'ASC' : 'DESC';
       try {
-        const res = await axios.get(`http://localhost:8080/searchResults/${search}`, { params: {order: order} });
+        const res = await axios.get(`http://localhost:8080/searchResults/${search}`, { params: { order: order } });
         setActiveButton("contents");
         setSearchRes(res.data.results);
         setDocx(res.data.docxFiles);
@@ -152,69 +152,69 @@ function SearchResults() {
     setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
   };
 
-const handleSortChange = (e) => {
-  const { value, checked } = e.target;
+  const handleSortChange = (e) => {
+    const { value, checked } = e.target;
 
-  if (checked) {
-    setSortOrder(value);
-  } else {
-    setSortOrder(null);  // If unchecked, reset to null
-  }
-};
+    if (checked) {
+      setSortOrder(value);
+    } else {
+      setSortOrder(null);  // If unchecked, reset to null
+    }
+  };
 
-const handleProgramSubjectSortChecked = () => {
-  setProgramSubjectFilterChecked((prev) => !prev);
-};
-// Filter by program and subject
-const filteredResults = searchRes.filter((item) => {
-  const matchesProgram = programSubjectFilterChecked
-    ? item.Program === parseInt(programFilter, 10)
-    : true;
-  const matchesSubject = programSubjectFilterChecked
-    ? (item.CourseTitle).includes(subjectFilter)
-    : true;
-  return matchesProgram && matchesSubject;
-});
+  const handleProgramSubjectSortChecked = () => {
+    setProgramSubjectFilterChecked((prev) => !prev);
+  };
+  // Filter by program and subject
+  const filteredResults = searchRes.filter((item) => {
+    const matchesProgram = programSubjectFilterChecked
+      ? item.Program === parseInt(programFilter, 10)
+      : true;
+    const matchesSubject = programSubjectFilterChecked
+      ? (item.CourseTitle).includes(subjectFilter)
+      : true;
+    return matchesProgram && matchesSubject;
+  });
 
-// Handler for program filter change
-const handleProgramFilterChange = (e) => {
-  setProgramFilter(e.target.value);
-};
+  // Handler for program filter change
+  const handleProgramFilterChange = (e) => {
+    setProgramFilter(e.target.value);
+  };
 
-// Handler for subject filter change
-const handleSubjectFilterChange = (e) => {
-  setSubjectFilter([e.target.value]);  // Set as an array
-};
+  // Handler for subject filter change
+  const handleSubjectFilterChange = (e) => {
+    setSubjectFilter([e.target.value]);  // Set as an array
+  };
 
-const currentItems = searchRes.slice(
-  (currentPage - 1) * itemsPerPage,
-  currentPage * itemsPerPage
-);
+  const currentItems = searchRes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
-useEffect(() => {
-  if (programFilter) {
-    const filtered = courses.filter(
-      (course) => course.Program === parseInt(programFilter)
-    );
-    setFilteredSubjects(filtered); // Set as array
-  } else {
-    setFilteredSubjects(courses);  // Clear as an empty array
-  }
-}, [programFilter, courses]);
+  useEffect(() => {
+    if (programFilter) {
+      const filtered = courses.filter(
+        (course) => course.Program === parseInt(programFilter)
+      );
+      setFilteredSubjects(filtered); // Set as array
+    } else {
+      setFilteredSubjects(courses);  // Clear as an empty array
+    }
+  }, [programFilter, courses]);
 
-// Get courses
-useEffect(() => {
-  axios
-    .get("http://localhost:8080/getCourses")
-    .then((res) => {
-      setCourses(res.data);
-    })
-    .catch((err) => {
-      toast.error("Error: " + err, {
-        autoClose: 4000,
+  // Get courses
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/getCourses")
+      .then((res) => {
+        setCourses(res.data);
+      })
+      .catch((err) => {
+        toast.error("Error: " + err, {
+          autoClose: 4000,
+        });
       });
-    });
-}, []);
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -267,30 +267,30 @@ useEffect(() => {
 
               <div
                 className={`${styles.search_result_sidebar_filter_option} ${styles.search_result_sidebar_filter_option_dropdown}`}
-              >                
+              >
                 <label>
-                  Subject                  
+                  Subject
                   <select
-    value={subjectFilter}
-    onChange={handleSubjectFilterChange}
-    disabled={!programSubjectFilterChecked}
-  >
-    <option value="">All</option>
-    {filteredSubjects.length > 0 ? (
-                        filteredSubjects
-                          .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
-                          .map((course) => (
-                            <option
-                              value={course.Title}
-                              key={course.CourseID}
-                            >
-                              {course.Title} {/* Display course title */}
-                            </option>
-                          ))
-                      ) : (
-                        <option disabled>No subjects available</option> // Fallback message
-                      )}
-  </select>
+                    value={subjectFilter}
+                    onChange={handleSubjectFilterChange}
+                    disabled={!programSubjectFilterChecked}
+                  >
+                    <option value="">All</option>
+                    {filteredSubjects.length > 0 ? (
+                      filteredSubjects
+                        .sort((a, b) => a.Title.localeCompare(b.Title)) // Sort alphabetically
+                        .map((course) => (
+                          <option
+                            value={course.Title}
+                            key={course.CourseID}
+                          >
+                            {course.Title} {/* Display course title */}
+                          </option>
+                        ))
+                    ) : (
+                      <option disabled>No subjects available</option> // Fallback message
+                    )}
+                  </select>
                 </label>
               </div>
             </div>
@@ -301,33 +301,29 @@ useEffect(() => {
         <div className={styles.search_result_main_content}>
           <div className={styles.search_result_main_content_header}>
             <button
-              className={`${styles.search_result_main_content_header_button} ${
-                activeButton === "contents" ? styles.active_button : ""
-              }`}
+              className={`${styles.search_result_main_content_header_button} ${activeButton === "contents" ? styles.active_button : ""
+                }`}
               onClick={() => handleButtonClick("contents")}
             >
               Contents
             </button>
             <button
-              className={`${styles.search_result_main_content_header_button} ${
-                activeButton === "documents" ? styles.active_button : ""
-              }`}
+              className={`${styles.search_result_main_content_header_button} ${activeButton === "documents" ? styles.active_button : ""
+                }`}
               onClick={() => handleButtonClick("documents")}
             >
               Documents
             </button>
             <button
-              className={`${styles.search_result_main_content_header_button} ${
-                activeButton === "presentations" ? styles.active_button : ""
-              }`}
+              className={`${styles.search_result_main_content_header_button} ${activeButton === "presentations" ? styles.active_button : ""
+                }`}
               onClick={() => handleButtonClick("presentations")}
             >
               Presentations
             </button>
             <button
-              className={`${styles.search_result_main_content_header_button} ${
-                activeButton === "pdfs" ? styles.active_button : ""
-              }`}
+              className={`${styles.search_result_main_content_header_button} ${activeButton === "pdfs" ? styles.active_button : ""
+                }`}
               onClick={() => handleButtonClick("pdfs")}
             >
               PDFs
@@ -338,28 +334,28 @@ useEffect(() => {
             {activeButton === "contents" && (
               <>
                 <div className={styles.content_container}>
-                {filteredResults.map((row, index) => (
-                  <div key={index} className={styles.main_content_body_item}>
-                    <div className={styles.upper_section}>
-                      <h3>{row.Title}</h3>
-                      <p>
-                        {row.Firstname} {row.Lastname}
-                      </p>
-                    </div>
-                    <div className={styles.lower_section}>
-                      <p>{row.CourseTitle}</p>
-                      {row.Program === 1 ? (
-                        <p className={styles.lower_section_program_cs}>
-                          computer science
+                  {filteredResults.map((row, index) => (
+                    <div key={index} className={styles.main_content_body_item} onClick={()=> window.open(`/view-content/${row.ContentID}`, "_blank")}>
+                      <div className={styles.upper_section}>
+                        <h3>{row.Title}</h3>
+                        <p>
+                          {row.Firstname} {row.Lastname}
                         </p>
-                      ) : (
-                        <p className={styles.lower_section_program_it}>
-                          information technology
-                        </p>
-                      )}
+                      </div>
+                      <div className={styles.lower_section}>
+                        <p>{row.CourseTitle}</p>
+                        {row.Program === 1 ? (
+                          <p className={styles.lower_section_program_cs}>
+                            computer science
+                          </p>
+                        ) : (
+                          <p className={styles.lower_section_program_it}>
+                            information technology
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
                 </div>
               </>
             )}
@@ -540,9 +536,8 @@ useEffect(() => {
                     <img
                       key={index}
                       src={index + 1 === currentPage ? current_page : next_page}
-                      className={`${styles.page} ${
-                        index + 1 === currentPage ? styles.current_page : ""
-                      }`}
+                      className={`${styles.page} ${index + 1 === currentPage ? styles.current_page : ""
+                        }`}
                       alt={`Page ${index + 1}`}
                       onClick={() => setCurrentPage(index + 1)}
                     />
