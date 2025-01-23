@@ -29,34 +29,6 @@ function ProfileStudent() {
     program: "",
   });
 
-  const [courses, setCourses] = useState([]);
-  const [contentFiles, setContentFiles] = useState([]);
-  const [contentDetails, setContentDetails] = useState({
-    title: "",
-    description: "",
-    subject: "",
-    program: "",
-    course: "",
-    keyword: "",
-    contentInput: "",
-  });
-
-  const [filteredSubjects, setFilteredSubjects] = useState([]);
-  const [selectedRequest, setSelectedRequest] = useState([]);
-
-  const [uploadedContent, setUploadedContent] = useState([]);
-
-  useEffect(() => {
-    // Fetch the uploaded content data
-    axios
-      .get("http://localhost:8080/getUploadedContent")
-      .then((response) => {
-        if (response.data.uploadedContent) {
-          setUploadedContent(response.data.uploadedContent);
-        }
-      })
-      .catch((error) => console.error("Error fetching content:", error));
-  }, [uploadedContent]);
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -102,87 +74,6 @@ function ProfileStudent() {
       setUploadedPFP(url);
     }
   };
-
-  const [editContent, setEditContent] = useState({
-    contentID: selectedRequest.ContentID,
-    title: selectedRequest.Title,
-    description: selectedRequest.Description,
-    subject: selectedRequest.Course,
-    program: selectedRequest.Program,
-    course: selectedRequest.Course,
-    courseTitle: selectedRequest.CourseTitle, // Add courseTitle
-    keyword: selectedRequest.Tags,
-    files: selectedRequest.Files, // Initialize files
-  });
-
-  const [editContentFiles, setEditContentFiles] = useState(
-    selectedRequest.Files || []
-  ); // Files for editing content
-
-  useEffect(() => {
-    if (selectedRequest) {
-      setEditContent({
-        contentID: selectedRequest.ContentID,
-        title: selectedRequest.Title,
-        description: selectedRequest.Description,
-        subject: selectedRequest.Course, // Ensure this is correctly set
-        program: selectedRequest.Program,
-        courseID: selectedRequest.Course,
-        courseTitle: selectedRequest.CourseTitle, // Add courseTitle
-        keyword: selectedRequest.Tags,
-        files: Array.isArray(selectedRequest.Files)
-          ? selectedRequest.Files
-          : [], // Ensure files is an array
-      });
-
-      setEditContentFiles(
-        Array.isArray(selectedRequest.Files) ? selectedRequest.Files : []
-      ); // Ensure files is an array
-    }
-  }, [selectedRequest]);
-
-  useEffect(() => {
-    if (editContent.program) {
-      axios
-        .get(
-          `http://localhost:8080/getContentSubjects?program=${editContent.program}`
-        )
-        .then((res) => {
-          setSubjects(res.data);
-        })
-        .catch((err) => {
-          toast.error("Error: " + err, {
-            autoClose: 4000,
-          });
-        });
-    }
-  }, [editContent.program]);
-
-  useEffect(() => {
-    // If program is selected, filter the courses accordingly
-    if (contentDetails.program) {
-      const filtered = courses.filter(
-        (course) => course.Program === parseInt(contentDetails.program)
-      );
-      setFilteredSubjects(filtered);
-    } else {
-      setFilteredSubjects([]); // Clear subjects when no program is selected
-    }
-  }, [contentDetails.program, courses]); // Run when program or courses change
-
-  //get courses
-  useEffect(() => {
-    axios
-      .get("http://localhost:8080/getCourses")
-      .then((res) => {
-        setCourses(res.data);
-      })
-      .catch((err) => {
-        toast.error("Error: " + err, {
-          autoClose: 4000,
-        });
-      });
-  }, []);
 
   const getProfile = () => {
     axios
