@@ -52,15 +52,6 @@ describe("Add Content Page", () => {
       </MemoryRouter>
     );
   
-  
-    // // Simulate file selection
-    // const testFile = new File(["dummy content"], "testFile.txt", { type: "text/plain" });
-    // fireEvent.change(fileInput, { target: { files: [testFile] } });
-  
-    // // Assert that the file name is displayed
-    // await waitFor(() =>
-    //   expect(screen.getByText("testFile.txt")).toBeInTheDocument()
-    // );
   });
   
 
@@ -71,9 +62,6 @@ describe("Add Content Page", () => {
       </MemoryRouter>
     );
 
-    // const programSelect = screen.getByRole("combobox", { name: /program/i });
-    // fireEvent.change(programSelect, { target: { value: "1" } });
-    // expect(programSelect).toHaveValue("1");
   });
 
   test("triggers save changes button", () => {

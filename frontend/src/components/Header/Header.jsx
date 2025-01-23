@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styles from "./Header.module.css";
-import notification from "../../assets/notification_icon.png";
-import default_profile from "../../assets/default-profile-photo.jpg";
 import profile from "../../assets/profile.jpg";
 import account_settings from "../../assets/account-settings.jpg";
 import logout from "../../assets/logout.jpg";

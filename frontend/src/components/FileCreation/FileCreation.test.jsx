@@ -35,52 +35,10 @@ describe('File Creation Component', () => {
     jest.clearAllMocks();
   });
 
-  // test('renders FileEditor and initializes WebViewer', async () => {
-
-  //   axios.get.mockResolvedValue({
-  //     data: {
-  //       valid: true,
-  //       email: 'test@example.com',
-  //       role: 'admin',
-  //     },
-  //   });
-
-  //   WebViewer.mockImplementation(() => Promise.resolve({ dispose: jest.fn() }));
-
-  //   render(<FileCreation />);
-
-
-  //   expect(screen.getByText('Finding NeedMo')).toBeInTheDocument();
-
-  //   await waitFor(() => {
-  //     expect(WebViewer).toHaveBeenCalledWith(
-  //       expect.objectContaining({
-  //         path: '/webviewer',
-  //         licenseKey: 'YOUR_LICENSE_KEY',
-  //         enableOfficeEditing: true,
-  //       }),
-  //       expect.any(HTMLElement)
-  //     );
-  //   });
-
-
-  //   await waitFor(() => {
-  //     expect(axios.get).toHaveBeenCalledWith('http://localhost:8080');
-  //   });
-  // });
 
   test('redirects to login page if user is not valid', async () => {
 
-    // axios.get.mockResolvedValue({
-    //   data: { valid: false },
-    // });
-
-    // render(<FileCreation />);
-
-
-    // await waitFor(() => {
-    //   expect(mockNavigate).toHaveBeenCalledWith('/registerlogin');
-    // });
+ 
   });
 
   test('handles axios error gracefully', async () => {
@@ -89,19 +47,6 @@ describe('File Creation Component', () => {
   });
 
   test('cleans up Web Viewer instance on unmount', async () => {
-  //   const mockDispose = jest.fn();
 
-
-  //   WebViewer.mockImplementation(() => Promise.resolve({ dispose: mockDispose }));
-
-  //   const { unmount } = render(<FileCreation />);
-
-  //   await waitFor(() => {
-  //     expect(WebViewer).toHaveBeenCalled();
-  //   });
-
-  //   unmount();
-  //   expect(mockDispose).toHaveBeenCalled();
-  // });
 });
 });

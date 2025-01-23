@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import SecondHeader from "./SecondHeader"; // Adjust the import based on actual file location
+import SecondHeader from "./SecondHeader"; 
 
 beforeAll(() => {
   global.console.error = jest.fn();
@@ -55,43 +55,11 @@ describe("SecondHeader Component", () => {
     expect(screen.getByText("Profile")).toBeInTheDocument();
     expect(screen.getByText("Logout")).toBeInTheDocument();
 
-    fireEvent.click(profileButton); // Closing the dropdown
+    fireEvent.click(profileButton);
     expect(screen.queryByText("Profile")).not.toBeInTheDocument();
   });
 
-  {
-    /** 
-  test("navigates to correct pages when links in dropdown are clicked", () => {
-    render(
-      <MemoryRouter>
-        <SecondHeader />
-      </MemoryRouter>
-    );
 
-    const profileButton = screen.getByRole("button", { name: /profile/i });
-    fireEvent.click(profileButton);
-
-    const profileLink = screen.getByText(/Profile/i);
-    const searchHistoryLink = screen.getByText(/Search History/i);
-    const accountSettingsLink = screen.getByText(/Account Settings/i);
-
-
-    fireEvent.click(profileLink);
-    expect(window.location.pathname).toBe("/");
-
-   
-    fireEvent.click(profileButton);
-
-  
-    fireEvent.click(searchHistoryLink);
-    expect(window.location.pathname).toBe("/");
-
-    fireEvent.click(profileButton);
-
-    fireEvent.click(accountSettingsLink);
-    expect(window.location.pathname).toBe("/");
-  });*/
-  }
 
   test("handles logout functionality", () => {
     render(

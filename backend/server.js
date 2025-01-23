@@ -306,7 +306,7 @@ app.post('/verifyOTP', (req, res) => {
         }
     }
 
-    return res.json({ message: "PIN not found. Please request a new one." });
+    return res.json({ message: "PIN has expired. Please request a new one." });
 })
 
 app.post('/resetPass', (req, res) => {

@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor} from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Profile from './Profile';
 
-// Mocking external components/icons
+
 jest.mock('react-toastify', () => ({
   ToastContainer: jest.fn(() => <div data-testid="toast-container">ToastContainer</div>),
 }));
@@ -165,7 +165,7 @@ test('triggers openArchiveContentModal function when archive button is clicked',
 
 const mockHandleDeleteRow = jest.fn();
 
-// Mock button component
+
 const mockButtonComponentDelete = (
   <button className="action">
     <img 
@@ -210,7 +210,7 @@ describe('Edit Profile Modal', () => {
           handleUploadChange={handleUploadChange}
           handleInputChange={handleInputChange}
           saveProfileChanges={saveProfileChanges}
-          isEditProfileModalOpen={true} // Make sure the modal is open
+          isEditProfileModalOpen={true} 
         />
       </BrowserRouter>
     );
@@ -218,61 +218,45 @@ describe('Edit Profile Modal', () => {
 
 
   test('renders the Edit Profile modal and inputs', () => {
-    // Ensure the modal is open by clicking the "Edit Profile" button
     fireEvent.click(screen.getByText(/Edit Profile/i));
     
-    // Wait for the modal to appear
+   
     const header = screen.getByRole('heading', { name: /edit profile/i });
     expect(header).toBeInTheDocument();
     
-    // Check for text inputs for "First name" and "Last name"
     expect(screen.getByPlaceholderText(/First name/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Last name/i)).toBeInTheDocument();
   
-    // Check for the "Position" select dropdown and its options
     const positionSelect = screen.getByText(/Your position/i).closest('select');
     expect(positionSelect).toBeInTheDocument();
     expect(positionSelect).toContainHTML('<option value="Instructor 1">Instructor 1</option>');
     expect(positionSelect).toContainHTML('<option value="Instructor 2">Instructor 2</option>');
     expect(positionSelect).toContainHTML('<option value="Instructor 3">Instructor 3</option>');
     
-    // Check for the "Program" select dropdown and its options
+
     const programSelect = screen.getByText(/Select Program/i).closest('select');
     expect(programSelect).toBeInTheDocument();
     expect(programSelect).toContainHTML('<option value="1">Bachelor of Science in Computer Science</option>');
     expect(programSelect).toContainHTML('<option value="2">Bachelor of Science in Information Technology</option>');
   
-    // Check for the "Save Changes" button
+
     const saveButton = screen.getByText(/Save Changes/i);
     expect(saveButton).toBeInTheDocument();
   });
   
 
   test('closes the modal when close button is clicked', () => {
-    // Simulate opening the modal if it's not already open
+
     fireEvent.click(screen.getByText(/edit profile/i));
   
-    // Find the close button by alt text or role
-    const closeButton = screen.getByAltText(/close icon/i); // or use getByRole
+    
+    const closeButton = screen.getByAltText(/close icon/i); 
     fireEvent.click(closeButton);
   
-    // Check that the close function is called
+
     expect(closeEditProfileModal).toHaveBeenCalledTimes(0);
   });
 
-  // test('calls saveProfileChanges when save button is clicked', async () => {
-  //   // Open the modal by clicking the "Edit Profile" button
-  //   fireEvent.click(screen.getByText(/edit profile/i));
-  
-  //   // Wait for the "Save Changes" button to appear in the modal
-  //   const saveButton = await screen.findByText(/Save Changes/i);
-  
-  //   // Simulate clicking the "Save Changes" button
-  //   fireEvent.click(saveButton);
-  
-  //   // Ensure the saveProfileChanges function is called
-  //   expect(saveProfileChanges).toHaveBeenCalledTimes(0);
-  // })
 
 });
 
@@ -297,26 +281,26 @@ describe('Add Content Modal', () => {
         handleAddContentChange={handleAddContentChange}
         handleContentFileChange={handleContentFileChange}
         handleContentFileRemove={handleContentFileRemove}
-        courses={[{ Course: 'CS101', Title: 'Intro to CS' }]} // Example courses
-        contentFiles={[]} // Example files
+        courses={[{ Course: 'CS101', Title: 'Intro to CS' }]} 
+        contentFiles={[]} 
       />
       </BrowserRouter>
     );
   });
 
   test('renders the Add Content modal and inputs', () => {
-    // Open the modal
+
     fireEvent.click(screen.getByText(/Add Content/i));
   
-    // Get the modal content by looking for the first header element
+    
     const header = screen.getByRole('heading', { name: /add content/i });
     expect(header).toBeInTheDocument();
   
-    // Check for inputs inside the modal content
+
     expect(screen.getByPlaceholderText(/Title/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Write description here\.\.\./i)).toBeInTheDocument();
   
-    // Check for 'Subject' and 'Program' dropdowns by targeting comboboxes
+   
     const comboboxes = screen.getAllByRole('combobox');
     expect(comboboxes[0]).toHaveTextContent("ProgramComputer ScienceInformation Technology");
     expect(comboboxes[1]).toHaveTextContent("SubjectNo subjects available");
@@ -327,54 +311,53 @@ describe('Add Content Modal', () => {
   
   
   test('calls closeAddContentModal when close button is clicked', () => {
-    // Simulate the action to open the modal first
+
     fireEvent.click(screen.getByText(/Add Content/i));
   
-    // Then find the close button using its alt text
+
     const closeButton = screen.getByAltText(/close icon/i);
   
-    // Simulate clicking the close button
+
     fireEvent.click(closeButton);
   
-    // Ensure the close function is called
+
     expect(closeAddContentModal).toHaveBeenCalledTimes(0);
   });
 
 
   test('calls handleAddContentChange when input fields change', () => {
     fireEvent.click(screen.getByText(/Add Content/i));
-    // Simulate typing into the Title and Description input fields
+
     fireEvent.change(screen.getByPlaceholderText(/Title/i), { target: { value: 'New Content' } });
     fireEvent.change(screen.getByPlaceholderText(/Write description here\.\.\./i), { target: { value: 'Description of new content' } });
 
-    // Check if the change handler is called
+
     expect(handleAddContentChange).toHaveBeenCalledTimes(0);
   });
 
   
 
   test('calls handleContentFileChange when a file is added', () => {
-    // Simulate file input change
+
     fireEvent.click(screen.getByText(/Add Content/i));
     fireEvent.change(screen.getByText(/add files/i), {
       target: { files: [new File(['file content'], 'testFile.txt', { type: 'text/plain' })] },
     });
 
-    // Check if the file change handler is called
+
     expect(handleContentFileChange).toHaveBeenCalledTimes(0);
   });
 
 
 
-// Mock the delete icon import
 jest.mock('../../assets/delete_file_icon_white.png', () => 'delete_file_icon_white');
 
-// Test case
+
 test('renders file name and removes file on clicking the remove icon', () => {
   const file = { name: 'testFile.txt' };
   const index = 0;
 
-  // Mock the handler function
+
   const handleContentFileRemove = jest.fn();
 
   render(
@@ -391,17 +374,16 @@ test('renders file name and removes file on clicking the remove icon', () => {
     </BrowserRouter>
   );
 
-  // Check if the file name is rendered correctly
   const fileNameElement = screen.getByText(/testFile\.txt/i);
   expect(fileNameElement).toBeInTheDocument();
 
-  // Find and click the remove icon
+
   const removeIcon = screen.getByAltText(/remove file icon/i);
   fireEvent.click(removeIcon);
 
-  // Ensure the handler was called
+
   expect(handleContentFileRemove).toHaveBeenCalledTimes(1);
-  expect(handleContentFileRemove).toHaveBeenCalledWith(index); // Optional, to ensure the correct index was passed
+  expect(handleContentFileRemove).toHaveBeenCalledWith(index); 
 });
 
 
@@ -413,7 +395,7 @@ test('renders file name and removes file on clicking the remove icon', () => {
 describe('Archive Content Modal', () => {
   const mockCloseArchiveContentModal = jest.fn();
   const mockNextStepArchive = jest.fn();
-  const currentStepArchive = 1; // Step 1 is the default for starting the modal
+  const currentStepArchive = 1;
   const styles = {
     modal_overlay: 'modal-overlay',
     archive_and_delete_content_container: 'modal-container',
@@ -462,7 +444,7 @@ describe('Archive Content Modal', () => {
                 />
                 <button
                   className={styles.confirm_button}
-                  data-testid="confirm-button" // Unique test ID for the button
+                  data-testid="confirm-button" 
                   onClick={mockNextStepArchive}
                 >
                   confirm
@@ -502,7 +484,7 @@ describe('Archive Content Modal', () => {
     expect(input.value).toBe('Arrays');
 
     // Step 3: Click the confirm button
-    const confirmButton = screen.getByTestId('confirm-button'); // Unique selector
+    const confirmButton = screen.getByTestId('confirm-button'); 
     fireEvent.click(confirmButton);
     expect(mockNextStepArchive).toHaveBeenCalledTimes(1);
   });
@@ -541,7 +523,7 @@ describe('Archive Content Modal', () => {
     ).toBeInTheDocument();
 
     // Ensure "view archived contents" button is present
-    const viewButton = screen.getByTestId('view-archived-button'); // Unique selector
+    const viewButton = screen.getByTestId('view-archived-button'); 
     expect(viewButton).toBeInTheDocument();
   });
 });
@@ -550,8 +532,8 @@ describe('Archive Content Modal', () => {
 describe('Delete Content Modal', () => {
   const mockCloseDeleteContentModal = jest.fn();
   const mockNextStepDelete = jest.fn();
-  const modal_close_icon = 'close-icon.png'; // Mock icon URL
-  const delte_content_icon = 'delete-icon.png'; // Mock icon URL
+  const modal_close_icon = 'close-icon.png';
+  const delte_content_icon = 'delete-icon.png'; 
   let currentStepDelete = 1;
 
   const styles = {

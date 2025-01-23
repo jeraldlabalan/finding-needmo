@@ -31,7 +31,6 @@ const styles = {
   item_thumbnail: "item_thumbnail",
 };
 
-// Component Code
 const Component = ({ files, thumbnailMapping }) => (
   <div className={styles.container}>
     <div className={styles.view_content_header}>

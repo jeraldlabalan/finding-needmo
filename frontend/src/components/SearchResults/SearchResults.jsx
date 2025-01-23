@@ -16,9 +16,7 @@ import SecondHeader from "../SecondHeader/SecondHeader.jsx";
 
 function SearchResults() {
 
-  const [userEmail, setUserEmail] = useState("");
-  const [uploadedPFP, setUploadedPFP] = useState(null);
-  const [searchValue, setSearchValue] = useState("");
+
   const [userRole, setUserRole] = useState("");
   const [docx, setDocx] = useState([]);
   const [ppts, setPPTs] = useState([]);

@@ -5,15 +5,11 @@ import logo from "../../assets/logo.png";
 import calendar_icon from "../../assets/calendar-icon.png";
 import delete_search from "../../assets/close-icon-modal.png";
 import trash_icon from "../../assets/delete-content-icon.png";
-import SecondHeader from "../SecondHeader/SecondHeader";
 import Header from "../Header/Header";
 import axios from 'axios';
-import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 
 function SearchHistory() {
-  const [userEmail, setUserEmail] = useState("");
-  const [userRole, setUserRole] = useState('');
   const calendarInputRef = useRef(null);
   const [isClearSearchModalOpen, setIsClearSearchModalOpen] = useState(false);
   const [isAllModalOpen, setIsAllModalOpen] = useState(false);

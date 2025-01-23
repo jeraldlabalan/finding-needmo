@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./ProfileStudent.module.css";
 import Header from "../Header/Header";
-import default_photo from "../../assets/default-profile-photo.jpg";
 import role_icon_black from "../../assets/role-icon-black.png";
 import information_icon from "../../assets/information-icon.png";
 import modal_close_icon from "../../assets/close-icon-modal.png";
@@ -14,17 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 function ProfileStudent() {
   // Modal logic
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
-  const [isEditContentModalOpen, setIsEditContentModalOpen] = useState(false);
-  const [isAddContentModalOpen, setIsAddContentModalOpen] = useState(false);
-  const [isArchiveContentModalOpen, setIsArchiveContentModalOpen] =
-    useState(false);
-  const [isDeleteContentModalOpen, setIsDeleteContentModalOpen] =
-    useState(false);
-  const [currentStepDelete, setCurrentStepDelete] = useState(1);
-  const [currentStepArchive, setCurrentStepArchive] = useState(1);
 
-  const [csContributions, setCSContributions] = useState(0);
-  const [itContributions, setITContributions] = useState(0);
 
   const [userEmail, setUserEmail] = useState("");
   const [userColumns, setUserColumns] = useState([]);

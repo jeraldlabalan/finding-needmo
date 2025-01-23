@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from "./ContentManagement.module.css";
 import logo from "../../assets/logo.png";
 import add_content_icon from "../../assets/add-content-icon.png";
@@ -793,27 +793,7 @@ function ContentManagement() {
             </div>
           )}
 
-          {/* {confirmDeleteRows && (
-        <>
-        <p className={styles.archive_and_delete_confirmation}>
-          Are you sure you want to delete the selected contents? This action is permanent and cannot be undone.
-        </p>
-
-        <div className={styles.view_button_container}>
-          <button
-            onClick={handleDeleteSelectedRows}
-            className={`${styles.view_archived_contents_button}`}>
-            Delete
-          </button>
-
-          <button
-            onClick={()=>setConfirmDeleteRows(false)}
-            className={`${styles.view_archived_contents_button}`}>
-            Cancel
-          </button>
-        </div>
-      </>
-      )} */}
+    
           <div className={styles.search_history_content_manipulation}>
             {!isMultipleSelect ? (
               <>

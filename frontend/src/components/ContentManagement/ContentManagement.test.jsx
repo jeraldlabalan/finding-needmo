@@ -173,20 +173,7 @@ const SearchHistory = ({
 
 // Tests
 describe("Content Management Component", () => {
- {/*  it("should render profile menu with dropdown", () => {
-        render(
-          <Router>
-            <SearchHistory />
-          </Router>
-        );
-    
-        const profileIcon = screen.getByAltText("Profile Icon");
-        expect(profileIcon).toBeInTheDocument();
-    
-        fireEvent.click(profileIcon);
-        const profileMenu = screen.getByText("Profile");
-        expect(profileMenu).toBeInTheDocument();
-      });*/} 
+
 
   test("should render All and Archived buttons and handle clicks", () => {
     const handleButtonClick = jest.fn();
@@ -476,7 +463,7 @@ const AddContentModal = ({
       <div className="modal_overlay" onClick={closeAddContentModal}>
         <div
           className="modal_content"
-          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+          onClick={(e) => e.stopPropagation()}
         >
           <button
             className="close_button"
@@ -1098,7 +1085,7 @@ const DeleteContentModal = ({
       <div className="modal_overlay" onClick={closeDeleteContentModal}>
         <div
           className="archive_and_delete_content_container"
-          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="archive_and_delete_content_header">
             <button
@@ -1106,7 +1093,7 @@ const DeleteContentModal = ({
               onClick={closeDeleteContentModal}
             >
               <img
-                src="/close-icon.png" // Placeholder for the close icon
+                src="/close-icon.png" 
                 className="header_close_icon"
                 alt="close icon"
               />
@@ -1115,7 +1102,7 @@ const DeleteContentModal = ({
 
           <div className="subheader_container">
             <img
-              src="/delete-content-icon.png" // Placeholder for delete icon
+              src="/delete-content-icon.png" 
               className="subheader_icon"
               alt="delete content icon"
             />

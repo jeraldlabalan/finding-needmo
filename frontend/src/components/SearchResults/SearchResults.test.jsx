@@ -464,19 +464,6 @@ describe("Search Result Pagination", () => {
     expect(screen.getByText("No PPT files available")).toBeInTheDocument();
   });
 
-  {/** 
-  it("should switch to PDFs and render them correctly", () => {
-    render(<SearchResultPaginationComponent ppts={mockPpts} pdfs={mockPdfs} currentPage={1} totalPages={3} />);
-    fireEvent.click(screen.getByText("PDFs"));
-    expect(screen.getByText("File1.pdf")).toBeInTheDocument();
-    expect(screen.getByText("File2.pdf")).toBeInTheDocument();
-  });
-
-  it("should switch to 'Presentations' when clicking on the presentations button", () => {
-
-    expect(screen.getByText("File1.ppt")).toBeInTheDocument();
-    expect(screen.getByText("File2.ppt")).toBeInTheDocument();
-  });*/}
 
 test ("should paginate correctly when next and previous buttons are clicked", () => {
     const mockHandlePreviousPage = jest.fn();

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./Profile.module.css";
 import Header from "../Header/Header";
-import default_photo from "../../assets/default-profile-photo.jpg";
 import role_icon from "../../assets/role-icon.png";
 import information_icon from "../../assets/information-icon.png";
 import edit_icon from "../../assets/edit-icon.png";
@@ -14,9 +13,7 @@ import edit_content_icon from "../../assets/edit-content-icon.png";
 import archive_content_icon from "../../assets/archive-content-icon.png";
 import delte_content_icon from "../../assets/delete-content-icon.png";
 import file_icon_white from "../../assets/file-icon-white.png";
-import file_icon_black from "../../assets/file-icon-black.png";
 import add_file_icon from "../../assets/add-file-icon.png";
-import delete_file_icon_black from "../../assets/delete-file-icon-black.png";
 import delete_file_icon_white from "../../assets/delete-file-icon-white.png";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";

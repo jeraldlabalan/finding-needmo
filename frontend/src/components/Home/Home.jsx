@@ -4,7 +4,6 @@ import styles from "./Home.module.css";
 import Header from "../Header/Header";
 import home_logo from "../../assets/logo2.svg";
 import search_icon from "../../assets/search-icon.png";
-import download_icon from "../../assets/download_icon.png";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

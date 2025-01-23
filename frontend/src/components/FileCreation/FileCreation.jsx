@@ -75,11 +75,6 @@ function FileEditor() {
         flexDirection: "column",
       }}
     >
-      {/* <div style={{ height: '50px', background: '#f0f0f0', padding: '10px', textAlign: 'center' }}>
-                <h1>Finding NeedMo</h1>
-            </div>   */}
-            
-      {/* pati ito */}
       <div
         style={{
           display: "flex",
@@ -98,8 +93,7 @@ function FileEditor() {
           }}
           alt="This is the logo"
         />
-      </div>{" "}
-      {/* hanggang dito */}
+      </div>
 
       <div
         ref={viewerRef}

@@ -4,8 +4,6 @@ import Header from '../Header/Header'
 import styles from './CreateDocument.module.css'
 import logo from '../../assets/logo.png'
 import file_icon_black from '../../assets/file-icon-black.png'
-import file_icon_blue from '../../assets/file-icon-blue.png'
-import file_icon_yellow from '../../assets/file-icon-yellow.png'
 import delete_icon from '../../assets/delete-icon.png'
 import add_file from '../../assets/add-file.png'
 
