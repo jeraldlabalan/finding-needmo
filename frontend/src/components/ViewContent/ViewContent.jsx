@@ -18,6 +18,8 @@ import docs_thumbnail from "../../assets/file-icon-blue.png";
 import pdf_thumbnail from "../../assets/file-icon-black.png";
 import pptx_thumbnail from "../../assets/file-icon-yellow.png";
 import SecondHeader from "../SecondHeader/SecondHeader";
+import logoutFunction from "../logoutFunction.jsx";
+import { toast, ToastContainer } from "react-toastify";
 
 function ViewContent() {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -30,6 +32,7 @@ function ViewContent() {
   const [pdfs, setPDFs] = useState([]);
   const [videos, setVideos] = useState([]);
   const [audios, setAudios] = useState([]);
+  const [authorPFP, setAuthorPFP] = useState('');
 
   //Reuse in other pages that requires logging in
   const navigate = useNavigate();
@@ -61,6 +64,9 @@ function ViewContent() {
         setPDFs(res.data.pdfFiles);
         setVideos(res.data.videoFiles);
         setAudios(res.data.audioFiles);
+        const profileImageUrl = `http://localhost:8080/${res.data.results.Picture.replace(/\\/g, '/')}`;
+        setAuthorPFP(profileImageUrl);
+
       } catch (error) {
         console.error("Error occurred:", error);
         toast.error("Error getting search results", {
@@ -89,15 +95,18 @@ function ViewContent() {
     return "#000";
   };
 
+  console.log(searchRes);
+
   return (
     <div className={styles.container}>
+      <ToastContainer position="top-center" />
       <div className={styles.view_content_header}>
         <SecondHeader />
       </div>
 
       <div className={styles.content_container}>
         <div className={styles.go_back_button_container}>
-          <button className={styles.go_back_button}>
+          <button className={styles.go_back_button} onClick={() => navigate(-1)}>
             <img src={go_back} alt="go back" />
             Go Back
           </button>
@@ -107,7 +116,11 @@ function ViewContent() {
           {/* Content goes here */}
           <div className={styles.content_author_and_keywords_container}>
             <div className={styles.content_author_container}>
-              <img src={uploadedPFP} alt="Author" />
+            <img
+              src={authorPFP}
+              alt="Author"
+              style={{ width: "150px", height: "150px", borderRadius: "50%" }}
+            />
               <div className={styles.author_details}>
                 <h4>{searchRes.Firstname} {searchRes.Lastname}</h4>
                 <p style={{ color: getColor(searchRes.Program) }}>{searchRes.Program === 1 ? "Computer Science" : "Information Technology"}</p>

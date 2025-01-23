@@ -745,7 +745,7 @@ function Profile() {
               <div className={styles.content_cards}>
                 {uploadedContent.length > 0 ? (
                   uploadedContent.map((details) => (
-                    <div className={styles.card} key={details.ContentID} onClick={()=> window.open(`/view-content/${details.ContentID}`)}>
+                    <div className={styles.card} key={details.ContentID} onClick={()=> navigate(`/view-content/${details.ContentID}`)}>
                       <div className={styles.card_info}>
                         <h4 className={styles.card_title}>{details.Title}</h4>
                         <p className={styles.card_subtitle}>

@@ -335,7 +335,7 @@ function SearchResults() {
               <>
                 <div className={styles.content_container}>
                   {filteredResults.map((row, index) => (
-                    <div key={index} className={styles.main_content_body_item} onClick={()=> window.open(`/view-content/${row.ContentID}`, "_blank")}>
+                    <div key={index} className={styles.main_content_body_item} onClick={()=> navigate(`/view-content/${row.ContentID}`)}>
                       <div className={styles.upper_section}>
                         <h3>{row.Title}</h3>
                         <p>

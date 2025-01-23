@@ -24,7 +24,7 @@ router.get("/viewContentDetails/:contentID", (req, res) => {
     const { contentID } = req.params;
 
     const searchQuery = `
-    SELECT content.*, profile.Firstname, profile.Lastname, course.Title AS CourseTitle
+    SELECT content.*, profile.Firstname, profile.Lastname, profile.Picture, course.Title AS CourseTitle
     FROM content
     JOIN profile ON content.CreatedBy = profile.User
     JOIN course ON content.Course = course.CourseID
